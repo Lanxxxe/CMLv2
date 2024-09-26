@@ -120,6 +120,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
+                <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right navbar-user">

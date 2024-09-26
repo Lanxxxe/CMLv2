@@ -39,13 +39,14 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/local.css" />
-
+    <link rel="stylesheet" type="text/css" href="css/salesreport.css" />
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    
     <script src="js/datatables.min.js"></script>
-
+    
     <!-- Include SweetAlert2 CSS and JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -72,9 +73,9 @@ if (isset($_GET['delete_id'])) {
                     <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
                     <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
                     <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
-                    <li class="active"><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
+                    <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                    <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+                    <li class="active"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                     <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right navbar-user">
@@ -98,107 +99,107 @@ if (isset($_GET['delete_id'])) {
         </nav>
 
         <div id="page-wrapper">
+            <div class="sales-report-container">
+                <h1>Sales Report</h1>
 
+                <div class="sales-report-content">
+                    <?php
+                    // Fetch daily sales
+                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_pick_up) as date FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                    $stmt_daily->execute();
+                    $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
+                    $dailySales = $daily['daily_sales'] ?? 0;
+                    $dailyDate = $daily['date'] ?? date('Y-m-d');
 
-            <div class="alert alert-danger">
+                    // Fetch weekly sales
+                    $stmt_weekly = $DB_con->prepare('SELECT SUM(order_total) as weekly_sales, DATE_SUB(CURDATE(), INTERVAL 7 DAY) as start_date, CURDATE() as end_date FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()');
+                    $stmt_weekly->execute();
+                    $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
+                    $weeklySales = $weekly['weekly_sales'] ?? 0;
+                    $weeklyStartDate = $weekly['start_date'] ?? date('Y-m-d', strtotime('-7 days'));
+                    $weeklyEndDate = $weekly['end_date'] ?? date('Y-m-d');
 
-                <center>
-                    <h3><strong>Item Management</strong> </h3>
-                </center>
+                    // Fetch monthly sales
+                    $stmt_monthly = $DB_con->prepare('SELECT SUM(order_total) as monthly_sales, DATE_SUB(CURDATE(), INTERVAL 1 MONTH) as start_date, CURDATE() as end_date FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND CURDATE()');
+                    $stmt_monthly->execute();
+                    $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
+                    $monthlySales = $monthly['monthly_sales'] ?? 0;
+                    $monthlyStartDate = $monthly['start_date'] ?? date('Y-m-d', strtotime('-1 month'));
+                    $monthlyEndDate = $monthly['end_date'] ?? date('Y-m-d');
+                    ?>
 
-            </div>
-
-            <br />
-
-            <div class="table-responsive">
-                <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name of Item</th>
-                            <th>Brand Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Expiration Date</th>
-                            <th>Date Added</th>
-                            <th>Actions</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        include("config.php");
-                        $stmt = $DB_con->prepare('SELECT * FROM items');
-                        $stmt->execute();
-
-                        if ($stmt->rowCount() > 0) {
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                extract($row);
-
-                                $date = new DateTime($item_date);
-                                $date1 = new DateTime($expiration_date);
-                                $formattedDate = $date->format('F j, Y');
-                                $formattedDate1 = $date1->format('F j, Y');
-                        ?>
-                                <tr>
-                                    <td>
-                                        <center> <img src="item_images/<?php echo $item_image; ?>" class="img img-rounded" width="50" height="50" /></center>
-                                    </td>
-                                    <td><?php echo $item_name . " (" . $gl . ")" ?></td>
-                                    <td><?php echo $brand_name ?></td>
-                                    <td>&#8369; <?php echo $item_price; ?></td>
-                                    <td><?php echo $quantity . " " . $gl ?></td>
-                                    <td><?php echo $formattedDate1 ?></td>
-                                    <td><?php echo $formattedDate; ?></td>
-
-                                    <td>
-
-
-                                        <a class="btn btn-info" href="javascript:void(0)" title="Edit Item" onclick="return confirmEdit('<?php echo $row['item_id']; ?>')">
-                                            <span class='glyphicon glyphicon-pencil'></span> Edit Item
-                                        </a>
-
-                                        <a class="btn btn-danger" href="javascript:void(0)" title="Remove Item" onclick="return confirmDelete('<?php echo $row['item_id']; ?>')">
-                                            <span class='glyphicon glyphicon-trash'></span> Remove Item
-                                        </a>
-                                        <!-- <a class="btn btn-info" href="edititem.php?edit_id=<?php echo $row['item_id']; ?>" title="click for edit" onclick="return confirm('Are you sure edit this item?')"><span class='glyphicon glyphicon-pencil'></span> Edit Item</a> 
-				
-                  <a class="btn btn-danger" href="?delete_id=<?php echo $row['item_id']; ?>" title="click for delete" onclick="return confirm('Are you sure to remove this item?')"><span class='glyphicon glyphicon-trash'></span> Remove Item</a>
-				 -->
-                                    </td>
-                                </tr>
-
-                            <?php
-                            }
-                            echo "</tbody>";
-                            echo "</table>";
-                            echo "</div>";
-                            echo "<br />";
-                            echo '<div class="alert alert-default" style="background-color:#033c73;">
-                       <p style="color:white;text-align:center;">
-                       &copy 2024 CML Paint Trading Shop | All Rights Reserved 
-
-						</p>
-                        
+                    <div class="sales-report-item">
+                        <div>
+                            <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
+                            <p>Daily Sales</p>
+                            <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
+                        </div>
+                        <img src="./local_image/daily.jpeg" alt="Daily Sales">
                     </div>
-	</div>';
+                    
+                    <div class="sales-report-item">
+                        <div>
+                            <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
+                            <p>Weekly Sales</p>
+                            <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+                        </div>
+                        <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
+                    </div>
 
-                            echo "</div>";
-                        } else {
-                            ?>
+                    <div class="sales-report-item">
+                        <div>
+                            <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
+                            <p>Monthly Sales</p>
+                            <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
+                        </div>
+                        <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
+                    </div>
+                </div>
 
 
-                            <div class="col-xs-12">
-                                <div class="alert alert-warning">
-                                    <span class="glyphicon glyphicon-info-sign"></span> &nbsp; No Data Found ...
-                                </div>
-                            </div>
-                        <?php
-                        }
+                <div class="sales-report-transactions">
+                    <h2>Transactions</h2>
+                    <div class="transactions-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Products Ordered</th>
+                                    <th>Order Status</th>
+                                </tr>
+                            </thead>    
+                            <tbody>
+                                <?php
+                                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id ORDER BY orderdetails.order_pick_up DESC');
+                                $stmt->execute();
 
-                        ?>
-
+                                if ($stmt->rowCount() > 0) {
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
+                                        $productsOrdered = $row['order_name'];
+                                        $orderStatus = $row['order_status'];
+                                        ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($customerName); ?></td>
+                                            <td><?php echo htmlspecialchars($productsOrdered); ?></td>
+                                            <td><?php echo htmlspecialchars($orderStatus); ?></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                } else {
+                                    ?>
+                                    <tr>
+                                        <td colspan="3">No transactions found.</td>
+                                    </tr>
+                                    <?php
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
         </div>
 
         <br />
@@ -238,7 +239,6 @@ if (isset($_GET['delete_id'])) {
             });
             return false; // Prevent default link behavior
         }
-
 
         function confirmDelete(itemName) {
             Swal.fire({

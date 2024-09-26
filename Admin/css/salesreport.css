@@ -1,0 +1,104 @@
+/* ========================== *
+/ Sales Report
+/ ========================== *
+*/
+
+.sales-report-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    /* border: 1px solid #008CBA; */
+}
+
+h1 {
+    color: #1c1c1c;
+}
+
+.sales-report-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    /* border: 1px solid #008CBA; */
+}
+
+.sales-report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 38rem;
+    /* border: 1px solid #008CBA; */
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+}
+.sales-report-item:nth-child(1) {
+    background-color: #bfea91;
+}
+.sales-report-item:nth-child(2) {
+    background-color: #91d4ea;
+}
+.sales-report-item:nth-child(3) {
+    background-color: #cb91ea;
+}
+
+.sales-report-item p:nth-child(3) {
+    align-self: end;
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+.sales-report-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+}
+
+
+/* ========================== *
+/ Transactions
+/ ========================== *
+*/
+
+.sales-report-transactions {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 5rem;
+}
+
+.transactions-table {
+    width: 100%;
+    /* border: 1px solid #008CBA; */
+}
+
+.transactions-table table {
+    width: 100%;
+    border: 2px solid #008CBA;
+    padding: 1rem;
+}
+
+.transactions-table table tr {
+    border: 1px solid #008CBA;
+    padding: 1rem;
+}
+
+.transactions-table table tr td {
+    border: 1px solid #008CBA;
+    padding: 1rem;
+}
+
+.transactions-table table tr th {
+    border: 1px solid #008CBA;
+    padding: 1rem;
+}
+
+
