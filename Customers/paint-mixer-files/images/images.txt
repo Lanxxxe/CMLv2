@@ -1,0 +1,45 @@
+Living_Room - https://visualizecolor.blob.core.windows.net/dcpstockimages/PPG5982V/PPG5982V_Thumb.jpg
+Beedroom - https://visualizecolor.blob.core.windows.net/dcpstockimages/PPG14493B/PPG14493B_Thumb.jpg
+
+Curated Pallets images
+The retreater - https://visualizecolor.blob.core.windows.net/voc/collectionimages/retreater.jpg
+Colors: 
+rgb(230, 215, 204)
+rgb(239, 233, 217)
+rgb(217, 177, 159)
+rgb(172, 173, 173)
+rgb(172, 173, 173)
+rgb(100, 93, 94)
+rgb(176, 159, 143)
+rgb(225, 204, 166)
+
+The Dream Weaver - https://visualizecolor.blob.core.windows.net/voc/collectionimages/dream_weaver.jpg
+rgb(202, 75, 101)
+rgb(198, 187, 104)
+rgb(167, 176, 204)
+rgb(225, 168, 75)
+rgb(77, 134, 129)
+rgb(98, 78, 69)
+rgb(216, 129, 103)
+rgb(181, 142, 139)
+
+
+The Commoner - https://visualizecolor.blob.core.windows.net/voc/collectionimages/commoner.jpg
+rgb(232, 234, 230)
+rgb(45, 89, 117)
+rgb(210, 188, 155)
+rgb(172, 58, 62)
+rgb(147, 149, 129)
+rgb(79, 68, 63)
+rgb(189, 182, 174)
+rgb(167, 134, 88)
+
+The Brave - https://visualizecolor.blob.core.windows.net/voc/collectionimages/brave.jpg
+rgb(74, 67, 84)
+rgb(63, 76, 90)
+rgb(175, 138, 91)
+rgb(108, 64, 62)
+rgb(140, 123, 108)
+rgb(232, 221, 198)
+rgb(71, 79, 67)
+rgb(80, 72, 74)

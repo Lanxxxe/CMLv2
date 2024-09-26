@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+.main-container.step4-container {
+  margin: auto;
+  max-width: 1200px;
+  max-height: 800px;
+  border: 1px solid rgba(179, 179, 179, 0.514);
+  box-shadow: 0 0 10px rgba(179, 179, 179, 0.8);
+  border-radius: 2rem;
+}
+
+.step4-container .visualizer-canvas-container {
+  width: fit-content;
+}
+
+.outcome-container {
+  display: flex;
+  margin: 40px 40px;
+}
+
+.outcome-container > div:first-child {
+  margin-right: 20px;
+}
+
+.ordered-color {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+
+.ordered-color .color-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.ordered-color .color-code {
+  font-size: 12px;
+  font-weight: lighter;
+}
+
+.controls {
+  display: flex;
+}
+
+.controls > div {
+  width: 155px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.try-again {
+  background-color: #0095f8;
+  margin-right: 12px;
+}
+
+.step4-container .visualizer-canvas-container {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.step4-container .share {
+  margin: 6px 2px;
+}
+
+.step4-container .head {
+  background-color: rgb(53, 53, 53);
+  width: 100%;
+}
+
+.color-to-by {
+  overflow-y: auto;
+  height: 70%;
+}
+
+@media (max-width: 1300px) {
+  .step4-container #visualizer-canvas {
+    max-width: 600px;
+    max-height: 300px;
+    object-fit: contain;
+  }
+  .step4-container .right-bar-container {
+    width: 200px;
+  }
+
+  .step4-container .cml-button > span:first-child {
+    font-size: 16px;
+  }
+  .step4-container .cml-button > span:last-child {
+    font-size: 10px;
+  }
+  .step4-container .ordered-color>.color-name {
+    font-size: 14px;
+  }
+  .step4-container .ordered-color>.color-code {
+    font-size: 10px;
+  }
+}
