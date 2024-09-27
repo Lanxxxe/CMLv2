@@ -12,10 +12,15 @@ $receipt = "";
 // $password = "6Vk~LBYc";
 // $dbname = "u473175646_edgedata";
 
+// $servername = "localhost";
+// $username = "u736664699_123";
+// $password = "Cmlpaint2024";
+// $dbname = "u736664699_123";
+
 $servername = "localhost";
-$username = "u736664699_123";
-$password = "Cmlpaint2024";
-$dbname = "u736664699_123";
+$username = "root";
+$password = "";
+$dbname = "cml_paint_db";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

@@ -3,45 +3,45 @@ session_start();
 include("db_conection.php");
 
 $response = array();
-    $user_email = $_POST['user_email'];
-    $user_password = $_POST['user_password'];
 
-    $check_user = "SELECT * FROM users WHERE user_email='$user_email' AND user_password='$user_password'";
-    $run = mysqli_query($dbcon, $check_user);
+$user_email = $_POST['user_email'];
+$user_password = $_POST['user_password'];
 
-    if (mysqli_num_rows($run)) {
-        $row = mysqli_fetch_assoc($run);
-        $user_type = $row['type'];
-        $userid = $row['user_id'];
-        $user_firstname = $row['user_firstname'];
-        $user_lastname = $row['user_lastname'];
-        $user_address = $row['user_address'];
-        $user_mobile = $row['user_mobile'];
+$check_user = "SELECT * FROM users WHERE user_email='$user_email' AND user_password='$user_password'";
+$run = mysqli_query($dbcon, $check_user);
 
-        $_SESSION['user_id'] = $userid;    
-        $_SESSION['user_email'] = $user_email;
-        $_SESSION['admin_username'] = $user_email;
-        $_SESSION['user_firstname'] = $user_firstname;
-        $_SESSION['user_lastname'] = $user_lastname;
-        $_SESSION['user_address'] = $user_address;
-        $_SESSION['user_mobile'] = $user_mobile;
+if (mysqli_num_rows($run)) {
+    $row = mysqli_fetch_assoc($run);
+    $user_type = $row['type'];
+    $userid = $row['user_id'];
+    $user_firstname = $row['user_firstname'];
+    $user_lastname = $row['user_lastname'];
+    $user_address = $row['user_address'];
+    $user_mobile = $row['user_mobile'];
 
-        $response['status'] = 'success';
-        $response['message'] = 'You\'re successfully logged in!';
-        if ($user_type == 'Customer') {
-            $response['redirect'] = '/Customers/index.php';
-        } elseif ($user_type == 'Admin') {
-            $response['redirect'] = '/Admin/index.php';
-        } else {
-            $response['status'] = 'error';
-            $response['message'] = 'Unknown user type!';
-        }
+    $_SESSION['user_id'] = $userid;    
+    $_SESSION['user_email'] = $user_email;
+    $_SESSION['admin_username'] = $user_email;
+    $_SESSION['user_firstname'] = $user_firstname;
+    $_SESSION['user_lastname'] = $user_lastname;
+    $_SESSION['user_address'] = $user_address;
+    $_SESSION['user_mobile'] = $user_mobile;
+
+    $response['status'] = 'success';
+    $response['message'] = 'You\'re successfully logged in!';
+    if ($user_type == 'Customer') {
+        $response['redirect'] = '/Customers/index.php';
+    } elseif ($user_type == 'Admin') {
+        $response['redirect'] = '/Admin/index.php';
     } else {
         $response['status'] = 'error';
-        $response['message'] = 'Email or password is incorrect!';
+        $response['message'] = 'Unknown user type!';
     }
-
-
+} else {
+    $response['status'] = 'error';
+    $response['message'] = 'Email or password is incorrect!';
+    }
+    
 echo json_encode($response);
 exit();
 ?>

@@ -404,7 +404,7 @@ session_start();
                         </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-md btn-warning btn-block" name="user_login" type="submit">Sign In</button>
+                    <button class="btn btn-md btn-warning btn-block" name="user_login">Sign In</button>
                     <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>
@@ -473,6 +473,7 @@ session_start();
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data)
                     if (data.status === 'success') {
                         Swal.fire({
                             icon: 'success',
