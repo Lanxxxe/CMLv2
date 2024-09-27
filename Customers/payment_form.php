@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mobile = isset($_SESSION['user_mobile']) ? $_SESSION['user_mobile'] : '';
     $email = isset($_SESSION['user_email']) ? $_SESSION['user_email'] : '';
     $address = isset($_SESSION['user_address']) ? $_SESSION['user_address'] : '';
-    $amount = floatval($_POST['amount']);
+    $amount = isset($_POST['amount']) ? floatval($_POST['amount']) : NULL;
     $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : (isset($_SESSION['order_id']) ? intval($_SESSION['order_id']) : 0);
     $order_stats = 'Verification';
     $paymentType = $_POST['paymentType'];
@@ -99,7 +99,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
                             $receipt .= "<p><strong>Gcash Number:</strong> $mobile</p>";
                             $receipt .= "<p><strong>Payment Type:</strong> $pay ($paymentType)</p>";
-                            $receipt .= "<p><strong>Amount:</strong> $amount</p>";
+
+                            if ($amount != NULL) {
+                                $receipt .= "<p><strong>Amount:</strong> $amount</p>";
+                            }
                             $receipt .= "<p><strong>Order ID:</strong> $order_id</p>";
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
                             $receipt .= "<p><strong>Payment Image:</strong> <img src='$dest_path' style='width: 50px; height: 50px; object-fit: cover;' alt='Proof of Payment'></p>";
@@ -236,6 +239,7 @@ $conn->close();
             <div class="input_group">
                 <div class="input_box">
                     <select name="paymentType" required id="paymentType" class="name">
+                        <option value="" selected>Type of Payment</option>
                         <option value="Full Payment">Full Payment</option>
                         <option value="Down Payment">Down Payment</option>
                         <option value="Installment">Installment</option>
@@ -244,7 +248,7 @@ $conn->close();
                 </div>
             </div>
             <div class="input_box" id="amountInput" style="display: none;">
-                <input type="number" name="amount" placeholder="Enter Amount" required class="name">
+                <input type="number" id="amount" name="amount" placeholder="Enter Amount" class="name" required>
                 <i class="fa fa-money icon" aria-hidden="true"></i>
             </div>
 
@@ -282,8 +286,10 @@ $conn->close();
         document.getElementById('paymentType').addEventListener('change', function() {
             var paymentType = this.value;
             var amountInput = document.getElementById('amountInput');
+            var amount = document.querySelector('#amount');
             if (paymentType === 'Full Payment') {
                 amountInput.style.display = 'none';
+                amount.removeAttribute('required');
             } else {
                 amountInput.style.display = 'block';
             }

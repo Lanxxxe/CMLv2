@@ -4,6 +4,9 @@
         <?php 
             include_once("steps-navigation.php");
             include("db-connect.php");
+
+
+            
         ?>
 
         <div class="">
@@ -76,7 +79,7 @@
                                 <form class="two-column-form"  action="paint-match/checkout.php" method="POST">
                                     <input type="hidden" name="itemID" value="<?php echo htmlspecialchars($itemInformation['item_id']) ?>">
                                     <div class="form-group">
-                                        <label for="itemName">Item:</label>
+                                        <label for="itemName">Item: <?php echo htmlspecialchars($itemInformation['item_id']) ?> </label>
                                         <input readonly type="text" id="itemName" placeholder="<?php echo htmlspecialchars($itemInformation['item_name'] . " (" . $palletColors . ")") ?>"  value="<?php echo  htmlspecialchars($itemInformation['item_name'] . " (" . $palletColors . ")") ?>"  name="itemName">                                   
                                     </div>
 
@@ -110,7 +113,7 @@
                                         <label for="pickup-place">Pickup Place:</label>
                                         <select id="pickup-place" name="pickupPlace" required>
                                             <option value="" selected>Choose pickup location</option>
-                                            <option value="On the Counter">Caloocan</option>
+                                            <option value="Caloocan">Caloocan</option>
                                             <option value="Valenzuela">Valenzuela</option>
                                             <option value="Quezon City">Quezon City</option>
                                             <option value="San Jose de Monte">San Jose de Monte</option>

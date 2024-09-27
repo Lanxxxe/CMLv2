@@ -35,6 +35,13 @@ if (isset($_GET['delete_id'])) {
     $stmt_delete->bindParam(':order_id', $_GET['delete_id']);
     $stmt_delete->execute();
 
+
+    $productQuantity = $_GET['quantity'];
+    $updateStock = $DB_con->prepare("UPDATE items SET quantity = quantity + '$productQuantity' WHERE item_id = :product_id");
+
+    $updateStock->bindParam(':product_id', $_GET['product_id']);
+    $updateStock->execute();
+
     header("Location: cart_items.php");
     exit();
 }
@@ -124,7 +131,7 @@ if (isset($_GET['update_id'])) {
                                     <td>
                                         <a class="btn btn-block btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>"
                                             title="click for delete"
-                                            onclick="confirmDelete(event, <?php echo $row['order_id']; ?>)">
+                                            onclick="confirmDelete(event, <?php echo $row['order_id']; ?>, <?php echo $row['product_id'] ?>, <?php echo $row['order_quantity'] ?>)">
                                             <span class='glyphicon glyphicon-trash'></span> Remove Item
                                         </a>
                                         <!-- <a class="btn btn-block btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>" title="click for delete" onclick="return confirm('Are you sure to remove this item?')"><span class='glyphicon glyphicon-trash'></span> Remove Item</a> -->
@@ -245,7 +252,7 @@ if (isset($_GET['update_id'])) {
         }    
     </script>
     <script>
-    function confirmDelete(event, orderId) {
+    function confirmDelete(event, orderId, product_id, quantity) {
         event.preventDefault();
         
         Swal.fire({
@@ -258,7 +265,8 @@ if (isset($_GET['update_id'])) {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect or perform delete action
-                window.location.href = '?delete_id=' + orderId;
+                window.location.href = '?delete_id=' + orderId + '&product_id=' + product_id + '&quantity=' + quantity;
+                console.log(orderId);
             } else {
                 // Do nothing or handle cancel
             }

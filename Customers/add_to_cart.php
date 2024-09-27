@@ -124,6 +124,8 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                 <input class="form-control" type="hidden" name="order_price" value="<?php echo $item_price; ?>" />
                 <input class="form-control" type="hidden" name="user_id" value="<?php echo $user_id; ?>" />
                 <input class="form-control" type="hidden" name="cart" value="<?php echo $id; ?>" />
+                <input class="form-control" type="hidden" name="product_id" value="<?php echo $item_id; ?>" />
+
 
                 <table class="table table-bordered table-responsive">
                     <tr>

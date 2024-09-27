@@ -111,7 +111,15 @@ if (isset($_GET['delete_id'])) {
                     $dailyDate = $daily['date'] ?? date('Y-m-d');
 
                     // Fetch weekly sales
-                    $stmt_weekly = $DB_con->prepare('SELECT SUM(order_total) as weekly_sales, DATE_SUB(CURDATE(), INTERVAL 7 DAY) as start_date, CURDATE() as end_date FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()');
+                    $stmt_weekly = $DB_con->prepare(
+                        'SELECT SUM(order_total) as weekly_sales, 
+                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
+                                DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
+                         FROM orderdetails 
+                         WHERE DATE(order_pick_up) BETWEEN 
+                               DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)'
+                    );
                     $stmt_weekly->execute();
                     $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
                     $weeklySales = $weekly['weekly_sales'] ?? 0;
@@ -119,7 +127,15 @@ if (isset($_GET['delete_id'])) {
                     $weeklyEndDate = $weekly['end_date'] ?? date('Y-m-d');
 
                     // Fetch monthly sales
-                    $stmt_monthly = $DB_con->prepare('SELECT SUM(order_total) as monthly_sales, DATE_SUB(CURDATE(), INTERVAL 1 MONTH) as start_date, CURDATE() as end_date FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND CURDATE()');
+                    $stmt_monthly = $DB_con->prepare(
+                        'SELECT SUM(order_total) as monthly_sales, 
+                                DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
+                                LAST_DAY(CURDATE()) as end_date 
+                         FROM orderdetails 
+                         WHERE DATE(order_pick_up) BETWEEN 
+                               DATE_FORMAT(CURDATE(), "%Y-%m-01") 
+                               AND LAST_DAY(CURDATE())'
+                    );
                     $stmt_monthly->execute();
                     $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
                     $monthlySales = $monthly['monthly_sales'] ?? 0;
@@ -164,6 +180,7 @@ if (isset($_GET['delete_id'])) {
                                 <tr>
                                     <th>Customer</th>
                                     <th>Products Ordered</th>
+                                    <th>Total Payment</th>
                                     <th>Order Status</th>
                                 </tr>
                             </thead>    
@@ -177,10 +194,12 @@ if (isset($_GET['delete_id'])) {
                                         $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
                                         $productsOrdered = $row['order_name'];
                                         $orderStatus = $row['order_status'];
+                                        $totalBill = $row['order_total'];
                                         ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($customerName); ?></td>
                                             <td><?php echo htmlspecialchars($productsOrdered); ?></td>
+                                            <td><?php echo htmlspecialchars($totalBill); ?></td>
                                             <td><?php echo htmlspecialchars($orderStatus); ?></td>
                                         </tr>
                                         <?php

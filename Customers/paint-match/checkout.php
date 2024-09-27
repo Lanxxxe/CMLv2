@@ -31,8 +31,8 @@ if (isset($_POST['checkout']) || isset($_POST['addToCart']) && isset($_SESSION['
     $currentDate = date('Y-m-d');
 
     
-    $toOrderDetails = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl) 
-    VALUES (:userID, :orderName, :orderPrice, :orderQuantity, :orderTotal, :orderStatus, :orderDate, :pickupDate, :pickupPlace, :gl)";
+    $toOrderDetails = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) 
+    VALUES (:userID, :orderName, :orderPrice, :orderQuantity, :orderTotal, :orderStatus, :orderDate, :pickupDate, :pickupPlace, :gl, :product_id)";
     
     $statement = $DB_con->prepare($toOrderDetails);
     $statement->bindParam(':userID', $userID);
@@ -45,6 +45,7 @@ if (isset($_POST['checkout']) || isset($_POST['addToCart']) && isset($_SESSION['
     $statement->bindParam(':pickupDate', $itemPickupDate);
     $statement->bindParam(':pickupPlace', $location);
     $statement->bindParam(':gl', $itemSize);
+    $statement->bindParam(':product_id', $itemId);
     
 
     if ($statement->execute()){
@@ -53,6 +54,11 @@ if (isset($_POST['checkout']) || isset($_POST['addToCart']) && isset($_SESSION['
         $query = "DELETE FROM cartitems";
         $statement = $DB_con->prepare($query);
         $statement->execute();
+
+        $updateStock = "UPDATE items SET quantity = quantity - '$itemQuantity' WHERE item_id = :product_id";
+        $updateStatement = $DB_con->prepare($updateStock);
+        $updateStatement->bindParam(':product_id', $itemId);
+        $updateStatement->execute(); 
         if (isset($_POST['checkout'])) {
             header('Location: ../checkout.php?order_id=' . $orderID);
             exit();
