@@ -143,7 +143,8 @@ if (isset($_GET['delete_id'])) {
                     $monthlyEndDate = $monthly['end_date'] ?? date('Y-m-d');
                     ?>
 
-                    <div class="sales-report-item">
+                    <!-- Daily Sales Container -->
+                    <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">
                         <div>
                             <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
                             <p>Daily Sales</p>
@@ -152,7 +153,8 @@ if (isset($_GET['delete_id'])) {
                         <img src="./local_image/daily.jpeg" alt="Daily Sales">
                     </div>
                     
-                    <div class="sales-report-item">
+                    <!-- Weekly Sales Container -->
+                    <div class="sales-report-item" data-toggle="modal" data-target="#weeklySales">
                         <div>
                             <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
                             <p>Weekly Sales</p>
@@ -161,7 +163,8 @@ if (isset($_GET['delete_id'])) {
                         <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
                     </div>
 
-                    <div class="sales-report-item">
+                    <!-- Monthly Sales Container -->
+                    <div class="sales-report-item" data-toggle="modal" data-target="#monthlySales">
                         <div>
                             <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
                             <p>Monthly Sales</p>
@@ -240,6 +243,7 @@ if (isset($_GET['delete_id'])) {
     <!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>
+    <?php include_once("salesReportModal.php"); ?>
 
     <script>
         function confirmEdit(itemName) {
