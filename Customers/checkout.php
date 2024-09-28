@@ -22,7 +22,7 @@ foreach ($_POST['order_ids'] as $order_id) {
         $response['status'] = 'failed';
         $response['message'] = 'Found an invalid id! Value: ' . $order_id;
         break;
-    } else if ($response['status'] !== 'success') {
+    } else {
         $response['status'] = 'success';
         $response['message'] = 'Checkout successfully!';
     }
