@@ -342,45 +342,72 @@ session_start();
                     </button>
                     <h4 class="modal-title" id="myModalLabel">Customer Registration Form</h4>
                 </div>
-                <div class="modal-body">
-                    <form id="registerForm" role="form" method="post">
-                        <fieldset>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Firstname" name="ruser_firstname" type="text"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Lastname" name="ruser_lastname" type="text"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Address" name="ruser_address" type="text"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Email" name="ruser_email" type="email"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Password" name="ruser_password" type="password"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Gcash Number" name="ruser_mobile" type="number"
-                                    required>
-                            </div>
-                        </fieldset>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-md btn-warning btn-block" name="register">Sign Up</button>
-                    <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
-                    </form>
-                </div>
+                <form id="registerForm" role="form" method="post">
+                    <div class="modal-body">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Firstname" name="ruser_firstname" type="text"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Lastname" name="ruser_lastname" type="text"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Address" name="ruser_address" type="text"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Email" name="ruser_email" type="email"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="ruser_password" type="password"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Gcash Number" name="ruser_mobile" type="number"
+                                        required>
+                                </div>
+                            </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-md btn-warning btn-block" name="register" data-toggle="modal" data-target="#verificationModal">Sign Up</button>
+                        <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     <!-- Script -->
 
+    <div class="modal fade" id="verificationModal" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div style="color:white;background-color:#008CBA" class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Email Verification</h4>
+                </div>
+                <form id="verificationForm" role="form" method="post">
+                    <div class="modal-body">
+                            <p class="form-label text-center" for="vCode">Enter the code we sent to you email account.</p>
+                            <fieldset>
+                                <div class="form-group">
+                                    <input id="vCode" class="form-control" placeholder="Enter Verification Code" name="verification_code" maxlength="6" type="text"
+                                        required>
+                                </div>
+                            </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-md btn-warning btn-block" name="verify">Submit</button>
+                        <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Your existing HTML content -->
     <div class="modal fade" id="ln" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
@@ -420,34 +447,34 @@ session_start();
                             aria-hidden="true">&times;</span></button>
                     <h4 style="color:white" class="modal-title" id="myModalLabel">Administrator Credentials</h4>
                 </div>
-                <div class="modal-body">
+                <form role="form" method="post" action="adminlogin.php">
+                    <div class="modal-body">
 
 
-                    <form role="form" method="post" action="adminlogin.php">
-                        <fieldset>
+                            <fieldset>
 
 
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Username" name="admin_username" type="text"
-                                    required>
-                            </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Username" name="admin_username" type="text"
+                                        required>
+                                </div>
 
-                            <div class="form-group">
-                                <input class="form-control" placeholder="Password" name="admin_password" type="password"
-                                    required>
-                            </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="admin_password" type="password"
+                                        required>
+                                </div>
 
-                        </fieldset>
+                            </fieldset>
 
 
-                </div>
-                <div class="modal-footer">
+                    </div>
+                    <div class="modal-footer">
 
-                    <button class="btn btn-md btn-warning btn-block" name="admin_login">Login</button>
+                        <button class="btn btn-md btn-warning btn-block" name="admin_login">Login</button>
 
-                    <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
-                    </form>
-                </div>
+                        <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -462,7 +489,15 @@ session_start();
     <!-- FOOTER SECTION END-->
 
 
-    <script>
+        <script>
+
+        function hideModal(modalID) {
+          document.getElementById(modalID).classList.remove('show');
+          document.getElementById(modalID).style.display = 'none';
+          document.querySelector('body').classList.remove('modal-open');
+          document.querySelector('.modal-backdrop').remove();
+        }
+
         document.getElementById('loginForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -499,11 +534,8 @@ session_start();
     </script>
 
     <script>
-        // Registration form submission
-        document.getElementById('registerForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-
+        let formData = null;
+        function registerUser() {
             fetch('register.php', {
                 method: 'POST',
                 body: formData
@@ -531,6 +563,37 @@ session_start();
                     }
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        // Registration form submission
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            formData = new FormData(this);
+            hideModal('su');
+            fetch('./EmailValidation/generate_code.php', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.verification_generated) {
+                        hideModal('verificationModal');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Verification Failed',
+                            text: data.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(console.error);
+        });
+
+        document.getElementById('verificationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const vcode = this.querySelector('#vCode').value;
+            formData.append('verification_code', vcode);
+            registerUser();
         });
     </script>
 
