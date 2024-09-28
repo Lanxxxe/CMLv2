@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 
 // Initialize variables
@@ -7,16 +9,6 @@ $message = "";
 $receipt = "";
 
 // Database connection parameters
-// $servername = "127.0.0.1:3306";
-// $username = "u473175646_cmlpaint";
-// $password = "6Vk~LBYc";
-// $dbname = "u473175646_edgedata";
-
-// $servername = "localhost";
-// $username = "u736664699_123";
-// $password = "Cmlpaint2024";
-// $dbname = "u736664699_123";
-
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -30,6 +22,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
+// Retrieve order IDs from session
+$order_ids = isset($_SESSION['order_ids']) ? $_SESSION['order_ids'] : [];
+
+// Calculate total amount for all orders
+$total_amount = 0;
+foreach ($order_ids as $order_id) {
+    $stmt = $conn->prepare("SELECT order_total FROM orderdetails WHERE order_id = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $total_amount += $row['order_total'];
+    }
+    $stmt->close();
+}
+
+
 // Check if form is submitted via POST method
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Sanitize and validate input fields
@@ -38,103 +48,101 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mobile = isset($_SESSION['user_mobile']) ? $_SESSION['user_mobile'] : '';
     $email = isset($_SESSION['user_email']) ? $_SESSION['user_email'] : '';
     $address = isset($_SESSION['user_address']) ? $_SESSION['user_address'] : '';
-    $amount = isset($_POST['amount']) ? floatval($_POST['amount']) : NULL;
-    $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : (isset($_SESSION['order_id']) ? intval($_SESSION['order_id']) : 0);
+    $amount = floatval($_POST['amount']);
     $order_stats = 'Verification';
     $paymentType = $_POST['paymentType'];
     $pay = $_POST['pay'];
 
-    // Check if order_id exists in orderdetails table
-    $orderCheckQuery = "SELECT * FROM orderdetails WHERE order_id = ?";
-    $stmt = $conn->prepare($orderCheckQuery);
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Process file upload
+    if (isset($_FILES['payment_image']) && $_FILES['payment_image']['error'] == 0) {
+        $fileTmpPath = $_FILES['payment_image']['tmp_name'];
+        $fileName = $_FILES['payment_image']['name'];
+        $fileSize = $_FILES['payment_image']['size'];
+        $fileType = $_FILES['payment_image']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
 
-    if ($result->num_rows > 0) {
-        // Process file upload
-        if (isset($_FILES['payment_image']) && $_FILES['payment_image']['error'] == 0) {
-            $fileTmpPath = $_FILES['payment_image']['tmp_name'];
-            $fileName = $_FILES['payment_image']['name'];
-            $fileSize = $_FILES['payment_image']['size'];
-            $fileType = $_FILES['payment_image']['type'];
-            $fileNameCmps = explode(".", $fileName);
-            $fileExtension = strtolower(end($fileNameCmps));
+        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
+        if (in_array($fileExtension, $allowedfileExtensions)) {
+            $uploadFileDir = './uploaded_images';
 
-            $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
-            if (in_array($fileExtension, $allowedfileExtensions)) {
-                $uploadFileDir = 'uploaded_images/';
+            // Check if the directory exists, if not, create it
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0777, true);
+            }
 
-                // Check if the directory exists, if not, create it
-                if (!is_dir($uploadFileDir)) {
-                    mkdir($uploadFileDir, 0777, true);
-                }
+            $dest_path = $uploadFileDir . '/' . $fileName;
 
-                $dest_path = $uploadFileDir . $fileName;
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                $message = 'File is successfully uploaded.';
 
-                if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                    $message = 'File is successfully uploaded.';
+                // Start transaction
+                $conn->begin_transaction();
 
+                try {
                     // Insert form data into database
-                    $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt_insert->bind_param('sssssssdsi', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path, $order_id);
+                    $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt_insert->bind_param('sssssssds', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path);
 
                     if ($stmt_insert->execute()) {
-                        // Get the inserted payment ID
                         $payment_id = $stmt_insert->insert_id;
                         $stmt_insert->close();
 
-                        // Update the order details with the payment ID and status
-                        $update_sql = "UPDATE orderdetails SET payment_id = ?, order_status = ? WHERE order_id = ?";
+                        // Update all selected orders
+                        $placeholders = implode(',', array_fill(0, count($order_ids), '?'));
+                        $update_sql = "UPDATE orderdetails SET payment_id = ?, order_status = ? WHERE order_id IN ($placeholders)";
                         $stmt_update = $conn->prepare($update_sql);
-                        $stmt_update->bind_param('isi', $payment_id, $order_stats, $order_id);
+                        $params = array_merge([$payment_id, $order_stats], $order_ids);
+                        $types = str_repeat('i', count($params));
+                        $stmt_update->bind_param($types, ...$params);
+
 
                         if ($stmt_update->execute()) {
-                            $message .= ' Payment Document Successfully Submitted.';
+                            $message .= ' Payment Document Successfully Submitted for all selected orders.';
                             // Generate receipt HTML
-                            $receipt .= "<div class='receipt'>";
+                            $receipt .= "<div class=\"receipt\">";
                             $receipt .= "<h2>Payment Receipt</h2>";
                             $receipt .= "<p><strong>Name:</strong> $firstName $lastName</p>";
                             $receipt .= "<p><strong>Email:</strong> $email</p>";
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
                             $receipt .= "<p><strong>Gcash Number:</strong> $mobile</p>";
                             $receipt .= "<p><strong>Payment Type:</strong> $pay ($paymentType)</p>";
-
-                            if ($amount != NULL) {
-                                $receipt .= "<p><strong>Amount:</strong> $amount</p>";
-                            }
-                            $receipt .= "<p><strong>Order ID:</strong> $order_id</p>";
+                            $receipt .= "<p><strong>Amount:</strong> $amount</p>";
+                            $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
-                            $receipt .= "<p><strong>Payment Image:</strong> <img src='$dest_path' style='width: 50px; height: 50px; object-fit: cover;' alt='Proof of Payment'></p>";
+                            $receipt .= "<p><strong>Payment Image:</strong> <img src=\"$dest_path\" style=\"width: 50px; height: 50px; object-fit: cover;\" alt=\"Proof of Payment\"></p>";
                             $receipt .= "</div>";
                             // Add the "Shop" button after the receipt
-                            $receipt .= "<div class='input_group'>";
-                            $receipt .= "<div class='input_box'>";
-                            $receipt .= "<a href='shop.php' class='w-100 btn btn-primary'>Shop</a>";
+                            $receipt .= "<div class=\"input_group\">";
+                            $receipt .= "<div class=\"input_box\">";
+                            $receipt .= "<a href=\"shop.php\" class=\"w-100 btn btn-primary\">Shop</a>";
                             $receipt .= "</div>";
                             $receipt .= "</div>";
                         } else {
-                            $error = 'Error updating order status: ' . $conn->error;
+                            throw new Exception('Error updating order status: ' . $conn->error);
                         }
                         $stmt_update->close();
                     } else {
-                        $error = 'Error: ' . $stmt_insert->error;
+                        throw new Exception('Error: ' . $stmt_insert->error);
                     }
-                } else {
-                    $error = 'There was some error moving the file to upload directory.';
+
+                    // If we've made it this far without exceptions, commit the transaction
+                    $conn->commit();
+                } catch (Exception $e) {
+                    // An error occurred; rollback the transaction
+                    $conn->rollback();
+                    $error = $e->getMessage();
                 }
             } else {
-                $error = 'Upload failed. Allowed file types: ' . implode(',', $allowedfileExtensions);
+                $error = 'There was some error moving the file to upload directory.';
             }
         } else {
-            $error = 'There is some error in the file upload. Please check the following error.<br>';
-            $error .= 'Error:' . $_FILES['payment_image']['error'];
+            $error = 'Upload failed. Allowed file types: ' . implode(',', $allowedfileExtensions);
         }
     } else {
-        $error = "Error: order_id does not exist in orderdetails table.";
+        $error = 'There is some error in the file upload. Please check the following error.<br>';
+        $error .= 'Error:' . $_FILES['payment_image']['error'];
     }
-
-    $stmt->close();
 
     // Output response
     if (!empty($error)) {
@@ -172,10 +180,8 @@ function sanitizeInput($input)
 $conn->close();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -186,39 +192,17 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .center-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .center-content img {
-            margin-right: 10px;
-        }
-
-        .receipt {
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .receipt h2 {
-            margin-bottom: 10px;
-        }
-
-        .receipt p {
-            margin-bottom: 5px;
-        }
+        /* ... (keep your existing styles) ... */
     </style>
 </head>
-
 <body>
     <div class="wrapper">
         <h2>Payment Form</h2>
         <form action="payment_form.php" method="post" enctype="multipart/form-data">
-            <!-- Hidden input for order ID -->
-            <input type="hidden" name="order_id" value="<?php echo isset($_SESSION['order_id']) ? htmlspecialchars($_SESSION['order_id']) : ''; ?>">
+            <?php foreach ($order_ids as $order_id): ?>
+                <input type="hidden" name="order_ids[]" value="<?php echo htmlspecialchars($order_id); ?>">
+            <?php endforeach; ?>
+            
             <!-- Payment Details Start -->
             <div class="input_group">
                 <div class="input_box">
@@ -239,7 +223,6 @@ $conn->close();
             <div class="input_group">
                 <div class="input_box">
                     <select name="paymentType" required id="paymentType" class="name">
-                        <option value="" selected>Type of Payment</option>
                         <option value="Full Payment">Full Payment</option>
                         <option value="Down Payment">Down Payment</option>
                         <option value="Installment">Installment</option>
@@ -247,8 +230,8 @@ $conn->close();
                     <i class="fa fa-credit-card icon"></i>
                 </div>
             </div>
-            <div class="input_box" id="amountInput" style="display: none;">
-                <input type="number" id="amount" name="amount" placeholder="Enter Amount" class="name" required>
+            <div class="input_box" id="amountInput">
+                <input type="number" name="amount" value="<?php echo $total_amount; ?>" readonly class="name">
                 <i class="fa fa-money icon" aria-hidden="true"></i>
             </div>
 
@@ -273,7 +256,6 @@ $conn->close();
                     <a href="cart_items.php" class="w-100 btn btn-secondary">CANCEL</a>
                 </div>
             </div>
-
         </form>
 
         <!-- Receipt display area -->
@@ -286,15 +268,16 @@ $conn->close();
         document.getElementById('paymentType').addEventListener('change', function() {
             var paymentType = this.value;
             var amountInput = document.getElementById('amountInput');
-            var amount = document.querySelector('#amount');
+            var amountField = document.querySelector('input[name="amount"]');
             if (paymentType === 'Full Payment') {
-                amountInput.style.display = 'none';
-                amount.removeAttribute('required');
+                amountField.readOnly = true;
+                amountField.value = <?php echo $total_amount; ?>;
             } else {
-                amountInput.style.display = 'block';
+                amountField.readOnly = false;
+                amountField.value = '';
             }
+            amountInput.style.display = 'block';
         });
     </script>
 </body>
-
 </html>
