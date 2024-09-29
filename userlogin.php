@@ -30,9 +30,9 @@ if (mysqli_num_rows($run)) {
     $response['status'] = 'success';
     $response['message'] = 'You\'re successfully logged in!';
     if ($user_type == 'Customer') {
-        $response['redirect'] = '/Customers/index.php';
+        $response['redirect'] = './Customers/index.php';
     } elseif ($user_type == 'Admin') {
-        $response['redirect'] = '/Admin/index.php';
+        $response['redirect'] = './Admin/index.php';
     } else {
         $response['status'] = 'error';
         $response['message'] = 'Unknown user type!';
