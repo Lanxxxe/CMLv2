@@ -8,7 +8,7 @@ if (!$_SESSION['user_email']) {
 ?>
 
 <?php
-include ("config.php");
+require "config.php";
 extract($_SESSION);
 $stmt_edit = $DB_con->prepare('SELECT * FROM users WHERE user_email = :user_email');
 $stmt_edit->execute(array(':user_email' => $user_email));
@@ -19,7 +19,7 @@ if ($edit_row) {
 ?>
 
 <?php
-include ("config.php");
+require "config.php";
 $stmt_edit = $DB_con->prepare("SELECT SUM(order_total) AS total FROM orderdetails WHERE user_id = :user_id AND order_status = 'Ordered'");
 $stmt_edit->execute(array(':user_id' => $user_id));
 $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
@@ -34,13 +34,6 @@ if (isset($_GET['delete_id'])) {
     $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE order_id = :order_id');
     $stmt_delete->bindParam(':order_id', $_GET['delete_id']);
     $stmt_delete->execute();
-
-
-    $productQuantity = $_GET['quantity'];
-    $updateStock = $DB_con->prepare("UPDATE items SET quantity = quantity + '$productQuantity' WHERE item_id = :product_id");
-
-    $updateStock->bindParam(':product_id', $_GET['product_id']);
-    $updateStock->execute();
 
     header("Location: cart_items.php");
     exit();
@@ -89,7 +82,7 @@ if (isset($_GET['update_id'])) {
 
 <body>
     <div id="wrapper">
-        <?php include_once ("navigation.php") ?>
+        <?php require_once "navigation.php" ?>
         <div id="page-wrapper">
             <div class="alert alert-default" style="color:white;background-color:#008CBA">
                 <center>
@@ -111,7 +104,7 @@ if (isset($_GET['update_id'])) {
                     </thead>
                     <tbody>
                         <?php
-                        include ("config.php");
+                        require "config.php";
                         $stmt = $DB_con->prepare("SELECT * FROM orderdetails WHERE order_status = 'Pending' AND user_id = :user_id");
                         $stmt->execute(array(':user_id' => $user_id));
 
@@ -129,12 +122,14 @@ if (isset($_GET['update_id'])) {
                                     <td><?php echo $order_pick_place; ?></td>
                                     <td>&#8369; <?php echo $order_total; ?> </td>
                                     <td>
-                                        <a class="btn btn-block btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>"
-                                            title="click for delete"
-                                            onclick="confirmDelete(event, <?php echo $row['order_id']; ?>, <?php echo $row['product_id'] ?>, <?php echo $row['order_quantity'] ?>)">
-                                            <span class='glyphicon glyphicon-trash'></span> Remove Item
-                                        </a>
-                                        <!-- <a class="btn btn-block btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>" title="click for delete" onclick="return confirm('Are you sure to remove this item?')"><span class='glyphicon glyphicon-trash'></span> Remove Item</a> -->
+                                        <div style="display: flex; justify-content: center; align-items: center;">
+                                            <a style="flex: 1;" class="btn btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>"
+                                                title="click for delete"
+                                                onclick="confirmDelete(event, <?php echo $row['order_id']; ?>)">
+                                                <span class='glyphicon glyphicon-trash'></span> Remove Item
+                                            </a>
+                                        <input class="checkOrdered" style="width: 20px; height: 20px; margin-inline: 10px; margin-top: 0;" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] ?>">
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php
@@ -147,7 +142,7 @@ if (isset($_GET['update_id'])) {
                                 echo "<tr>";
                                 echo "<td colspan='5' align='right'>Total Price:";
                                 echo "</td>";
-                                echo "<td>&#8369; " . $totalx;
+                                echo "<td>&#8369; " . "<span id=\"totalPrice\">$totalx</span>";
                                 echo "</td>";
                                 echo "<td>";
                                 // Query again to get the first pending order's order_id
@@ -156,7 +151,7 @@ if (isset($_GET['update_id'])) {
                                 $row_order_id = $stmt_order_id->fetch(PDO::FETCH_ASSOC);
                                 if ($row_order_id) {
                                     $order_id = $row_order_id['order_id'];
-                                    echo "<a class='btn btn-block btn-success' href='checkout.php?order_id=" . $order_id . "'><span class='glyphicon glyphicon-'></span> CheckOut</a>";
+                                    echo "<button class='btn btn-block btn-success' id='checkOutBtn'><span class='glyphicon glyphicon-'></span> CheckOut</button>";
                                 }
                                 echo "</td>";
                                 echo "</tr>";
@@ -252,7 +247,7 @@ if (isset($_GET['update_id'])) {
         }    
     </script>
     <script>
-    function confirmDelete(event, orderId, product_id, quantity) {
+    function confirmDelete(event, orderId) {
         event.preventDefault();
         
         Swal.fire({
@@ -265,13 +260,62 @@ if (isset($_GET['update_id'])) {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect or perform delete action
-                window.location.href = '?delete_id=' + orderId + '&product_id=' + product_id + '&quantity=' + quantity;
-                console.log(orderId);
+                window.location.href = '?delete_id=' + orderId;
             } else {
                 // Do nothing or handle cancel
             }
         });
     }
+
+    const totalPrice = document.getElementById('totalPrice');
+    let formData = new FormData();
+
+    function getTotalPriceByCheck() {
+        const orders = document.querySelectorAll('.checkOrdered');
+        let total = 0;
+        for (let key of formData.keys()) {
+            formData.delete(key);
+        }
+        orders.forEach(order => {
+            const dataOrder = order.getAttribute('data-order').split(':');
+            if (order.checked) {
+                total += +dataOrder[1];
+                formData.append('order_ids[]', dataOrder[0]);
+            }
+        });
+        totalPrice.textContent = total;
+    }
+
+    document.addEventListener('click', (event) => {
+        const checkOrdered = event.target.closest('.checkOrdered');
+        if (checkOrdered) {
+            getTotalPriceByCheck();
+        }
+    });
+
+
+    document.getElementById('checkOutBtn').addEventListener('click', () => {
+        fetch('./checkout.php', {
+            method: 'post',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = './payment_form.php';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Checkout Error!',
+                            text: data.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+            })
+            .catch(console.error);
+    });
+
+    getTotalPriceByCheck();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
