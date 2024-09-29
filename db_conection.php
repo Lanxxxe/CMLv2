@@ -11,6 +11,5 @@ $dbcon=mysqli_connect("localhost","root","", "cml_paint_db");
 if (!$dbcon) {
     die("Connection failed: " . mysqli_connect_error());
 }
-echo "Connected successfully";
 
 ?>
