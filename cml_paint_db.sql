@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 28, 2024 at 03:48 PM
+-- Generation Time: Sep 29, 2024 at 06:16 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -100,7 +100,7 @@ CREATE TABLE `items` (
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`) VALUES
 (33, 'Latex Paint', 'Rain or Shine', '353368.jpg', '2024-09-28 00:00:00.000000', '2024-09-26', '100', 'Latex', 86, 'Gallon'),
-(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 141, 'Gallon');
+(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 140, 'Gallon');
 
 -- --------------------------------------------------------
 
@@ -132,7 +132,8 @@ INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, 
 (69, 8, 'Latex Paint', 100, 10, 1000, 'Confirmed', '2024-09-28', '2024-10-04 02:52:00.000000', 'Quezon City', 'Gallon', 37, 33),
 (70, 8, 'Latex Paint (Ice Cubes)', 100, 2, 200, 'Confirmed', '2024-09-27', '2024-09-27 02:53:00.000000', 'San Jose de Monte', 'Gallon', 36, 33),
 (71, 8, 'Boysen Paint', 200, 50, 10000, 'Confirmed', '2024-09-28', '2024-09-26 02:55:00.000000', 'Quezon City', 'Gallon', 38, 34),
-(72, 8, 'Boysen Paint', 200, 5, 1000, 'Pending', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', NULL, 34);
+(72, 8, 'Boysen Paint', 200, 5, 1000, 'Pending', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
+(73, 8, 'Boysen Paint', 200, 1, 200, 'Pending', '2024-09-29', '2024-10-02 02:03:00.000000', 'Valenzuela', 'Gallon', NULL, 34);
 
 -- --------------------------------------------------------
 
@@ -572,7 +573,7 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `pallets`
