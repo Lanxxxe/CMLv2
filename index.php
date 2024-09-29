@@ -395,7 +395,7 @@ session_start();
                             <p class="form-label text-center" for="vCode">Enter the code we sent to you email account.</p>
                             <fieldset>
                                 <div class="form-group">
-                                    <input id="vCode" class="form-control" placeholder="Enter Verification Code" name="verification_code" maxlength="6" type="text"
+                                    <input id="vCode" class="form-control" placeholder="Enter Verification Code" name="verification_code" maxlength="6" minlength="6" type="text"
                                         required>
                                 </div>
                             </fieldset>
