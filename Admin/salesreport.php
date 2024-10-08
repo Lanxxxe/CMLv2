@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 
 if (!$_SESSION['admin_username']) {
@@ -40,9 +42,10 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/local.css" />
     <link rel="stylesheet" type="text/css" href="css/salesreport.css" />
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <script src="js/datatables.min.js"></script>
     
@@ -50,12 +53,19 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+    <style>
+        #saveAsPDFBtn {
+            position: fixed !important;
+            top: 60px !important;
+            right: 10px !important;
+        }
+    </style>
 
 </head>
 
 <body>
     <div id="wrapper">
+        <button type="button" class="btn btn-primary" id="saveAsPDFBtn">Save as PDF</button>
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -241,9 +251,9 @@ if (isset($_GET['delete_id'])) {
 
 
     <!-- Mediul Modal -->
-    <?php include_once("uploadItems.php"); ?>
-    <?php include_once("insertBrandsModal.php"); ?>
-    <?php include_once("salesReportModal.php"); ?>
+    <?php require_once "uploadItems.php"; ?>
+    <?php require_once "insertBrandsModal.php"; ?>
+    <?php require_once "salesReportModal.php"; ?>
 
     <script>
         function confirmEdit(itemName) {
@@ -286,10 +296,23 @@ if (isset($_GET['delete_id'])) {
     </script>
 
     <script>
+        function saveAsPDF() {
+            const cmlReciept = document.querySelector('#page-wrapper');
+            const opts = {
+              margin:       0.55,
+              filename:     'sales-report.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+            html2pdf().set(opts).from(cmlReciept).save();
+        }
+
         $(document).ready(function() {
             $('#priceinput').keypress(function(event) {
                 return isNumber(event, this)
             });
+            $('#saveAsPDFBtn').click(saveAsPDF);
         });
 
         function isNumber(evt, element) {
