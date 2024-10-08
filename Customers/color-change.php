@@ -7,7 +7,6 @@ if (!empty($step) && !in_array($step, $valid_steps)) {
     header("Location: HTTP/1.0 404 Not Found");
 }
 
-
 session_start();
 
 if (!$_SESSION['user_email']) {
@@ -41,8 +40,7 @@ extract($edit_row);
 require_once 'config.php';
 
 if (isset($_GET['delete_id'])) {
-
-
+    
     $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE order_id =:order_id');
     $stmt_delete->bindParam(':order_id', $_GET['delete_id']);
     $stmt_delete->execute();
