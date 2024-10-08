@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once './sweetAlert.php';
 
 function alertError($msg)
 {
@@ -30,10 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt);
         
         if (mysqli_stmt_affected_rows($stmt) > 0) {
-            echo "<script>
-            alert('Password updated successfully!');
-            window.location.href = '../index.php';
-            </script>";
+            sweetAlert("success", "Success!", "Password updated successfully!", "OK", "../index.php");
         } else {
             alertError("Error updating password. Please try again.");
         }

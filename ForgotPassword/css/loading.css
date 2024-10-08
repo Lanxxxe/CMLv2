@@ -1,0 +1,21 @@
+.page {
+  height: 100vh;
+  width: inherit;
+}
+#loading {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(192, 192, 192, 0.5);
+  background-image: url("../images/loading.gif");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.hide {
+  display: none !important;
+}
