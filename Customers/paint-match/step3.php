@@ -1,12 +1,8 @@
 <div class="main-container step3-container border-2">
     <div class="progress-container" >
-
         <?php 
             include_once("steps-navigation.php");
             include("db-connect.php");
-
-
-            
         ?>
 
         <div class="">
@@ -21,37 +17,32 @@
                 $palletColors = '';
                 
                 $query = "SELECT * FROM items WHERE brand_name = :brand AND type = 'Latex' LIMIT 1";
-
                 $statement = $DB_con->prepare($query);
-
                 $statement->bindParam(':brand', $brand);
 
                 if ($statement->execute()) {
                     $itemInformation = $statement->fetch(PDO::FETCH_ASSOC);
 
                     if ($itemInformation) {
+                        $availableStock = $itemInformation['quantity']; // Store the available stock in a variable
                         ?>
 
-                            <div>
-                                <img src="https://down-ph.img.susercontent.com/file/f92161588cb914ccdafc5213dd758d9b" alt="Latex Paint">
-                                
-                                <div class="collected-pallet">
-                                    <?php
-                                    $query = "SELECT * FROM cartitems";
+                        <div>
+                            <img src="https://down-ph.img.susercontent.com/file/f92161588cb914ccdafc5213dd758d9b" alt="Latex Paint">
+                            
+                            <div class="collected-pallet">
+                                <?php
+                                $query = "SELECT * FROM cartitems";
+                                $statement = $DB_con->prepare($query);
+                                $statement->execute();
+                                $items = $statement->fetchAll();
 
-                                    $statement = $DB_con->prepare($query);
-
-                                    $statement->execute();
-
-                                    $items = $statement->fetchAll();
-
-                                    if (!empty($items)) {
-                                        $totalItems = count($items);
-                                        $currentIndex = 0;
-                                        
-                                        foreach($items as $order) {
+                                if (!empty($items)) {
+                                    $totalItems = count($items);
+                                    $currentIndex = 0;
+                                    
+                                    foreach($items as $order) {
                                         $currentIndex++;
-
                                         $palletColors .= htmlspecialchars($order['palletName']);
                                     
                                         if ($currentIndex < $totalItems) {
@@ -67,7 +58,6 @@
                                                 <p><?php echo $palletColors ?></p>
                                             </div>
                                         </div>
-
                                     <?php
                                         }
                                     }
@@ -76,7 +66,8 @@
                             </div>
 
                             <div class="order-Information">
-                                <form class="two-column-form"  action="paint-match/checkout.php" method="POST">
+                                <!-- Add onsubmit attribute to call checkQuantity function -->
+                                <form class="two-column-form" action="paint-match/checkout.php" method="POST" onsubmit="return checkQuantity()">
                                     <input type="hidden" name="itemID" value="<?php echo htmlspecialchars($itemInformation['item_id']) ?>">
                                     <div class="form-group">
                                         <label for="itemName">Item: <?php echo htmlspecialchars($itemInformation['item_id']) ?> </label>
@@ -85,7 +76,7 @@
 
                                     <div class="form-group">
                                         <label for="itemStock">Available Stock:</label>
-                                        <input readonly type="text" id="itemStock" placeholder="<?php echo htmlspecialchars($itemInformation['quantity']) ?>" value="<?php echo htmlspecialchars($itemInformation['quantity']) ?>" name="itemStock">
+                                        <input readonly type="text" id="itemStock" placeholder="<?php echo htmlspecialchars($availableStock) ?>" value="<?php echo htmlspecialchars($availableStock) ?>" name="itemStock">
                                     </div>
 
                                     <div class="form-group">
@@ -93,7 +84,6 @@
                                         <input readonly type="number" id="price" placeholder="<?php echo htmlspecialchars($itemInformation['item_price']) ?>" value="<?php echo htmlspecialchars($itemInformation['item_price']) ?>" name="price">
                                     </div>
 
-                                    
                                     <div class="form-group">
                                         <label for="size">Gallon/Liter:</label>
                                         <input readonly type="text" id="size" placeholder="<?php echo htmlspecialchars($itemInformation['gl']) ?>" value="<?php echo htmlspecialchars($itemInformation['gl']) ?>" name="size">
@@ -120,7 +110,6 @@
                                         </select>                        
                                     </div>                      
 
-
                                     <div class="form-buttons">
                                         <button type="submit" name="checkout" id="checkout">Proceed to Review</button>
                                         <button type="submit" name="addToCart" id="addToCart">Add to Cart</button>
@@ -130,18 +119,33 @@
                         <?php
                     } else {
                         ?>
-                        
-                            <h3 class="text-danger">Sorry, the paint you choose is out of stock</h3>
+                            <h3 class="text-danger">Sorry, the paint you chose is out of stock</h3>
                             <a href="paint-match.php?step=1">< choose other brand</a>
                         <?php
                     }
-
                 }
-                
                 ?>
-                
             </div>
         </div>
     </div>
-
 </div>
+
+<script>
+    
+// JavaScript function to check quantity before form submission
+function checkQuantity() {
+    const quantityInput = document.getElementById('quantity').value;
+    const availableStock = <?php echo json_encode($availableStock); ?>;
+
+    if (parseInt(quantityInput) > availableStock) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Stock Warning',
+            text: 'The item is currently low in stock. Plase lower the quantity you order to proceed.',
+            confirmButtonText: 'OK'
+        });       
+         return false; 
+    }
+    return true; 
+}
+</script>
