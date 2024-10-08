@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-?>
-<?php
-
 include("db_conection.php");
-
 
 
 if(isset($_POST['admin_login']))

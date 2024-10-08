@@ -30,7 +30,11 @@ if (isset($_POST['checkout']) || isset($_POST['addToCart']) && isset($_SESSION['
     $paymentStatus = 'Pending';
     $currentDate = date('Y-m-d');
 
-    
+    if ($itemQuantity > $itemStock) {
+        header('Location: ../paint-match.php');
+        exit();
+    }
+
     $toOrderDetails = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) 
     VALUES (:userID, :orderName, :orderPrice, :orderQuantity, :orderTotal, :orderStatus, :orderDate, :pickupDate, :pickupPlace, :gl, :product_id)";
     

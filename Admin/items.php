@@ -140,7 +140,23 @@ if (isset($_GET['delete_id'])) {
                                 $formattedDate = $date->format('F j, Y');
                                 $formattedDate1 = $date1->format('F j, Y');
                         ?>
-                                <tr>
+                                <tr 
+                                    style="
+                                    
+                                    background: <?php 
+                                    if ($quantity <= 30 && $quantity > 20 ) {
+                                        echo '#e7dd51; color: #000;';
+                                    }
+                                    elseif ($quantity <= 20 && $quantity > 10) {
+                                        echo '#f17d4f; color: #000;';
+                                    } elseif ($quantity <= 10 || $quantity == 0 ) {
+                                        echo '#d93434; color: #000;';
+                                    } else {
+                                        echo '#5be65b; color: #000;';
+                                    }
+                                ?>
+                                ">
+
                                     <td>
                                         <center> <img src="item_images/<?php echo $item_image; ?>" class="img img-rounded" width="50" height="50" /></center>
                                     </td>

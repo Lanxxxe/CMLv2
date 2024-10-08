@@ -10,6 +10,13 @@ body {
   padding: 5px 15px;
 }
 
+.style {
+  color: #e7dd51;
+  color: #d93434;
+  background-color: #f17d4f;
+  color: #5be65b;
+}
+
 .sui-cell {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
