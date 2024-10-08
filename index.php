@@ -431,6 +431,9 @@ session_start();
                         </fieldset>
                 </div>
                 <div class="modal-footer">
+                    <p class="text-center">
+                        <a style="color: white;" href="ForgotPassword/index.php">Forgot Password</a>
+                    </p>
                     <button class="btn btn-md btn-warning btn-block" name="user_login">Sign In</button>
                     <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
                     </form>
