@@ -36,6 +36,7 @@
                 </table>
                 </div>
                 <div class="modal-footer">
+                    <a class="btn btn-primary" href="./reports/daily.php">Save as PDF</a>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -80,6 +81,7 @@
                 </table>
             </div>
             <div class="modal-footer">
+                <a class="btn btn-primary" href="./reports/weekly.php">Save as PDF</a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -123,6 +125,7 @@
                 </table>
             </div>
             <div class="modal-footer">
+                <a class="btn btn-primary" href="./reports/monthly.php">Save as PDF</a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
