@@ -1,23 +1,29 @@
 <?php
 
-require_once './sweetAlert.php';
-
-session_start();
-$email = $_SESSION['dest_email'] ?? null;
-
-if (empty($email) && empty($_SESSION['verification'])) {
-    sweetAlert("error", "Invalid Session!",  "Please try again.", "OK", "./index.php");
-}
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php';
-require '../EmailValidation/gmail_con.php';
 
-if (isset($_SESSION['verification']['expiration']) && $_SESSION['verification']['expiration'] <= time()) {
-    echo "<script>alert('Verification Code Expired! Check email and try again.');</script>";
-    $email = $_SESSION['verification']['email'];
+try {
+    require_once './sweetAlert.php';
+
+    session_start();
+    $email = $_SESSION['dest_email'] ?? null;
+
+    if (empty($email) && empty($_SESSION['verification'])) {
+        sweetAlert("error", "Invalid Session!",  "Please try again.", "OK", "./index.php");
+    }
+
+    require '../vendor/autoload.php';
+    require '../EmailValidation/gmail_con.php';
+
+    if (isset($_SESSION['verification']['expiration']) && $_SESSION['verification']['expiration'] <= time()) {
+        sweetAlert("info", "Verification Code Expired!",  "Please Check your email and try again.", "OK");
+        $email = $_SESSION['verification']['email'];
+    }
+} catch (Exception $e) {
+    sweetAlert("error", "Ooops! Something went wrong", "Please try again later or contact support.", "OK", "./index.php");
+    include '../error_log.php';
 }
 
 if (!empty($email)) {
@@ -26,10 +32,9 @@ if (!empty($email)) {
         return substr(bin2hex(random_bytes($length)), 0, $length);
     }
 
-    $response = array();
-    $mail = new PHPMailer(true);
-
     try {
+        $response = array();
+        $mail = new PHPMailer(true);
         //Server settings
         // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
         $mail->isSMTP();                                            //Send using SMTP

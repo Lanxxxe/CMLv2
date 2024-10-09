@@ -1,43 +1,48 @@
 <?php
-session_start();
-require_once './sweetAlert.php';
+try {
+    session_start();
+    require_once './sweetAlert.php';
 
-function verifyCode()
-{
-    $verification = $_SESSION['verification'] ?? null;
+    function verifyCode()
+    {
+        $verification = $_SESSION['verification'] ?? null;
 
-    if (empty($verification)) {
-        sweetAlert("error", "Try again!", "No verification code generated!", "OK", "./verify_user.php");
+        if (empty($verification)) {
+            sweetAlert("error", "Try again!", "No verification code generated!", "OK", "./verify_user.php");
+        }
+
+        if ($verification['expiration'] <= time() ) {
+            sweetAlert("error", "Verification code expired!", "Please try again.", "OK", "./verify_user.php");
+        }
+
+        return $verification['code'] === $_POST['verification_code'];
     }
 
-    if ($verification['expiration'] <= time() ) {
-        sweetAlert("error", "Verification code expired!", "Please try again.", "OK", "./verify_user.php");
+    function generateCsrfToken()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
     }
 
-    return $verification['code'] === $_POST['verification_code'];
-}
-
-function generateCsrfToken()
-{
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    function generateRandString($length = 4)
+    {
+        return substr(bin2hex(random_bytes($length)), 0, $length);
     }
-    return $_SESSION['csrf_token'];
-}
 
-function generateRandString($length = 4)
-{
-    return substr(bin2hex(random_bytes($length)), 0, $length);
-}
-
-$s = generateRandString();
-$q = null;
-if (!verifyCode()) {
-    sweetAlert("error", "Invalid Verification Code!", "Please try again.", "OK", "./verify_user.php");
-} else {
-    $verification = $_SESSION['verification'] ?? null;
-    $_SESSION['input_verification_code'] = $_POST['verification_code'];
-    $q = $s . md5($s . $_SESSION['verification']['email']);
+    $s = generateRandString();
+    $q = null;
+    if (!verifyCode()) {
+        sweetAlert("error", "Invalid Verification Code!", "Please try again.", "OK", "./verify_user.php");
+    } else {
+        $verification = $_SESSION['verification'] ?? null;
+        $_SESSION['input_verification_code'] = $_POST['verification_code'];
+        $q = $s . md5($s . $_SESSION['verification']['email']);
+    }
+} catch (Exception $e) {
+    sweetAlert("error", "Ooops! Something went wrong", "Please try again later or contact support.", "OK", "./index.php");
+    include '../error_log.php';
 }
 ?>
 <!DOCTYPE html>
