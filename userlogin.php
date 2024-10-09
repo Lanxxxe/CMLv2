@@ -28,7 +28,7 @@ try {
         $_SESSION['user_address'] = $user_address;
         $_SESSION['user_mobile'] = $user_mobile;
         $_SESSION['user_type'] = $user_type;
-    
+    }
 
     $response['status'] = 'success';
     $response['message'] = 'You\'re successfully logged in!';
