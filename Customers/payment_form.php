@@ -341,7 +341,7 @@ $conn->close();
             const cmlReciept = document.querySelector('#cmlReciept');
             const opts = {
               margin:       0.55,
-              filename:     'sales-report.pdf',
+              filename:     'reciept.pdf',
               image:        { type: 'jpeg', quality: 0.98 },
               html2canvas:  { scale: 2 },
               jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
