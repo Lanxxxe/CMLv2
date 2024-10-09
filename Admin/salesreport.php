@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 
 if (!$_SESSION['admin_username']) {
@@ -40,9 +42,9 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/local.css" />
     <link rel="stylesheet" type="text/css" href="css/salesreport.css" />
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     
     <script src="js/datatables.min.js"></script>
     
@@ -50,12 +52,19 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
+    <style>
+        #saveAsPDFBtn {
+            position: fixed !important;
+            top: 60px !important;
+            right: 10px !important;
+        }
+    </style>
 
 </head>
 
 <body>
     <div id="wrapper">
+        <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php">Save as PDF</a>
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -227,25 +236,15 @@ if (isset($_GET['delete_id'])) {
         <br />
 
     </div>
-    </div>
-
-
-
-
-    </div>
-
-
-
-    </div>
     <!-- /#wrapper -->
 
 
     <!-- Mediul Modal -->
-    <?php include_once("uploadItems.php"); ?>
-    <?php include_once("insertBrandsModal.php"); ?>
-    <?php include_once("salesReportModal.php"); ?>
+    <?php require_once "uploadItems.php"; ?>
+    <?php require_once "insertBrandsModal.php"; ?>
+    <?php require_once "salesReportModal.php"; ?>
 
-    <script>
+    <script type="text/javascript" charset="utf-8">
         function confirmEdit(itemName) {
             Swal.fire({
                 title: 'Edit Item',
@@ -278,14 +277,10 @@ if (isset($_GET['delete_id'])) {
             });
             return false; // Prevent default link behavior
         }
-    </script>
-    <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             $('#example').dataTable();
         });
-    </script>
 
-    <script>
         $(document).ready(function() {
             $('#priceinput').keypress(function(event) {
                 return isNumber(event, this)

@@ -7,6 +7,7 @@ session_start();
 $error = "";
 $message = "";
 $receipt = "";
+$paid = false;
 
 // Database connection parameters
 $servername = "localhost";
@@ -88,33 +89,74 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $payment_id = $stmt_insert->insert_id;
                         $stmt_insert->close();
 
-                        // Update all selected orders
                         $placeholders = implode(',', array_fill(0, count($order_ids), '?'));
+
+                        // Get Orders
+                        $stmt_select = $conn->prepare(
+                            "SELECT order_name as name, SUM(order_quantity) as qty, MAX(order_price) as price
+                            FROM orderdetails WHERE order_id IN ($placeholders) GROUP BY order_name"
+                        );
+                        $types = str_repeat('i', count($order_ids));
+                        $stmt_select->bind_param($types, ...$order_ids);
+                        $stmt_select->execute();
+                        $order_list = $stmt_select->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                        // Update all selected orders
                         $update_sql = "UPDATE orderdetails SET payment_id = ?, order_status = ? WHERE order_id IN ($placeholders)";
                         $stmt_update = $conn->prepare($update_sql);
                         $params = array_merge([$payment_id, $order_stats], $order_ids);
                         $types = str_repeat('i', count($params));
                         $stmt_update->bind_param($types, ...$params);
+                        $stmt_select->close();
 
 
                         if ($stmt_update->execute()) {
+                            date_default_timezone_set('Asia/Manila');
+                            $currentDateTime = new DateTime();
+                            $formattedDateTime = $currentDateTime->format('F j, Y - h:ia');
+
                             $message .= ' Payment Document Successfully Submitted for all selected orders.';
                             // Generate receipt HTML
-                            $receipt .= "<div class=\"receipt\">";
+                            $receipt .= "<div id=\"cmlReciept\" class=\"receipt\">";
                             $receipt .= "<h2>Payment Receipt</h2>";
+                            $receipt .= "<p><strong>Date Ordered:</strong> $formattedDateTime</p>";
                             $receipt .= "<p><strong>Name:</strong> $firstName $lastName</p>";
                             $receipt .= "<p><strong>Email:</strong> $email</p>";
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
                             $receipt .= "<p><strong>Gcash Number:</strong> $mobile</p>";
-                            $receipt .= "<p><strong>Payment Type:</strong> $pay ($paymentType)</p>";
-                            $receipt .= "<p><strong>Amount:</strong> $amount</p>";
-                            $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
+                            $receipt .= "<p style=\"padding-bottom: 16px; border-bottom: 1px solid #6c757d;\"><strong>Payment Type:</strong> $pay ($paymentType)</p>";
+
+                            $receipt .= "<table style=\"width: 100%; margin-bottom: 16px;\">";
+                            $receipt .= "<thead>";
+                                $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
+                                    $receipt .= "<th style=\"padding: 4px 0;\"> Item </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\"> Quantity </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\"> Price </th>";
+                                $receipt .= "</tr>";
+                            $receipt .= "</thead>";
+                            $receipt .= "<tbody>";
+                            foreach ($order_list as $order_data) {
+                                $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
+                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['name']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['price']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['qty']} </td>";
+                                $receipt .= "</tr>";
+                            }
+                                $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
+                                    $receipt .= "<th colspan=\"2\" style=\"padding: 4px 0;\"> Total Amount </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\"> $amount </th>";
+                                $receipt .= "</tr>";
+                            $receipt .= "</tbody>";
+                            $receipt .= "</table>";
+                            // $receipt .= "<p><strong>Amount:</strong> $amount</p>";
+                            // $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
                             $receipt .= "<p><strong>Payment Image:</strong> <img src=\"$dest_path\" style=\"width: 50px; height: 50px; object-fit: cover;\" alt=\"Proof of Payment\"></p>";
                             $receipt .= "</div>";
                             // Add the "Shop" button after the receipt
                             $receipt .= "<div class=\"input_group\">";
                             $receipt .= "<div class=\"input_box\">";
+                            $receipt .= "<button style=\"margin: 10px auto;\" onclick=\"saveAsPDF()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Save as PDF</button>";
                             $receipt .= "<a href=\"shop.php\" class=\"w-100 btn btn-primary\">Shop</a>";
                             $receipt .= "</div>";
                             $receipt .= "</div>";
@@ -127,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
 
                     // If we've made it this far without exceptions, commit the transaction
-                    $conn->commit();
+                    $paid = $conn->commit();
                 } catch (Exception $e) {
                     // An error occurred; rollback the transaction
                     $conn->rollback();
@@ -146,22 +188,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Output response
     if (!empty($error)) {
+        $sError = json_encode($error);
         echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: '$error'
+                        text: $sError
                     });
                 });
               </script>";
     } elseif (!empty($message)) {
+        $sMessage = json_encode($message);
         echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
-                        text: '$message'
+                        text: $sMessage
                     }).then(function() {
                         document.getElementById('receipt').innerHTML = '$receipt';
                     });
@@ -191,12 +235,39 @@ $conn->close();
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
-        /* ... (keep your existing styles) ... */
+        .center-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .center-content img {
+            margin-right: 10px;
+        }
+
+        .receipt {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .receipt h2 {
+            margin-bottom: 10px;
+        }
+
+        .receipt p {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
+
+    <?php if (empty($receipt)) : ?>
         <h2>Payment Form</h2>
         <form action="payment_form.php" method="post" enctype="multipart/form-data">
             <?php foreach ($order_ids as $order_id): ?>
@@ -263,14 +334,27 @@ $conn->close();
                 </div>
             </div>
         </form>
-
+    <?php else: ?>
         <!-- Receipt display area -->
         <div id="receipt">
             <?php echo $receipt; ?>
         </div>
+    <?php endif; ?>
     </div>
 
     <script>
+        function saveAsPDF() {
+            const cmlReciept = document.querySelector('#cmlReciept');
+            const opts = {
+              margin:       0.55,
+              filename:     'sales-report.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opts).from(cmlReciept).save();
+        }
+
         document.getElementById('paymentType').addEventListener('change', function() {
             var paymentType = this.value;
             var amountInput = document.getElementById('amountInput');
