@@ -28,6 +28,8 @@ try {
         $_SESSION['user_address'] = $user_address;
         $_SESSION['user_mobile'] = $user_mobile;
         $_SESSION['user_type'] = $user_type;
+    } else {
+        throw new Exception('Email or password is incorrect!');
     }
 
     $response['status'] = 'success';
