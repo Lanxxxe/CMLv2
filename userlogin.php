@@ -28,16 +28,16 @@ try {
         $_SESSION['user_address'] = $user_address;
         $_SESSION['user_mobile'] = $user_mobile;
         $_SESSION['user_type'] = $user_type;
+    
 
-        $response['status'] = 'success';
-        $response['message'] = 'You\'re successfully logged in!';
-        if ($user_type == 'Customer') {
-            $response['redirect'] = './Customers/index.php';
-        } elseif ($user_type == 'Admin') {
-            $response['redirect'] = './Admin/index.php';
-        } else {
-            throw new Exception('Unknown user type!');
-        }
+    $response['status'] = 'success';
+    $response['message'] = 'You\'re successfully logged in!';
+    if ($user_type == 'Customer') {
+        $response['redirect'] = './Customers/index.php';
+    } elseif ($user_type == 'Admin') {
+        $response['redirect'] = './Admin/index.php';
+    }elseif ($user_type == 'Cashier') {
+        $response['redirect'] = './Customers/index.php';
     } else {
         throw new Exception('Email or password is incorrect!');
     }

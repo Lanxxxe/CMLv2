@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2024 at 08:19 AM
+-- Generation Time: Oct 09, 2024 at 05:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,13 +75,6 @@ CREATE TABLE `cartitems` (
   `palletRGB` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `cartitems`
---
-
-INSERT INTO `cartitems` (`itemID`, `palletName`, `palletCode`, `palletRGB`) VALUES
-(64, 'Sandy Beaches', 'BM-0244', 'rgb(254,208,158)');
-
 -- --------------------------------------------------------
 
 --
@@ -106,11 +99,11 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`) VALUES
-(27, 'Sample1', 'Boysen', '356636.png', '2024-08-16 00:00:00.000000', '2025-08-16', '300', 'Primer', 0, 'Gallon'),
-(28, 'Sample2', 'Davies', '604033.jpg', '2024-08-16 00:00:00.000000', '2025-07-02', '500', 'Oil Paint', 18, 'Gallon'),
-(29, 'Sample3', 'Rain or Shine', '954810.png', '2024-08-16 00:00:00.000000', '2027-07-14', '400', 'Primer', 12, 'Gallon'),
-(31, 'Latex Patin', 'Boysen', '52179.png', '2024-08-26 00:00:00.000000', '2024-09-06', '100', 'Latex', 99, 'Gallon'),
-(32, 'Latex Paint', 'Davies', '667842.jpg', '2024-08-31 00:00:00.000000', '2024-09-07', '100', 'Latex', 100, 'Liter');
+(33, 'Latex Paint', 'Rain or Shine', '353368.jpg', '2024-09-28 00:00:00.000000', '2024-09-26', '15', 'Latex', 90, 'Gallon'),
+(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 138, 'Gallon'),
+(35, 'Boysend', 'Boysen', '712709.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrylic', 3, 'Gallon'),
+(36, 'Latex Patin', 'Boysen', '750156.jpg', '2024-10-08 00:00:00.000000', '2024-10-22', '5000', 'Primer', 0, 'Liter'),
+(37, 'Sample Paint', 'K92', '158008.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrytex', 5, 'Liter');
 
 -- --------------------------------------------------------
 
@@ -130,8 +123,22 @@ CREATE TABLE `orderdetails` (
   `order_pick_up` datetime(6) DEFAULT NULL,
   `order_pick_place` enum('Quezon City','Caloocan','Valenzuela','San Jose de Monte') DEFAULT NULL,
   `gl` enum('Gallon','Liter') DEFAULT NULL,
-  `payment_id` int(11) DEFAULT NULL
+  `payment_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `orderdetails`
+--
+
+INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
+(69, 8, 'Latex Paint', 100, 10, 1000, 'Confirmed', '2024-09-28', '2024-10-04 02:52:00.000000', 'Quezon City', 'Gallon', 37, 33),
+(70, 8, 'Latex Paint (Ice Cubes)', 100, 2, 200, 'Confirmed', '2024-09-27', '2024-09-27 02:53:00.000000', 'San Jose de Monte', 'Gallon', 36, 33),
+(71, 8, 'Boysen Paint', 200, 50, 10000, 'Confirmed', '2024-09-28', '2024-09-26 02:55:00.000000', 'Quezon City', 'Gallon', 38, 34),
+(72, 8, 'Boysen Paint', 200, 5, 1000, '0', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', 39, 34),
+(73, 8, 'Boysen Paint', 200, 1, 200, '0', '2024-09-29', '2024-10-02 02:03:00.000000', 'Valenzuela', 'Gallon', 39, 34),
+(78, 8, 'Boysen Paint', 200, 2, 400, 'Pending', '2024-10-09', '2024-10-10 07:07:00.000000', 'Quezon City', 'Gallon', NULL, 34),
+(79, 8, 'Latex Paint', 15, 1, 15, 'Pending', '2024-10-09', '2024-10-09 07:08:00.000000', 'Caloocan', 'Gallon', NULL, 33);
 
 -- --------------------------------------------------------
 
@@ -417,6 +424,40 @@ CREATE TABLE `paymentform` (
   `payment_status` varchar(20) DEFAULT 'verification'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `paymentform`
+--
+
+INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`) VALUES
+(36, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 0.00, 'uploaded_images/SUN AND RAIN CORNSILK.PNG', '2024-09-27 18:53:35', 70, 'verification'),
+(37, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Walk In', 'Down Payment', 50.00, 'uploaded_images/SUN AND RAIN ROSE WHITE.PNG', '2024-09-27 18:54:28', 69, 'verification'),
+(38, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Walk In', 'Full Payment', 0.00, 'uploaded_images/SUN AND RAIN CORNSILK.PNG', '2024-09-27 18:57:00', 71, 'verification'),
+(39, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1200.00, './uploaded_images/SUN AND RAIN MILKY WAY.PNG', '2024-09-30 05:42:49', NULL, 'verification');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `returnitems`
+--
+
+CREATE TABLE `returnitems` (
+  `return_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `receipt_image` varchar(255) DEFAULT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `returnitems`
+--
+
+INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `product_image`, `receipt_image`, `product_name`, `status`) VALUES
+(3, 8, 'Incorrect Item', 5, 'returnItems/BAGUIO GREEN.png', 'returnItems/CLEAR GLOSS EMULSION.PNG', 'Latex Paint', 'Pending');
+
 -- --------------------------------------------------------
 
 --
@@ -431,7 +472,7 @@ CREATE TABLE `users` (
   `user_lastname` varchar(1000) NOT NULL,
   `user_address` varchar(1000) NOT NULL,
   `user_mobile` varchar(255) NOT NULL,
-  `type` enum('Customer','Admin') NOT NULL
+  `type` enum('Admin','Customer','Cashier') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -440,7 +481,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`) VALUES
 (6, 'admin@email.com', 'admin', 'admin', 'r', 'r', '09123456778', 'Admin'),
-(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer');
+(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer'),
+(17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier');
 
 --
 -- Indexes for dumped tables
@@ -494,6 +536,13 @@ ALTER TABLE `paymentform`
   ADD KEY `FK_paymentform_orderdetails` (`order_id`);
 
 --
+-- Indexes for table `returnitems`
+--
+ALTER TABLE `returnitems`
+  ADD PRIMARY KEY (`return_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -519,19 +568,19 @@ ALTER TABLE `brands`
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -543,13 +592,19 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `returnitems`
+--
+ALTER TABLE `returnitems`
+  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
@@ -567,6 +622,12 @@ ALTER TABLE `orderdetails`
 --
 ALTER TABLE `paymentform`
   ADD CONSTRAINT `FK_paymentform_orderdetails` FOREIGN KEY (`order_id`) REFERENCES `orderdetails` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `returnitems`
+--
+ALTER TABLE `returnitems`
+  ADD CONSTRAINT `returnitems_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

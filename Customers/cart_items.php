@@ -179,7 +179,8 @@ if (isset($_GET['update_id'])) {
             </div>
         </div>
     </div>
-    </div>
+</div>
+
     <!-- /#wrapper -->
     <!-- Mediul Modal -->
     <div class="modal fade" id="setAccount" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
