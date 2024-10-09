@@ -3,11 +3,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 
-if (!$_SESSION['admin_username']) {
-
-    header("Location: ../index.php");
-}
-
 ?>
 
 <?php
@@ -29,6 +24,22 @@ if (isset($_GET['delete_id'])) {
     header("Location: items.php");
 }
 
+extract($_SESSION);
+$stmt_edit = $DB_con->prepare('SELECT * FROM users WHERE user_email = :user_email');
+$stmt_edit->execute(array(':user_email' => $user_email));
+$edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
+if ($edit_row) {
+    extract($edit_row);
+}
+
+
+$stmt_edit = $DB_con->prepare("SELECT SUM(order_total) AS total FROM orderdetails WHERE user_id = :user_id AND order_status = 'Ordered'");
+$stmt_edit->execute(array(':user_id' => $user_id));
+$edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
+if ($edit_row) {
+    extract($edit_row);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +52,7 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/local.css" />
-    <link rel="stylesheet" type="text/css" href="css/salesreport.css" />
+    <link rel="stylesheet" type="text/css" href="../Admin/css/salesreport.css" />
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -64,47 +75,8 @@ if (isset($_GET['delete_id'])) {
 
 <body>
     <div id="wrapper">
-        <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php">Save as PDF</a>
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="logo-custom" src="../assets/img/logo.png" alt="" style="height: 40px; margin-left: 15px;" />
-            </div>
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
-                    <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
-                    <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
-                    <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
-                    <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
-                    <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
-                    <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                    <li class="active"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
-                    <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right navbar-user">
-                    <li class="dropdown messages-dropdown">
-                        <a href="#"><i class="fa fa-calendar"></i> <?php
-                                                                    $Today = date('y:m:d');
-                                                                    $new = date('l, F d, Y', strtotime($Today));
-                                                                    echo $new; ?></a>
-
-                    </li>
-                    <li class="dropdown user-dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?php extract($_SESSION);
-                                                                                                                echo $admin_username; ?><b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-
-                            <li><a href="logout.php"><i class="fa fa-power-off"></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="../Admin/generate_pdf.php">Save as PDF</a>
+        <?php require_once "navigation.php" ?>
 
         <div id="page-wrapper">
             <div class="sales-report-container">
@@ -159,7 +131,7 @@ if (isset($_GET['delete_id'])) {
                             <p>Daily Sales</p>
                             <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
                         </div>
-                        <img src="./local_image/daily.jpeg" alt="Daily Sales">
+                        <img src="../Admin/local_image/daily.jpeg" alt="Daily Sales">
                     </div>
                     
                     <!-- Weekly Sales Container -->
@@ -169,7 +141,7 @@ if (isset($_GET['delete_id'])) {
                             <p>Weekly Sales</p>
                             <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
                         </div>
-                        <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
+                        <img src="../Admin/local_image/weekly.jpeg" alt="Weekly Sales">
                     </div>
 
                     <!-- Monthly Sales Container -->
@@ -179,7 +151,7 @@ if (isset($_GET['delete_id'])) {
                             <p>Monthly Sales</p>
                             <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
                         </div>
-                        <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
+                        <img src="../Admin/local_image/monthly.jpeg" alt="Monthly Sales">
                     </div>
                 </div>
 
@@ -240,9 +212,7 @@ if (isset($_GET['delete_id'])) {
 
 
     <!-- Mediul Modal -->
-    <?php require_once "uploadItems.php"; ?>
-    <?php require_once "insertBrandsModal.php"; ?>
-    <?php require_once "salesReportModal.php"; ?>
+    <?php require_once "./salesReportModal.php"; ?>
 
     <script type="text/javascript" charset="utf-8">
         function confirmEdit(itemName) {

@@ -25,6 +25,7 @@
                 if ($_SESSION['user_type'] == 'Cashier'){
                     ?>
                     <li><a href="items.php"> &nbsp; <span class='fa fa-cart-plus'></span> Inventory</a></li>
+                    <li><a href="salesreport.php"> &nbsp; <span class='fa fa-cart-plus'></span> Sales Report</a></li>
                 <?php
                 }
             ?>
