@@ -12,12 +12,30 @@
         <ul class="nav navbar-nav side-nav">
             <li><a href="index.php"> &nbsp; <span class='glyphicon glyphicon-home'></span> Home</a></li>
             <li><a href="shop.php?id=1"> &nbsp; <span class='glyphicon glyphicon-shopping-cart'></span> Shop Now</a></li>
-            <li><a href="paint-match.php"> &nbsp; <span class='glyphicon glyphicon-tint'></span> Paint Match</a></li>
-            <!-- <li class=""><a href="./paint-mixer.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Paint Mixer</a></li> -->
-            <li><a href="color-change.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Color Change</a></li>
+            <?php 
+                if ($_SESSION['user_type'] != 'Cashier'){
+                ?>
+                    <li><a href="paint-match.php"> &nbsp; <span class='glyphicon glyphicon-tint'></span> Paint Match</a></li>
+                    <li><a href="color-change.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Color Change</a></li>
+                <?php
+                }
+            ?>
             <li><a href="cart_items.php"> &nbsp; <span class='fa fa-cart-plus'></span> Shopping Cart Lists</a></li>
+            <?php 
+                if ($_SESSION['user_type'] == 'Cashier'){
+                    ?>
+                    <li><a href="items.php"> &nbsp; <span class='fa fa-cart-plus'></span> Inventory</a></li>
+                <?php
+                }
+            ?>
             <li><a href="orders.php"> &nbsp; <span class='glyphicon glyphicon-list-alt'></span> My Ordered Items</a></li>
-            <li><a href="returnItemPage.php"> &nbsp; <span class='glyphicon glyphicon-remove-sign'></span> Return An Item</a></li>
+            <?php 
+                if ($_SESSION['user_type'] != 'Cashier'){
+                    ?>
+                    <li><a href="returnItemPage.php"> &nbsp; <span class='glyphicon glyphicon-remove-sign'></span> Return An Item</a></li>
+                    <?php
+                }   
+            ?>
             <!-- <li><a href="./view_purchased.php"> &nbsp; <span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a></li> -->
             <li><a data-toggle="modal" data-target="#setAccount"> &nbsp; <span class='fa fa-gear'></span> Account Settings</a></li>
             <li><a href="logout.php"> &nbsp; <span class='glyphicon glyphicon-off'></span> Logout</a></li>

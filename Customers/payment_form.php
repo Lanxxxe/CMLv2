@@ -207,8 +207,14 @@ $conn->close();
             <div class="input_group">
                 <div class="input_box">
                     <h4>Payment Details</h4>
-                    <input type="radio" name="pay" class="radio" id="bc1" value="Gcash" checked>
-                    <label for="bc1"><span><i class="fa fa-cc-visa"></i> Gcash</span></label>
+                    <?php 
+                        if ($_SESSION['user_type'] != 'Cashier'){
+                            ?>
+                            <input type="radio" name="pay" class="radio" id="bc1" value="Gcash" checked>
+                            <label for="bc1"><span><i class="fa fa-cc-visa"></i> Gcash</span></label>
+                        <?php
+                        }
+                    ?>
                     <input type="radio" name="pay" class="radio" id="bc2" value="Walk In">
                     <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Walk In</span></label>
                 </div>

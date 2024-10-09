@@ -26,6 +26,8 @@ if (mysqli_num_rows($run)) {
     $_SESSION['user_lastname'] = $user_lastname;
     $_SESSION['user_address'] = $user_address;
     $_SESSION['user_mobile'] = $user_mobile;
+    $_SESSION['user_type'] = $user_type;
+    
 
     $response['status'] = 'success';
     $response['message'] = 'You\'re successfully logged in!';
@@ -33,6 +35,8 @@ if (mysqli_num_rows($run)) {
         $response['redirect'] = './Customers/index.php';
     } elseif ($user_type == 'Admin') {
         $response['redirect'] = './Admin/index.php';
+    }elseif ($user_type == 'Cashier') {
+        $response['redirect'] = './Customers/index.php';
     } else {
         $response['status'] = 'error';
         $response['message'] = 'Unknown user type!';
