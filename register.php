@@ -41,8 +41,8 @@ try {
     // Check if the verification code is valid
     if (verifyCode()) {
         // Prepare and execute the insert statement
-        $saveaccount = "INSERT INTO users (user_email, user_password, user_firstname, user_lastname, user_address, user_mobile) 
-                        VALUES ('$user_email', '$user_password', '$user_firstname', '$user_lastname', '$user_address', '$user_mobile')";
+        $saveaccount = "INSERT INTO users (user_email, user_password, user_firstname, user_lastname, user_address, user_mobile, type) 
+                        VALUES ('$user_email', '$user_password', '$user_firstname', '$user_lastname', '$user_address', '$user_mobile', 'Customer')";
 
         if (mysqli_query($dbcon, $saveaccount)) {
             $response['status'] = 'success';
