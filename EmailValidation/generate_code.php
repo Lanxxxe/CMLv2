@@ -54,7 +54,9 @@ try {
 
 } catch (Exception $e) {
     $response['verification_code'] = false;
-    $response['message'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    $response['message'] = "Message could not be sent. Internal Server Error!";
+    // $response['message'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    include '../error_log.php';
 } finally {
     echo json_encode($response);
 }
