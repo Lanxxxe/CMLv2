@@ -1,35 +1,41 @@
 <?php
-session_start();
-unset($_SESSION['verification']);
-require_once './sweetAlert.php';
-
-if (isset($_SESSION['user_email'])) {
-    $_SESSION['dest_email'] = $_SESSION['user_email'];
-    header("Location: verify_user.php");
-    exit;
-} else if (isset($_POST['verify_email']) && isset($_POST['email'])) {
-    $email = trim(filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL));
-
-    if (empty($email)) {
-        sweetAlert("error", "Empty Email", "Email is required!", "OK", "./index.php");
+try {
+    session_start();
+    unset($_SESSION['verification']);
+    require_once './sweetAlert.php';
+    
+    if (isset($_SESSION['user_email'])) {
+        $_SESSION['dest_email'] = $_SESSION['user_email'];
+        header("Location: verify_user.php");
+        exit;
+    } else if (isset($_POST['verify_email']) && isset($_POST['email'])) {
+        $email = trim(filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL));
+    
+        if (empty($email)) {
+            sweetAlert("error", "Empty Email", "Email is required!", "OK", "./index.php");
+            exit;
+        }
+    
+        include_once '../db_conection.php';
+        $stmt = mysqli_prepare($dbcon, "SELECT user_email FROM users WHERE user_email = ?");
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+    
+        $rows = mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
+        if (!$rows) {
+            sweetAlert("error", "User not found!", "Please enter your email!", "OK", "./index.php");
+            exit;
+        }
+    
+        $_SESSION['dest_email'] = $email;
+        header("Location: verify_user.php");
         exit;
     }
-
-    include_once '../db_conection.php';
-    $stmt = mysqli_prepare($dbcon, "SELECT user_email FROM users WHERE user_email = ?");
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-
-    $rows = mysqli_stmt_fetch($stmt);
-    mysqli_stmt_close($stmt);
-    if (!$rows) {
-        sweetAlert("error", "User not found!", "Please enter your email!", "OK", "./index.php");
-        exit;
-    }
-
-    $_SESSION['dest_email'] = $email;
-    header("Location: verify_user.php");
-    exit;
+    
+} catch (Exception $e) {
+    sweetAlert("error", "Ooops! Something went wrong", "Please try again later or contact support.", "OK", "./index.php");
+    include '../error_log.php';
 }
 ?>
 <!DOCTYPE html>
