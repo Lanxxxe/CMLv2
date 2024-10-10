@@ -231,14 +231,23 @@ extract($edit_row);
 
 
             <?php
-            // $conn = mysqli_connect("127.0.0.1:3306", "u473175646_cmlpaint", "6Vk~LBYc");
-            $conn = mysqli_connect("localhost", "root", "");
+            require '../vendor/autoload.php';
+
+            use Dotenv\Dotenv;
+
+            $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+            $dotenv->load();
+
+            $dbHost = $_ENV['DB_HOST'];
+            $dbName = $_ENV['DB_NAME'];
+            $dbUser = $_ENV['DB_USER'];
+            $dbPass = $_ENV['DB_PASS'];
+
+            $conn=mysqli_connect($dbHost, $dbUser, $dbPass, $dbName);
+
             if (!$conn) {
                 die("Connection failed: " . mysqli_connect_error());
             }
-            
-            // mysqli_select_db($conn, "u473175646_edgedata") or die("Could not select database");
-            mysqli_select_db($conn, "cml_paint_db") or die("Could not select database");
 
             $start = 0;
             $limit = 8;

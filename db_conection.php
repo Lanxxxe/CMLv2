@@ -1,12 +1,17 @@
 <?php
+require 'vendor/autoload.php';
 
+use Dotenv\Dotenv;
 
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
-// $dbcon=mysqli_connect("localhost","u736664699_123","Cmlpaint2024");
+$dbHost = $_ENV['DB_HOST'];
+$dbName = $_ENV['DB_NAME'];
+$dbUser = $_ENV['DB_USER'];
+$dbPass = $_ENV['DB_PASS'];
 
-// mysqli_select_db($dbcon,"u736664699_123");
-
-$dbcon=mysqli_connect("localhost","root","", "cml_paint_db");
+$dbcon=mysqli_connect($dbHost, $dbUser, $dbPass, $dbName);
 
 if (!$dbcon) {
     die("Connection failed: " . mysqli_connect_error());

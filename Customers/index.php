@@ -20,9 +20,8 @@ function customErrorHandler($errno, $errstr, $errfile, $errline) {
 }
 
 set_error_handler("customErrorHandler");
-?>
 
-<?php
+try {
  include("config.php");
  extract($_SESSION); 
 		  $stmt_edit = $DB_con->prepare('SELECT * FROM users WHERE user_email =:user_email');
@@ -38,8 +37,11 @@ set_error_handler("customErrorHandler");
 		$stmt_edit->execute(array(':user_id'=>$user_id));
 		$edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
 		extract($edit_row);
+} catch(Exception $e) {
+    include '../error_log.php';
+}
 		
-		?>
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

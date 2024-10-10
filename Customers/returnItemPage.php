@@ -112,7 +112,7 @@ extract($edit_row);
                       $userID = $_SESSION['user_id'];
 
                       // Prepare the query to retrieve returned items based on the logged-in user
-                      $query = "SELECT product_name, reason, status FROM returnItems WHERE user_id = :user_id";
+                      $query = "SELECT product_name, reason, status FROM returnitems WHERE user_id = :user_id";
 
                       // Prepare and execute the query using PDO
                       try {
