@@ -5,7 +5,6 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 require '../vendor/autoload.php';
-require 'gmail_con.php';
 
 function generateVerificationCode($length = 6)
 {
@@ -18,6 +17,7 @@ $email = filter_input(INPUT_POST, 'ruser_email', FILTER_VALIDATE_EMAIL);
 $mail = new PHPMailer(true);
 
 try {
+    include 'gmail_con.php';
     //Server settings
     // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
     $mail->isSMTP();                                            //Send using SMTP

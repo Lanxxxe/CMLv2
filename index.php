@@ -19,6 +19,25 @@ session_start();
     <link href="assets/css/style.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        #loading {
+          display: flex;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(192, 192, 192, 0.5);
+          background-image: url("ForgotPassword/images/loading.gif");
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+
+        .hide {
+          display: none !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -372,7 +391,7 @@ session_start();
                             </fieldset>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-md btn-warning btn-block" name="register" data-toggle="modal" data-target="#verificationModal">Sign Up</button>
+                        <button type="submit" class="btn btn-md btn-warning btn-block" name="register">Sign Up</button>
                         <button type="button" class="btn btn-md btn-success btn-block" data-dismiss="modal">Cancel</button>
                     </div>
                 </form>
@@ -491,8 +510,33 @@ session_start();
     </div>
     <!-- FOOTER SECTION END-->
 
+    <div id="loading" class="hide"></div>
+    <!--  Jquery Core Script -->
+    <script src="assets/js/jquery-1.10.2.js"></script>
+    <!--  Core Bootstrap Script -->
+    <script src="assets/js/bootstrap.js"></script>
+    <!--  Flexslider Scripts -->
+    <script src="assets/js/jquery.flexslider.js"></script>
+    <!--  Scrolling Reveal Script -->
+    <script src="assets/js/scrollReveal.js"></script>
+    <!--  Scroll Scripts -->
+    <script src="assets/js/jquery.easing.min.js"></script>
+    <!--  Custom Scripts -->
+    <script src="assets/js/custom.js"></script>
 
-        <script>
+
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const setVisible = (elementOrSelector, visible) => {
+          const element = document.querySelector(elementOrSelector);
+          if (visible) {
+            element.classList.remove("hide");
+          } else {
+            element.classList.add("hide");
+          }
+        };
 
         function hideModal(modalID) {
           document.getElementById(modalID).classList.remove('show');
@@ -533,9 +577,7 @@ session_start();
                 })
                 .catch(error => console.error('Error:', error));
         });
-    </script>
 
-    <script>
         let formData = null;
         function registerUser() {
             fetch('register.php', {
@@ -571,6 +613,7 @@ session_start();
         document.getElementById('registerForm').addEventListener('submit', function (event) {
             event.preventDefault();
             formData = new FormData(this);
+            setVisible("#loading", true);
             hideModal('su');
             fetch('./EmailValidation/generate_code.php', {
                 method: 'POST',
@@ -579,14 +622,16 @@ session_start();
                 .then(response => response.json())
                 .then(data => {
                     if (!data.verification_generated) {
-                        hideModal('verificationModal');
                         Swal.fire({
                             icon: 'error',
                             title: 'Verification Failed',
                             text: data.message,
                             confirmButtonText: 'OK'
                         });
+                    } else {
+                        $('#verificationModal').modal('show');
                     }
+                    setVisible("#loading", false);
                 })
                 .catch(console.error);
         });
@@ -597,11 +642,6 @@ session_start();
             formData.append('verification_code', vcode);
             registerUser();
         });
-    </script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
         var shopNowBtns = document.getElementsByClassName('shopNowBtn'); // Get all elements with class 'shopNowBtn'
 
         // Loop through each button in the collection
@@ -630,21 +670,6 @@ session_start();
         });
     });
 </script>
-
-
-
-    <!--  Jquery Core Script -->
-    <script src="assets/js/jquery-1.10.2.js"></script>
-    <!--  Core Bootstrap Script -->
-    <script src="assets/js/bootstrap.js"></script>
-    <!--  Flexslider Scripts -->
-    <script src="assets/js/jquery.flexslider.js"></script>
-    <!--  Scrolling Reveal Script -->
-    <script src="assets/js/scrollReveal.js"></script>
-    <!--  Scroll Scripts -->
-    <script src="assets/js/jquery.easing.min.js"></script>
-    <!--  Custom Scripts -->
-    <script src="assets/js/custom.js"></script>
 
 
 
