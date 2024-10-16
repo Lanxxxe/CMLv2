@@ -26,19 +26,14 @@ try {
         return $_SESSION['csrf_token'];
     }
 
-    function generateRandString($length = 4)
-    {
-        return substr(bin2hex(random_bytes($length)), 0, $length);
-    }
 
-    $s = generateRandString();
     $q = null;
     if (!verifyCode()) {
         sweetAlert("error", "Invalid Verification Code!", "Please try again.", "OK", "./verify_user.php");
     } else {
         $verification = $_SESSION['verification'] ?? null;
         $_SESSION['input_verification_code'] = $_POST['verification_code'];
-        $q = $s . md5($s . $_SESSION['verification']['email']);
+        $q = $_SESSION['verification']['email'];
     }
 } catch (Exception $e) {
     sweetAlert("error", "Ooops! Something went wrong", "Please try again later or contact support.", "OK", "./index.php");

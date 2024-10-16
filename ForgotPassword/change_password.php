@@ -21,14 +21,9 @@ try {
                 alertError("Password and Confirm password doesn't match!");
             }
             $q = filter_input(INPUT_POST, 'q', FILTER_SANITIZE_SPECIAL_CHARS);
-            if (empty($q) || strlen($q) <= 4) {
-                alertError("Invalid user key! Please try again.");
-            }
 
-            $salt = mysqli_escape_string($dbcon, substr($q, 0, 4));
-            $userkey = substr($q, 4);
-            $stmt = mysqli_prepare($dbcon, "UPDATE users SET user_password = ? WHERE md5(concat('$salt', user_email)) = ?");
-            mysqli_stmt_bind_param($stmt, "ss", $password, $userkey);
+            $stmt = mysqli_prepare($dbcon, "UPDATE users SET user_password = ? WHERE user_email = ?");
+            mysqli_stmt_bind_param($stmt, "ss", $password, $q);
             mysqli_stmt_execute($stmt);
             
             if (mysqli_stmt_affected_rows($stmt) > 0) {
