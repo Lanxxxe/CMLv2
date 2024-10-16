@@ -343,6 +343,18 @@ if (isset($_GET['update_id'])) {
         }
     }
 
+    function toggleBtns() {
+        const orders = document.querySelectorAll('.checkOrdered');
+        const anyCheked = Array.from(orders).some(order => order.checked);
+        if (anyCheked) {
+            unselectAllBtn.style.visibility = 'visible';
+            removeSelectedBtn.disabled = false;
+        } else {
+            unselectAllBtn.style.visibility = 'hidden';
+            removeSelectedBtn.disabled = true;
+        }
+    };
+    toggleBtns();
     document.addEventListener('click', (event) => {
         const _unselectAllBtn = event.target.closest('#unselectAllBtn');
         if (_unselectAllBtn) {
@@ -359,13 +371,7 @@ if (isset($_GET['update_id'])) {
             checkAllBtn.checked = getTotalPriceByCheck();
         }
 
-        const orders = document.querySelectorAll('.checkOrdered');
-        if (Array.from(orders).some(order => order.checked)) {
-            unselectAllBtn.style.visibility = 'visible';
-        } else {
-            unselectAllBtn.style.visibility = 'hidden';
-        }
-
+        toggleBtns();
     });
 
 
