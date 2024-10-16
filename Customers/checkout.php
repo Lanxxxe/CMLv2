@@ -4,7 +4,7 @@ session_start();
 $user_id = $_SESSION['user_id'];
 require "config.php";
 
-$stmt = $DB_con->prepare("SELECT * FROM orderdetails WHERE order_status = 'Pending' AND user_id = :user_id");
+$stmt = $DB_con->prepare("SELECT * FROM orderdetails WHERE user_id = :user_id");
 $stmt->execute(array(':user_id' => $user_id));
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -78,6 +78,25 @@ if (isset($_GET['update_id'])) {
     <link rel="stylesheet" type="text/css" href="css/local.css" />
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <style>
+        .last-column {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .all-checkbtn {
+            justify-content: end;
+            align-items: center;
+        }
+        .all-checkbtn #checkAllBtn {
+            align-self: end;
+            width: 20px;
+            height: 20px;
+            margin-inline: 10px;
+            position: relative;
+            top: 4px;
+        }
+    </style>
 </head>
 
 <body>
@@ -99,7 +118,15 @@ if (isset($_GET['update_id'])) {
                             <th>Pick Up Date</th>
                             <th>Pick Up Place</th>
                             <th>Total</th>
-                            <th>Actions</th>
+                            <th>
+                                <div class="last-column">
+                                    <span>Actions</span>
+                                    <span class="all-checkbtn">
+                                        All
+                                        <input id="checkAllBtn" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] ?>">
+                                    </span>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -144,15 +171,17 @@ if (isset($_GET['update_id'])) {
                                 echo "</td>";
                                 echo "<td>&#8369; " . "<span id=\"totalPrice\">$totalx</span>";
                                 echo "</td>";
-                                echo "<td>";
+                                echo "<td style='display: flex; justify-content: center; align-items: center;'>";
                                 // Query again to get the first pending order's order_id
                                 $stmt_order_id = $DB_con->prepare("SELECT order_id FROM orderdetails WHERE user_id = :user_id AND order_status = 'Pending' LIMIT 1");
                                 $stmt_order_id->execute(array(':user_id' => $user_id));
                                 $row_order_id = $stmt_order_id->fetch(PDO::FETCH_ASSOC);
                                 if ($row_order_id) {
                                     $order_id = $row_order_id['order_id'];
-                                    echo "<button class='btn btn-block btn-success' id='checkOutBtn'><span class='glyphicon glyphicon-'></span> CheckOut</button>";
+                                    echo "<button style='flex: 1;' class='btn btn-success flex' id='checkOutBtn'><span class='glyphicon glyphicon-'></span> CheckOut</button>";
                                 }
+                                echo "<button id='removeSelectedBtn' style='margin-inline: 7px;' class='btn btn-danger'><span class='glyphicon glyphicon-trash'></span></button>";
+                                echo "<button id='unselectAllBtn' class='btn' style='background-color: transparent; visibility: hidden; color: gray;'><span class='glyphicon glyphicon-remove'></span></button>";
                                 echo "</td>";
                                 echo "</tr>";
                             }
@@ -269,11 +298,16 @@ if (isset($_GET['update_id'])) {
     }
 
     const totalPrice = document.getElementById('totalPrice');
+    const checkAllBtn = document.getElementById('checkAllBtn');
+    const unselectAllBtn = document.getElementById('unselectAllBtn');
+    const removeSelectedBtn = document.getElementById('removeSelectedBtn');
+
     let formData = new FormData();
 
     function getTotalPriceByCheck() {
         const orders = document.querySelectorAll('.checkOrdered');
         let total = 0;
+        let allBtnChecked = true;
         for (let key of formData.keys()) {
             formData.delete(key);
         }
@@ -282,16 +316,56 @@ if (isset($_GET['update_id'])) {
             if (order.checked) {
                 total += +dataOrder[1];
                 formData.append('order_ids[]', dataOrder[0]);
+            } else {
+                allBtnChecked = false;
             }
         });
         totalPrice.textContent = total;
+        return allBtnChecked;
+    }
+
+    function unselectAllBtnF() {
+        const orders = document.querySelectorAll('.checkOrdered');
+        orders.forEach(order => {
+            order.checked = false;
+        });
+        checkAllBtn.checked = false;
+    }
+
+    function checkAllCheckBtn() {
+        if (checkAllBtn.checked) {
+            const orders = document.querySelectorAll('.checkOrdered');
+            orders.forEach(order => {
+                order.checked = true;
+            });
+        } else {
+            unselectAllBtnF();
+        }
     }
 
     document.addEventListener('click', (event) => {
+        const _unselectAllBtn = event.target.closest('#unselectAllBtn');
+        if (_unselectAllBtn) {
+            unselectAllBtnF();
+        }
+
+        const _checkAllBtn = event.target.closest('#checkAllBtn');
+        if (_checkAllBtn) {
+            checkAllCheckBtn();
+        }
+
         const checkOrdered = event.target.closest('.checkOrdered');
         if (checkOrdered) {
-            getTotalPriceByCheck();
+            checkAllBtn.checked = getTotalPriceByCheck();
         }
+
+        const orders = document.querySelectorAll('.checkOrdered');
+        if (Array.from(orders).some(order => order.checked)) {
+            unselectAllBtn.style.visibility = 'visible';
+        } else {
+            unselectAllBtn.style.visibility = 'hidden';
+        }
+
     });
 
 
@@ -314,6 +388,41 @@ if (isset($_GET['update_id'])) {
                     }
             })
             .catch(console.error);
+    });
+
+    removeSelectedBtn.addEventListener('click', () => {
+        for (const n of formData.values()) {
+            console.log(n);
+        }
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: 'You are about to remove the selected items!',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch('./delete_cart_item.php', {
+                    method: 'post',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                        if(data.status === 'success'){
+                            window.location.reload();
+                        }else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to remove items!',
+                                text: data.message,
+                                confirmButtonText: 'OK'
+                            });
+                    }
+                })
+                .catch(console.error);
+            }
+        })
     });
 
     getTotalPriceByCheck();
