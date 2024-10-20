@@ -34,9 +34,14 @@ $stmt_verification = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetail
 $stmt_verification->execute();
 $total_verification = $stmt_verification->fetch(PDO::FETCH_ASSOC)['total'];
 
+$stmt_return = $DB_con->prepare('SELECT COUNT(*) AS total FROM  returnitems WHERE status = "Confirmed"');
+$stmt_return->execute();
+$returnItems = $stmt_return->fetch(PDO::FETCH_ASSOC)['total'];
+
 $stmt_rejected = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status = "Rejected"');
 $stmt_rejected->execute();
 $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
+
 ?>
 
 <!DOCTYPE html>
@@ -158,6 +163,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             </div>
             <div class="dashboard-circle danger">
                 <div style="text-align:center">Rejected<br><?php echo $total_rejected; ?></div>
+            </div>
+            <div class="dashboard-circle primary">
+                <div style="text-align:center">Return Items<br><?php echo $returnItems; ?></div>
             </div>
             <div class="dashboard-circle success">
                 <div style="text-align:center">Total Confirmed Sum<br>&#8369; <?php echo number_format($total_sum_confirmed, 2); ?></div>

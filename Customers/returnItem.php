@@ -43,7 +43,7 @@ if (isset($_SESSION['user_email']) && isset($_POST['returnItem'])) {
 
     // Insert data into the database using PDO
     try {
-        $sql = "INSERT INTO returnItems (user_id, product_name, reason, quantity, product_image, receipt_image, status)
+        $sql = "INSERT INTO returnitems (user_id, product_name, reason, quantity, product_image, receipt_image, status)
                 VALUES (:user_id, :product_name ,:reason, :quantity, :product_image, :receipt_image, :status)";
 
         $stmt = $DB_con->prepare($sql);
