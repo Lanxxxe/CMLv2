@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $update_sql = "UPDATE orderdetails SET payment_id = ?, order_status = ? WHERE order_id IN ($placeholders)";
                         $stmt_update = $conn->prepare($update_sql);
                         $params = array_merge([$payment_id, $order_stats], $order_ids);
-                        $types = str_repeat('i', count($params));
+                        $types = 'is' . str_repeat('i', count($order_ids));
                         $stmt_update->bind_param($types, ...$params);
                         $stmt_select->close();
 

@@ -18,6 +18,12 @@ $options = new Options();
 $options->set('defaultFont', 'DejaVu Sans');
 $dompdf = new Dompdf($options);
 
+
+$order_type = $_GET['order_type'] ?? null;
+if ($order_type !== 'walk_in' && $order_type !== 'gcash') {
+    $order_type = null;
+}
+
 // Start output buffering to capture HTML
 ob_start();
 ?>
@@ -82,8 +88,20 @@ ob_start();
 
                 <div class="sales-report-content">
                     <?php
+                        $order_type_str = '';
+                        if (isset($order_type)) {
+                            if($order_type === 'walk_in') {
+                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                            } else if($order_type === 'gcash') {
+                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                            }
+                        }
                     // Fetch daily sales
-                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_pick_up) as date FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                    $stmt_daily = $DB_con->prepare(
+                        'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                        FROM orderdetails
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                        WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
                     $stmt_daily->execute();
                     $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
                     $dailySales = $daily['daily_sales'] ?? 0;
@@ -95,9 +113,10 @@ ob_start();
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)'
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
                     );
                     $stmt_weekly->execute();
                     $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
@@ -111,9 +130,10 @@ ob_start();
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
                                 LAST_DAY(CURDATE()) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                               AND LAST_DAY(CURDATE())'
+                               AND LAST_DAY(CURDATE())' . $order_type_str
                     );
                     $stmt_monthly->execute();
                     $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);

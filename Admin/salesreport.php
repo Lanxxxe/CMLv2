@@ -29,6 +29,11 @@ if (isset($_GET['delete_id'])) {
     header("Location: items.php");
 }
 
+$order_type = $_GET['order_type'] ?? null;
+if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gcash') {
+    $order_type = null;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,10 +58,40 @@ if (isset($_GET['delete_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        #filterTab {
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 50px;
+            background: #333;
+            border-radius: 0;
+            width: calc(100% - 225px);
+        }
+        #filterTab .mnav {
+            padding: 5px 20px;
+            border: none;
+            font-size: 18px;
+            margin-right: 2px;
+            background: #f2f2f2;
+            border-radius: 5px;
+            color: #0f0f0f;
+        }
+        #filterTab .mnav:first-child {
+            margin-left: 5px;
+        }
         #saveAsPDFBtn {
-            position: fixed !important;
-            top: 60px !important;
-            right: 10px !important;
+            margin-left: auto;
+        }
+        .sales-report-container {
+            margin-top: 50px;
+        }
+        #filterTab .activeFilterTab {
+            background: gray;
+            color: white;
+        }
+        #filterTab .mnav:hover:not(.activeFilterTab) {
+            color: gray;
+            transition: all 300ms;
         }
     </style>
 
@@ -64,7 +99,6 @@ if (isset($_GET['delete_id'])) {
 
 <body>
     <div id="wrapper">
-        <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php">Save as PDF</a>
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -106,14 +140,34 @@ if (isset($_GET['delete_id'])) {
             </div>
         </nav>
 
+        <nav id="filterTab" class="navbar navbar-inverse">
+            <a class="btn mnav <?php echo ($order_type !== 'walk_in' && $order_type !== 'gcash')? 'activeFilterTab' : '' ?>" href="./salesreport.php">All</a>
+            <a class="btn mnav <?php echo ($order_type === 'walk_in')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=walk_in">Walk In</a>
+            <a class="btn mnav <?php echo ($order_type === 'gcash')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=gcash">Gcash</a>
+            <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
+        </nav>
         <div id="page-wrapper">
             <div class="sales-report-container">
                 <h1>Sales Report</h1>
 
                 <div class="sales-report-content">
                     <?php
+                        $order_type_str = '';
+                        if (isset($order_type)) {
+                            if($order_type === 'walk_in') {
+                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                            } else if($order_type === 'gcash') {
+                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                            }
+                        }
+
                     // Fetch daily sales
-                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_pick_up) as date FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                        $stmt_daily = $DB_con->prepare(
+                        'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                        FROM orderdetails
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                        WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
+
                     $stmt_daily->execute();
                     $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
                     $dailySales = $daily['daily_sales'] ?? 0;
@@ -125,9 +179,10 @@ if (isset($_GET['delete_id'])) {
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)'
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
                     );
                     $stmt_weekly->execute();
                     $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
@@ -141,9 +196,10 @@ if (isset($_GET['delete_id'])) {
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
                                 LAST_DAY(CURDATE()) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                               AND LAST_DAY(CURDATE())'
+                               AND LAST_DAY(CURDATE())' . $order_type_str
                     );
                     $stmt_monthly->execute();
                     $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);

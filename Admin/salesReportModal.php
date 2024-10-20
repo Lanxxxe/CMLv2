@@ -21,7 +21,11 @@
                     <tbody>
                         <?php
                         // Fetch daily transactions
-                        $stmt_daily = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                        $stmt_daily = $DB_con->prepare(
+                            'SELECT orderdetails.* 
+                            FROM orderdetails
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
                         $stmt_daily->execute();
                         while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
@@ -36,7 +40,7 @@
                 </table>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-primary" href="./reports/daily.php">Save as PDF</a>
+                    <a class="btn btn-primary" href="./reports/daily.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -66,7 +70,16 @@
                     <tbody>
                         <?php
                         // Fetch weekly transactions
-                        $stmt_weekly = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND CURDATE()');
+                        $stmt_weekly = $DB_con->prepare(
+                        'SELECT orderdetails.*,
+                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
+                                DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
+                         FROM orderdetails 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
+                               DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
+                        );
                         $stmt_weekly->execute();
                         while ($row = $stmt_weekly->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
@@ -81,7 +94,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-primary" href="./reports/weekly.php">Save as PDF</a>
+                <a class="btn btn-primary" href="./reports/weekly.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -110,7 +123,16 @@
                     <tbody>
                         <?php
                         // Fetch monthly transactions
-                        $stmt_monthly = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_pick_up) BETWEEN DATE_FORMAT(CURDATE(), "%Y-%m-01") AND LAST_DAY(CURDATE())');
+                        $stmt_monthly = $DB_con->prepare(
+                        'SELECT orderdetails.*,
+                                DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
+                                LAST_DAY(CURDATE()) as end_date 
+                         FROM orderdetails 
+                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                         WHERE DATE(order_date) BETWEEN 
+                               DATE_FORMAT(CURDATE(), "%Y-%m-01") 
+                               AND LAST_DAY(CURDATE())' . $order_type_str
+                        );
                         $stmt_monthly->execute();
                         while ($row = $stmt_monthly->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
@@ -125,7 +147,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-primary" href="./reports/monthly.php">Save as PDF</a>
+                <a class="btn btn-primary" href="./reports/monthly.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>

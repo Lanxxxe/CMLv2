@@ -364,6 +364,7 @@ if (isset($_GET['update_id'])) {
         const _checkAllBtn = event.target.closest('#checkAllBtn');
         if (_checkAllBtn) {
             checkAllCheckBtn();
+            checkAllBtn.checked = getTotalPriceByCheck();
         }
 
         const checkOrdered = event.target.closest('.checkOrdered');

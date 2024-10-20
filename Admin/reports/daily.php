@@ -7,8 +7,8 @@ if (!$_SESSION['admin_username']) {
     header("Location: ../index.php");
 }
 
-require_once('../../vendor/autoload.php');
-require_once '../config.php'; // Include your DB config if you need to fetch data
+require_once '../../vendor/autoload.php';
+require_once './config.php'; // Include your DB config if you need to fetch data
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -17,6 +17,11 @@ use Dompdf\Options;
 $options = new Options();
 $options->set('defaultFont', 'DejaVu Sans');
 $dompdf = new Dompdf($options);
+
+$order_type = $_GET['order_type'] ?? null;
+if ($order_type !== 'walk_in' && $order_type !== 'gcash') {
+    $order_type = null;
+}
 
 // Start output buffering to capture HTML
 ob_start();
@@ -70,8 +75,20 @@ ob_start();
             </thead>
             <tbody>
                 <?php
+                $order_type_str = '';
+                if (isset($order_type)) {
+                    if($order_type === 'walk_in') {
+                        $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                    } else if($order_type === 'gcash') {
+                        $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                    }
+                }
                 // Fetch daily transactions
-                $stmt_daily = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                    $stmt_daily = $DB_con->prepare(
+                            'SELECT orderdetails.* 
+                            FROM orderdetails
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
                 $stmt_daily->execute();
                 while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
                     echo '<tr>';
