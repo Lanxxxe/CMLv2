@@ -80,7 +80,6 @@ if (isset($_GET['delete_id'])) {
                     <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
                     <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
                     <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
-                    <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
                     <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                     <li class="active"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
@@ -113,7 +112,7 @@ if (isset($_GET['delete_id'])) {
                 <div class="sales-report-content">
                     <?php
                     // Fetch daily sales
-                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_pick_up) as date FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_date) as date FROM orderdetails WHERE DATE(order_date) = CURDATE()');
                     $stmt_daily->execute();
                     $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
                     $dailySales = $daily['daily_sales'] ?? 0;
@@ -125,7 +124,7 @@ if (isset($_GET['delete_id'])) {
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
                                AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)'
                     );
@@ -141,7 +140,7 @@ if (isset($_GET['delete_id'])) {
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
                                 LAST_DAY(CURDATE()) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
                                AND LAST_DAY(CURDATE())'
                     );

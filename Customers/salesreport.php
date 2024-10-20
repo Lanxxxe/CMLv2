@@ -80,12 +80,19 @@ if ($edit_row) {
 
         <div id="page-wrapper">
             <div class="sales-report-container">
-                <h1>Sales Report</h1>
+                <h1>Sales Report <?php echo $_SESSION['user_firstname'] ?></h1>
 
                 <div class="sales-report-content">
                     <?php
+                    $current_user_id = $_SESSION['user_id'];
                     // Fetch daily sales
-                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_pick_up) as date FROM orderdetails WHERE DATE(order_pick_up) = CURDATE()');
+                    $stmt_daily = $DB_con->prepare(
+                        'SELECT SUM(order_total) as daily_sales, 
+                        DATE(order_pick_up) as date 
+                        FROM orderdetails 
+                        WHERE DATE(order_date) = CURDATE()
+                        AND user_id = ?');
+                    $stmt_daily->bindParam(1, $current_user_id, PDO::PARAM_INT);
                     $stmt_daily->execute();
                     $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
                     $dailySales = $daily['daily_sales'] ?? 0;
@@ -97,10 +104,11 @@ if ($edit_row) {
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)'
-                    );
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
+                               AND user_id = ?');
+                    $stmt_weekly->bindParam(1, $current_user_id, PDO::PARAM_INT);
                     $stmt_weekly->execute();
                     $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
                     $weeklySales = $weekly['weekly_sales'] ?? 0;
@@ -113,10 +121,11 @@ if ($edit_row) {
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
                                 LAST_DAY(CURDATE()) as end_date 
                          FROM orderdetails 
-                         WHERE DATE(order_pick_up) BETWEEN 
+                         WHERE DATE(order_date) BETWEEN 
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                               AND LAST_DAY(CURDATE())'
-                    );
+                               AND LAST_DAY(CURDATE())
+                               AND user_id = ?');
+                    $stmt_monthly->bindParam(1, $current_user_id, PDO::PARAM_INT);
                     $stmt_monthly->execute();
                     $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
                     $monthlySales = $monthly['monthly_sales'] ?? 0;
@@ -170,7 +179,14 @@ if ($edit_row) {
                             </thead>    
                             <tbody>
                                 <?php
-                                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id ORDER BY orderdetails.order_pick_up DESC');
+                                $current_user = $_SESSION['user_id'];
+                                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* 
+                                FROM users 
+                                INNER JOIN orderdetails 
+                                ON users.user_id = orderdetails.user_id 
+                                WHERE orderdetails.user_id = :current_user 
+                                ORDER BY orderdetails.order_pick_up DESC');
+                                $stmt->bindParam(':current_user', $current_user, PDO::PARAM_INT);
                                 $stmt->execute();
 
                                 if ($stmt->rowCount() > 0) {
