@@ -161,16 +161,12 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                         }
 
                     // Fetch daily sales
-<<<<<<< HEAD
                         $stmt_daily = $DB_con->prepare(
                         'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
                         FROM orderdetails
                             LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
                         WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
 
-=======
-                    $stmt_daily = $DB_con->prepare('SELECT SUM(order_total) as daily_sales, DATE(order_date) as date FROM orderdetails WHERE DATE(order_date) = CURDATE()');
->>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                     $stmt_daily->execute();
                     $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
                     $dailySales = $daily['daily_sales'] ?? 0;
@@ -182,10 +178,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
-<<<<<<< HEAD
                             LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-=======
->>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                          WHERE DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
                                AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
@@ -202,10 +195,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
                                 LAST_DAY(CURDATE()) as end_date 
                          FROM orderdetails 
-<<<<<<< HEAD
                             LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-=======
->>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                          WHERE DATE(order_date) BETWEEN 
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
                                AND LAST_DAY(CURDATE())' . $order_type_str
