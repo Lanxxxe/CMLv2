@@ -71,7 +71,6 @@ if (isset($_GET['delete_id'])) {
                     <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
                     <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
                     <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
-                    <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
                     <li class="active"><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                     <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
@@ -145,14 +144,14 @@ if (isset($_GET['delete_id'])) {
                                     
                                     background: <?php 
                                     if ($quantity <= 30 && $quantity > 20 ) {
-                                        echo '#e7dd51; color: #000;';
+                                        echo '#d8df40; color: #000;';
                                     }
                                     elseif ($quantity <= 20 && $quantity > 10) {
-                                        echo '#f17d4f; color: #000;';
+                                        echo '#df9440; color: #000;';
                                     } elseif ($quantity <= 10 || $quantity == 0 ) {
-                                        echo '#d93434; color: #000;';
+                                        echo '#df6540; color: #000;';
                                     } else {
-                                        echo '#5be65b; color: #000;';
+                                        echo '#70df40; color: #000;';
                                     }
                                 ?>
                                 ">

@@ -118,7 +118,6 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
                 <li class="active"><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
                 <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
-                <li><a data-toggle="modal" data-target="#addBrandsModal"> &nbsp; &nbsp; &nbsp; Add Brands</a></li>
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>

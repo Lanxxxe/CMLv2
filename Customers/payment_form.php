@@ -55,40 +55,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = isset($_SESSION['user_email']) ? $_SESSION['user_email'] : '';
     $address = isset($_SESSION['user_address']) ? $_SESSION['user_address'] : '';
     $amount = floatval($_POST['amount']);
-    $order_stats = 'Verification';
+    $order_stats = 'Confirmed';
     $paymentType = $_POST['paymentType'];
     $pay = $_POST['pay'];
 
     // Process file upload
-    if (isset($_FILES['payment_image']) && $_FILES['payment_image']['error'] == 0) {
-        $fileTmpPath = $_FILES['payment_image']['tmp_name'];
-        $fileName = $_FILES['payment_image']['name'];
-        $fileSize = $_FILES['payment_image']['size'];
-        $fileType = $_FILES['payment_image']['type'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-
-        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
-        if (in_array($fileExtension, $allowedfileExtensions)) {
-            $uploadFileDir = './uploaded_images';
-
-            // Check if the directory exists, if not, create it
-            if (!is_dir($uploadFileDir)) {
-                mkdir($uploadFileDir, 0777, true);
+    if (($_SESSION['user_type'] == 'Cashier') || isset($_FILES['payment_image']) && $_FILES['payment_image']['error'] == 0) {
+        if ($_SESSION['user_type'] != 'Cashier') {
+            $fileTmpPath = $_FILES['payment_image']['tmp_name'];
+            $fileName = $_FILES['payment_image']['name'];
+            $fileSize = $_FILES['payment_image']['size'];
+            $fileType = $_FILES['payment_image']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+    
+            $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
+        } 
+        if ($_SESSION['user_type'] == 'Cashier' || in_array($fileExtension, $allowedfileExtensions)) {
+            if ($_SESSION['user_type'] != 'Cashier') {
+                $uploadFileDir = './uploaded_images';
+    
+                // Check if the directory exists, if not, create it
+                if (!is_dir($uploadFileDir)) {
+                    mkdir($uploadFileDir, 0777, true);
+                }
+    
+                $dest_path = $uploadFileDir . '/' . $fileName;
+            } else {
+                $dest_path = '';
             }
 
-            $dest_path = $uploadFileDir . '/' . $fileName;
-
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                $message = 'File is successfully uploaded.';
+            if ($_SESSION['user_type'] == 'Cashier' || move_uploaded_file($fileTmpPath, $dest_path)) {
+                if ($_SESSION['user_type'] != 'Cashier') {
+                    $message = 'File is successfully uploaded.';
+                }
 
                 // Start transaction
                 $conn->begin_transaction();
 
                 try {
                     // Insert form data into database
-                    $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt_insert->bind_param('sssssssds', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path);
+                    if ($_SESSION['user_type'] == 'Cashier'){
+                        $stats = "Confirmed";
+                        $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt_insert->bind_param('sssssssdss', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path, $stats);
+                    } else {
+                        $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt_insert->bind_param('sssssssds', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path);
+                    }
 
                     if ($stmt_insert->execute()) {
                         $payment_id = $stmt_insert->insert_id;
@@ -116,6 +130,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
                         if ($stmt_update->execute()) {
+                            foreach ($order_ids as $order_id) {
+                                $stmt = $conn->prepare("UPDATE orderdetails SET order_status = 'Confirmed' WHERE order_id = ?");
+                                $stmt->bind_param("i", $order_id);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $stmt->close();
+                            }
+
                             date_default_timezone_set('Asia/Manila');
                             $currentDateTime = new DateTime();
                             $formattedDateTime = $currentDateTime->format('F j, Y - h:ia');
@@ -156,7 +178,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             // $receipt .= "<p><strong>Amount:</strong> $amount</p>";
                             // $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
-                            $receipt .= "<p><strong>Payment Image:</strong> <img src=\"$dest_path\" style=\"width: 50px; height: 50px; object-fit: cover;\" alt=\"Proof of Payment\"></p>";
+                            if ($_SESSION['user_type'] != 'Cashier'){
+                                $receipt .= "<p><strong>Payment Image:</strong> <img src=\"$dest_path\" style=\"width: 50px; height: 50px; object-fit: cover;\" alt=\"Proof of Payment\"></p>";
+                            }
                             $receipt .= "</div>";
                             // Add the "Shop" button after the receipt
                             $receipt .= "<div class=\"input_group\">";
@@ -186,7 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $error = 'Upload failed. Allowed file types: ' . implode(',', $allowedfileExtensions);
         }
-    } else {
+    } else if ($_SESSION['user_type'] == 'Cashier') {
+
+    } 
+    else {
         $error = 'There is some error in the file upload. Please check the following error.<br>';
         $error .= 'Error:' . $_FILES['payment_image']['error'];
     }
@@ -218,6 +245,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </script>";
     }
 }
+
+
 
 // Function to sanitize input
 function sanitizeInput($input)
@@ -277,13 +306,13 @@ $conn->close();
         <form action="payment_form.php" method="post" enctype="multipart/form-data">
             <?php foreach ($order_ids as $order_id): ?>
                 <input type="hidden" name="order_ids[]" value="<?php echo htmlspecialchars($order_id); ?>">
-            <?php endforeach; ?>
-            
-            <!-- Payment Details Start -->
-            <div class="input_group">
-                <div class="input_box">
-                    <h4>Payment Details</h4>
-                    <?php 
+                <?php endforeach; ?>
+                
+                <!-- Payment Details Start -->
+                <div class="input_group">
+                    <div class="input_box">
+                        <h4>Payment Details</h4>
+                        <?php 
                         if ($_SESSION['user_type'] != 'Cashier'){
                             ?>
                             <input type="radio" name="pay" class="radio" id="bc1" value="Gcash" checked>
@@ -295,19 +324,32 @@ $conn->close();
                     <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Walk In</span></label>
                 </div>
             </div>
+          
             <div class="input_group center-content">
+                <?php 
+                if ($_SESSION['user_type'] != 'Cashier'){
+                ?>
                 <div class="input_box" style="display: inline-flex; align-items: center;">
                     <img src="gcash.png" alt="gcash qr">
                     <span style="margin: 0 10px;">OR</span>
                     <p>Jericson Oghayon 09207652366</p>
                 </div>
+                <?php 
+                }
+                ?>
             </div>
             <div class="input_group">
                 <div class="input_box">
                     <select name="paymentType" required id="paymentType" class="name">
                         <option value="Full Payment">Full Payment</option>
-                        <option value="Down Payment">Down Payment</option>
-                        <option value="Installment">Installment</option>
+                        <?php 
+                        if ($_SESSION['user_type'] != 'Cashier'){
+                            ?>
+                            <option value="Down Payment">Down Payment</option>
+                            <option value="Installment">Installment</option>
+                        <?php
+                        }
+                        ?>
                     </select>
                     <i class="fa fa-credit-card icon"></i>
                 </div>
@@ -317,14 +359,20 @@ $conn->close();
                 <i class="fa fa-money icon" aria-hidden="true"></i>
             </div>
 
-            <!-- Image Upload Start -->
-            <h4>Proof Of Payment</h4>
-            <div class="input_group">
-                <div class="input_box">
-                    <input type="file" name="payment_image" required class="name">
-                    <i class="fa fa-upload icon"></i>
+            <?php
+                if ($_SESSION['user_type'] != 'Cashier'){
+            ?>
+                <!-- Image Upload Start -->
+                <h4>Proof Of Payment</h4>
+                <div class="input_group">
+                    <div class="input_box">
+                        <input type="file" name="payment_image" required class="name">
+                        <i class="fa fa-upload icon"></i>
+                    </div>
                 </div>
-            </div>
+            <?php
+            }
+            ?>
             <!-- Image Upload End -->
 
             <!-- Payment Details End -->

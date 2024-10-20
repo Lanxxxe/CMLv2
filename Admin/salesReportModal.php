@@ -21,18 +21,22 @@
                     <tbody>
                         <?php
                         // Fetch daily transactions
+<<<<<<< HEAD
                         $stmt_daily = $DB_con->prepare(
                             'SELECT orderdetails.* 
                             FROM orderdetails
                                 LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
                             WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
+=======
+                        $stmt_daily = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_date) = CURDATE()');
+>>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                         $stmt_daily->execute();
                         while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
                             echo '<td>' . $row['order_id'] . '</td>';
                             echo '<td>' . $row['order_name'] . '</td>';
                             echo '<td>&#8369 ' . number_format($row['order_total'], 2) . '</td>';
-                            echo '<td>' . date('F j, Y', strtotime($row['order_pick_up'])) . '</td>';
+                            echo '<td>' . date('F j, Y', strtotime($row['order_date'])) . '</td>';
                             echo '</tr>';
                         }
                         ?>
@@ -70,6 +74,7 @@
                     <tbody>
                         <?php
                         // Fetch weekly transactions
+<<<<<<< HEAD
                         $stmt_weekly = $DB_con->prepare(
                         'SELECT orderdetails.*,
                                 DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
@@ -80,13 +85,16 @@
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
                                AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
                         );
+=======
+                        $stmt_weekly = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_date) BETWEEN DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND CURDATE()');
+>>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                         $stmt_weekly->execute();
                         while ($row = $stmt_weekly->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
                             echo '<td>' . $row['order_id'] . '</td>';
                             echo '<td>' . $row['order_name'] . '</td>';
                             echo '<td>&#8369 ' . number_format($row['order_total'], 2) . '</td>';
-                            echo '<td>' . date('F j, Y', strtotime($row['order_pick_up'])) . '</td>';
+                            echo '<td>' . date('F j, Y', strtotime($row['order_date'])) . '</td>';
                             echo '</tr>';
                         }
                         ?>
@@ -123,6 +131,7 @@
                     <tbody>
                         <?php
                         // Fetch monthly transactions
+<<<<<<< HEAD
                         $stmt_monthly = $DB_con->prepare(
                         'SELECT orderdetails.*,
                                 DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
@@ -133,13 +142,16 @@
                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
                                AND LAST_DAY(CURDATE())' . $order_type_str
                         );
+=======
+                        $stmt_monthly = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_date) BETWEEN DATE_FORMAT(CURDATE(), "%Y-%m-01") AND LAST_DAY(CURDATE())');
+>>>>>>> dd7a7b8e83621156e62ad10ce9975a44091f0f2b
                         $stmt_monthly->execute();
                         while ($row = $stmt_monthly->fetch(PDO::FETCH_ASSOC)) {
                             echo '<tr>';
                             echo '<td>' . $row['order_id'] . '</td>';
                             echo '<td>' . $row['order_name'] . '</td>';
                             echo '<td>&#8369 ' . number_format($row['order_total'], 2) . '</td>';
-                            echo '<td>' . date('F j, Y', strtotime($row['order_pick_up'])) . '</td>';
+                            echo '<td>' . date('F j, Y', strtotime($row['order_date'])) . '</td>';
                             echo '</tr>';
                         }
                         ?>

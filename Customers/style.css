@@ -6,9 +6,11 @@
 
 body{
     background-image: url("../assets/img/banner.png");
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     font-family: Arial, Helvetica, sans-serif;
+    width: 100dvw;
+    height: 100dvh;
 }
 
 .wrapper {

@@ -41,3 +41,12 @@
 2024-10-15 23:33:37 [42000] - SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1 in /var/www/html/projects/CMLv2/Customers/delete_cart_item.php:33
 2024-10-16 00:00:09 [42000] - SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1 in /var/www/html/projects/CMLv2/Customers/delete_cart_item.php:18
 (2024-10-16 01:44:28) Error: [2] Undefined array key "user_email" - /var/www/html/projects/CMLv2/Customers/add_to_cart.php:13
+(2024-10-19 17:21:44) Error: [2] file_get_contents(C:\xampp\htdocs\CMLv2\Customers/../../\.env): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\vendor\vlucas\phpdotenv\src\Store\File\Reader.php:73
+2024-10-19 17:21:44 [0] - Unable to read any of the environment file(s) at [C:\xampp\htdocs\CMLv2\Customers/../../\.env]. in C:\xampp\htdocs\CMLv2\vendor\vlucas\phpdotenv\src\Store\FileStore.php:68
+(2024-10-19 17:21:44) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:55
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:61
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_firstname - C:\xampp\htdocs\CMLv2\Customers\index.php:208
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_lastname - C:\xampp\htdocs\CMLv2\Customers\index.php:217
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_address - C:\xampp\htdocs\CMLv2\Customers\index.php:225
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_password - C:\xampp\htdocs\CMLv2\Customers\index.php:233
+(2024-10-19 17:21:44) Error: [2] Undefined variable $user_id - C:\xampp\htdocs\CMLv2\Customers\index.php:240
