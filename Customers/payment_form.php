@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $types = str_repeat('i', count($order_ids));
                         $stmt_select->bind_param($types, ...$order_ids);
                         $stmt_select->execute();
+                        
                         $order_list = $stmt_select->get_result()->fetch_all(MYSQLI_ASSOC);
 
                         // Update all selected orders
@@ -147,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<div id=\"cmlReciept\" class=\"receipt\">";
                             $receipt .= "<h2>Payment Receipt</h2>";
                             $receipt .= "<p><strong>Date Ordered:</strong> $formattedDateTime</p>";
+                            $receipt .= "<p><strong>Order ID/s:</strong> " . implode(', ', $order_ids) . "</p>";
                             $receipt .= "<p><strong>Name:</strong> $firstName $lastName</p>";
                             $receipt .= "<p><strong>Email:</strong> $email</p>";
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
@@ -320,8 +322,8 @@ $conn->close();
                         <?php
                         }
                     ?>
-                    <input type="radio" name="pay" class="radio" id="bc2" value="Walk In">
-                    <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Walk In</span></label>
+                    <input type="radio" name="pay" class="radio" id="bc2" value="Walk In" checked>
+                    <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Walk In</span></label>                
                 </div>
             </div>
           

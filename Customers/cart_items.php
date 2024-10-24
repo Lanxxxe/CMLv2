@@ -123,7 +123,7 @@ if (isset($_GET['update_id'])) {
                                     <span>Actions</span>
                                     <span class="all-checkbtn">
                                         All
-                                        <input id="checkAllBtn" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] ?>">
+                                        <input id="checkAllBtn" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
                                     </span>
                                 </div>
                             </th>
@@ -155,7 +155,7 @@ if (isset($_GET['update_id'])) {
                                                 onclick="confirmDelete(event, <?php echo $row['order_id']; ?>)">
                                                 <span class='glyphicon glyphicon-trash'></span> Remove Item
                                             </a>
-                                        <input class="checkOrdered" style="width: 20px; height: 20px; margin-inline: 10px; margin-top: 0;" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] ?>">
+                                        <input class="checkOrdered" style="width: 20px; height: 20px; margin-inline: 10px; margin-top: 0;" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
                                         </div>
                                     </td>
                                 </tr>
@@ -313,8 +313,11 @@ if (isset($_GET['update_id'])) {
         }
         orders.forEach(order => {
             const dataOrder = order.getAttribute('data-order').split(':');
+            console.log(dataOrder); 
             if (order.checked) {
-                total += +dataOrder[1];
+                sub = dataOrder[1] * dataOrder[2];
+                total += sub;
+                
                 formData.append('order_ids[]', dataOrder[0]);
             } else {
                 allBtnChecked = false;

@@ -385,7 +385,7 @@ session_start();
                                         required>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Gcash Number" name="ruser_mobile" type="number"
+                                    <input class="form-control" placeholder="Mobile Number" name="ruser_mobile" type="number"
                                         required>
                                 </div>
                             </fieldset>
