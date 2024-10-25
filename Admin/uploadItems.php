@@ -1,3 +1,7 @@
+<?php
+include_once 'config.php';
+?>
+
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md">
         <div style="color:white;background-color:#008CBA" class="modal-content">
@@ -15,31 +19,33 @@
                             <input class="form-control" placeholder="Item Color" name="item_name" type="text"
                                 required>
                         </div>
-                        <p>Brand Name:</p>
+
+                        <p>Brand:</p>
                         <div class="form-group">
-                            <!-- <input class="form-control" placeholder="Brand Name" name="brand_name" type="text"
-                                required> -->
-                            <select name="brand_name" id="brand_name" class="form-control">
-                                <option value="" disabled selected>Select an option</option>
-                                <?php 
-                                include 'config.php';
-
-                                $query = "SELECT * FROM brands";
-
-                                $statement = $DB_con->prepare($query);
-                                if($statement->execute()){
-                                    $contents = $statement->fetchAll();
-
-                                    foreach($contents as $brand){
-                                        ?>
-                                            <option value="<?php echo htmlspecialchars($brand['brand_name']) ?>"><?php echo htmlspecialchars($brand['brand_name']) ?></option>
-                                        <?php
-                                    }
-                                }
+                            <select name="paint_brand_id" id="paintBrandSelect" class="form-control" required>
+                                <option value="">Select Brand</option>
+                                <?php
+                                // Fetch all brands from database
+                                $stmt = $DB_con->prepare("SELECT brand_id, brand_name FROM brands ORDER BY brand_name");
+                                $stmt->execute();
+                                $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 
+                                foreach ($brands as $brand) {
+                                    echo "<option value='" . htmlspecialchars($brand['brand_id']) . "'>" . 
+                                        htmlspecialchars($brand['brand_name']) . "</option>";
+                                }
                                 ?>
                             </select>
                         </div>
+                        
+                        <p class="mt-3">Type:</p>
+                        <div class="form-group">
+                            <select name="paint_type_id" id="paintTypeSelect" class="form-control" required disabled>
+                                <option value="">Select Brand First</option>
+                            </select>
+                        </div>
+
+
                         <p>Gallon/Liter:</p>
                         <div class="form-group">
                             <select name="gl" id="gl" class="form-control">
@@ -64,24 +70,6 @@
                                 type="date" required>
                         </div>
                         
-                        <p>Type:</p>
-                        <div class="form-group">
-                            <select name="type" id="" class="form-control">
-                                <option value="" disabled selected>Select type</option>
-                                <option value="Gloss">Gloss</option>
-                                <option value="Acrytex">Acrytex</option>
-                                <option value="Oil Paint">Oil Paint</option>
-                                <option value="Enamel">Enamel</option>
-                                <option value="QDE">QDE</option>
-                                <option value="Primer">Primer</option>
-                                <option value="Acrylic">Acrylic</option>
-                                <option value="Flat/Matte">Flat/Matte</option>
-                                <option value="Latex">Latex</option>
-                                <option value="Brush">Brush</option>
-                                <option value="Alkyds">Alkyds</option>
-                                <option value="Tape">Tape</option>
-                            </select>
-                        </div>
                         <p>Choose Image:</p>
                         <div class="form-group">
                             <input class="form-control" type="file" name="item_image" accept="image/*" required />
@@ -113,10 +101,7 @@
                         <div class="form-group">
                             <input class="form-control" placeholder="Name of Item" name="item_name" type="text" required>
                         </div>
-                        <!-- <p>Brand Name:</p>
-                        <div class="form-group">
-                            <input class="form-control" placeholder="Name of Item" name="item_name" type="text" required>
-                        </div> -->
+
                         <p>Price:</p>
                         <div class="form-group">
                             <input id="priceinput" class="form-control" placeholder="Price" name="item_price"
@@ -126,14 +111,33 @@
                         <div class="form-group">
                             <input type="number" placeholder="Quantity" class="form-control" name="quantity" required>
                         </div>
-                        
-                        <p>Type:</p>
+
+                        <p>Brand:</p>
                         <div class="form-group">
-                            <select name="type" id="" class="form-control">
-                                <option value="Brush">Brush</option>
-                                <option value="Tape">Tape</option>
+                            <select name="brand_id" id="brandSelect" class="form-control" required>
+                                <option value="">Select Brand</option>
+                                <?php
+                                // Fetch all brands from database
+                                $stmt = $DB_con->prepare("SELECT brand_id, brand_name FROM brands ORDER BY brand_name");
+                                $stmt->execute();
+                                $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                foreach ($brands as $brand) {
+                                    echo "<option value='" . htmlspecialchars($brand['brand_id']) . "'>" . 
+                                        htmlspecialchars($brand['brand_name']) . "</option>";
+                                }
+                                ?>
                             </select>
                         </div>
+                        
+                        <p class="mt-3">Type:</p>
+                        <div class="form-group">
+                            <select name="type_id" id="typeSelect" class="form-control" required disabled>
+                                <option value="">Select Brand First</option>
+                            </select>
+                        </div>
+
+
                         <p>Choose Image:</p>
                         <div class="form-group">
                             <input class="form-control" type="file" name="item_image" accept="image/*" required />
@@ -148,6 +152,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     // Registration form submission
@@ -168,9 +173,7 @@
                         text: data.message,
                         confirmButtonText: 'OK'
                     }).then((result) => {
-                        // Close the modal or perform other actions
-                        $('#uploadModal').modal('hide'); // Assuming you are using Bootstrap modal
-                        // Additional actions if needed
+                        location.reload();
                     });
                 } else {
                     Swal.fire({
@@ -203,9 +206,7 @@
                         text: data.message,
                         confirmButtonText: 'OK'
                     }).then((result) => {
-                        // Close the modal or perform other actions
-                        $('#uploadItems').modal('hide'); // Assuming you are using Bootstrap modal
-                        // Additional actions if needed
+                        location.reload();
                     });
                 } else {
                     Swal.fire({
@@ -220,4 +221,60 @@
                 console.error('Error:', error);
             });
     });
+
+    $(document).ready(function() {
+    $('#brandSelect').change(handleBrandChange);
+    $('#paintBrandSelect').change(handlePaintBrandChange);
+
+    function handleBrandChange() {
+        var brandId = $(this).val();
+        var typeSelect = $('#typeSelect');
+        updateTypeOptions(typeSelect, brandId);
+    }
+
+    function handlePaintBrandChange() {
+        var brandId = $(this).val();
+        var typeSelect = $('#paintTypeSelect');
+        updateTypeOptions(typeSelect, brandId);
+    }
+
+    function updateTypeOptions(typeSelect, brandId) {
+        if (brandId) {
+            typeSelect.prop('disabled', false);
+            
+            $.ajax({
+                url: 'get_types.php',
+                method: 'GET',
+                data: { brand_id: brandId },
+                dataType: 'json'
+            })
+            .done(function(types) {
+                if (types.error) {
+                    console.error('Server Error:', types.error);
+                    alert('Error fetching types. Please try again.');
+                    return;
+                }
+                
+                typeSelect.empty();
+                typeSelect.append('<option value="">Select Type</option>');
+                
+                types.forEach(function(type) {
+                    typeSelect.append(
+                        $('<option></option>')
+                            .val(type.type_id)
+                            .text(type.type_name)
+                    );
+                });
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX Error:', textStatus, errorThrown);
+                alert('Error fetching types. Please try again.');
+            });
+        } else {
+            typeSelect.prop('disabled', true);
+            typeSelect.empty();
+            typeSelect.append('<option value="">Select Brand First</option>');
+        }
+    }
+});
 </script>

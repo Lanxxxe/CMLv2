@@ -317,7 +317,7 @@ $conn->close();
                         }
                     ?>
                     <input type="radio" name="pay" class="radio" id="bc2" value="Walk In" checked>
-                    <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Walk In</span></label>                
+                    <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Cash Payment</span></label>                
                 </div>
             </div>
           

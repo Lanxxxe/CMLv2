@@ -7,6 +7,30 @@ if(!$_SESSION['admin_username'])
     header("Location: ../index.php");
 }
 
+// Display alert if exists
+if (isset($_SESSION['alert'])) {
+    $alert = $_SESSION['alert'];
+    echo "<script>
+        Swal.fire({
+            icon: '" . $alert['type'] . "',
+            title: '" . ucfirst($alert['type']) . "!',
+            text: '" . htmlspecialchars($alert['message']) . "',
+            timer: 2000,
+            showConfirmButton: true
+        });
+    </script>";
+    unset($_SESSION['alert']); // Clear the alert after displaying
+}
+
+if(isset($_GET['brand_id'])) {
+    header('Content-Type: application/json');
+    $stmt = $DB_con->prepare("SELECT type_id, type_name FROM product_type WHERE brand_id = ?");
+    $stmt->execute([$_GET['brand_id']]);
+    $types = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($types);
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +44,7 @@ if(!$_SESSION['admin_username'])
     <link rel="stylesheet" type="text/css" href="css/local.css" />
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -45,6 +70,7 @@ if(!$_SESSION['admin_username'])
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                     <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                     <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+                    <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                     <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right navbar-user">
@@ -170,8 +196,6 @@ if(!$_SESSION['admin_username'])
 
 </div>
 </div>
-
-
 
 
 </div>

@@ -76,6 +76,7 @@ if (isset($_GET['delete_id'])) {
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                     <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                     <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+                    <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                     <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right navbar-user">

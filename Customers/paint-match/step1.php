@@ -11,29 +11,29 @@
             </h1>
 
             <div class="brand-logo-container">
-                <?php 
-                    include("db-connect.php");
+                <a href="paint-match.php?step=2&brandName=Boysen">
+                    <div class="flex flex-col">
+                        <img src="https://images.rodpub.com/images/191/531_main.jpg" alt="Boysen">
+                    </div>
+                </a>
 
-                    $query = "SELECT * FROM brands";
+                <a href="paint-match.php?step=2&brandName=Davies">
+                    <div class="flex flex-col">
+                        <img src="https://daviespaints.com.ph/daviespaints.com.ph/core/views/d4a0f9d286/assets/images/logo.jpg" alt="Davies">
+                    </div>
+                </a>
 
-                    $statement = $DB_con->prepare($query);
+                <a href="paint-match.php?step=2&brandName=Rain or Shine">
+                    <div class="flex flex-col">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNMZPYVi2mnBRmwSzaZ-gaTy-rSG9h9KlsOQ&s" alt="Rain or Shine">
+                    </div>
+                </a>
 
-                    if($statement->execute()) {
-                        $row = $statement->fetchAll();
-                        // print_r($row[0]);
-
-                        foreach($row as $result) {
-                            ?>
-                            <a href="paint-match.php?step=2&brandName=<?php echo htmlspecialchars($result['brand_name']) ?>">
-                                <div class="flex flex-col">
-                                    <img src="<?php echo htmlspecialchars($result['brand_logo']) ?>" alt="<?php echo htmlspecialchars($result['brand_name']) ?>">
-                                </div>
-                            </a>
-                            <?php
-                        
-                        }
-                    }
-                ?>
+                <a href="paint-match.php?step=2&brandName=K92">
+                    <div class="flex flex-col">
+                        <img src="https://baesacolorspaintcenter.com.ph/cdn/shop/collections/LznXc15m0F1XEBkW1FRyp8ciE6VIprKGnnYulMw3.png?v=1712806428" alt="K92">
+                    </div>
+                </a>
             </div>
         </div>
     </div>

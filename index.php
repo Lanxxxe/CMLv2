@@ -653,23 +653,24 @@ session_start();
             shopNowBtn.addEventListener('click', function (event) {
                 event.preventDefault(); // Prevent default link behavior
 
-                var isLoggedIn = <?php echo isset($_SESSION['admin_username']) ? 'true' : 'false'; ?>;
+                window.location.href = 'viewshop.php'
+                // var isLoggedIn = <?php echo isset($_SESSION['admin_username']) ? 'true' : 'false'; ?>;
 
-                if (!isLoggedIn) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Sign In Required',
-                        text: 'Please sign in to access the shop.',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    var href = shopNowBtn.getAttribute('href');
-                    if (href) {
-                        window.location.href = href;
-                    } else {
-                        console.error('No href attribute found on the SHOP NOW button.');
-                    }
-                }
+                // if (!isLoggedIn) {
+                //     Swal.fire({
+                //         icon: 'info',
+                //         title: 'Sign In Required',
+                //         text: 'Please sign in to access the shop.',
+                //         confirmButtonText: 'OK'
+                //     });
+                // } else {
+                //     var href = shopNowBtn.getAttribute('href');
+                //     if (href) {
+                //         window.location.href = href;
+                //     } else {
+                //         console.error('No href attribute found on the SHOP NOW button.');
+                //     }
+                // }
             });
         });
     });
