@@ -117,7 +117,10 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php foreach ($downpayment_row as $row): ?>
+                                                    <?php foreach ($downpayment_row as $row): 
+                                                        $stat = $row['payment_status'];
+                                                        $paid = $stat === 'Confirm' && $row['total_amount'] <= $row['amount'];
+                                                        ?>
                                                         <tr>
                                                             <td><?= $row['id'] ?></td>
                                                             <td><?= $row['firstname'] . ' ' . $row['lastname'] ?></td>
@@ -125,20 +128,25 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             <td>₱<?= $row['total_amount'] ?></td>
                                                             <td>₱<?= $row['total_amount'] - $row['amount'] ?></td>
                                                             <td><?php
-                                                                $stat = $row['payment_status'];
-                                                                if ($stat === 'Confirm' && $row['total_amount'] <= $row['amount']) {
-                                                                    echo 'Paid';
+                                                                if ($paid) {
+                                                                   echo '<span class="label label-success">Paid</span>';
                                                                 } else {
-                                                                    echo 'Pending Payment';
+                                                                   echo '<span class="label label-secondary">Payment Pending</span>';
                                                                 }
                                                             ?></td>
                                                             <td>
                                                                 <button class="btn btn-primary btn-sm">
                                                                     <i class="fa fa-eye"></i> View
                                                                 </button>
-                                                                <button class="btn btn-success btn-sm">
-                                                                    <i class="fa fa-check"></i> Process Payment
-                                                                </button>
+                                                                <?php if ($paid): ?>
+                                                                    <button class="btn btn-success btn-sm" disabled>
+                                                                        <i class="fa fa-check"></i> Process Payment
+                                                                    </button>
+                                                                <?php else: ?>
+                                                                    <button class="btn btn-success btn-sm">
+                                                                        <i class="fa fa-check"></i> Process Payment
+                                                                    </button>
+                                                                <?php endif; ?>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -172,6 +180,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             $monthly_payment = $amount / 12;
                                                             $added_day = 30 * ($row['months_paid'] + 1);
                                                             $due_date = date('Y-m-d', strtotime("+$added_day day", strtotime($row['created_at']))); 
+                                                            $remaining_balance = ($row['total_amount'] - $row['amount']) - (($months_paid + 1) * $monthly_payment);
                                                         ?>
                                                         <tr>
                                                             <td><?= $row['id'] ?></td>
@@ -179,8 +188,8 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             <td>₱<?= $row['total_amount'] ?></td>
                                                             <td>₱<?= number_format($monthly_payment, 2) ?></td>
                                                             <td><?= $due_date ?></td>
-                                                            <td><?= $row['months_paid'] ?>&sol;12 </td>
-                                                            <td>₱<?= ($row['total_amount'] - $row['amount']) - $months_paid * $monthly_payment ?></td>
+                                                            <td><?= $row['months_paid']+1 ?>&sol;12 </td>
+                                                            <td>₱<?= number_format($remaining_balance, 2) ?></td>
                                                             <td>
                                                                 <?php if ($row['months_paid'] * $monthly_payment >= $row['total_amount']): ?>
                                                                     <span class="label label-primary">Complete</span>
@@ -403,7 +412,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                     const row = $(this).closest('tr');
                     const paymentId = row.find('td:first').text().trim();
                     const totalAmount = parseFloat(row.find('td:contains("₱")').text().replace('₱', ''));
-                    const paidAmount = parseFloat(row.find('td:contains("₱")').eq(1).text().replace('₱', ''));
+                    const paidAmount = totalAmount - parseFloat(row.find('td:contains("₱")').eq(1).text().replace('₱', ''));
                     const remainingBalance = totalAmount - paidAmount;
                     const paymentType = $(this).closest('.tab-pane').attr('id');
                     
