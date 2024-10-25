@@ -180,7 +180,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             $monthly_payment = $amount / 12;
                                                             $added_day = 30 * ($row['months_paid'] + 1);
                                                             $due_date = date('Y-m-d', strtotime("+$added_day day", strtotime($row['created_at']))); 
-                                                            $remaining_balance = ($row['total_amount'] - $row['amount']) - (($months_paid + 1) * $monthly_payment);
+                                                            $remaining_balance =  $amount - ($row['months_paid'] + 1) * $monthly_payment;
                                                         ?>
                                                         <tr>
                                                             <td><?= $row['id'] ?></td>
@@ -191,7 +191,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             <td><?= $row['months_paid']+1 ?>&sol;12 </td>
                                                             <td>₱<?= number_format($remaining_balance, 2) ?></td>
                                                             <td>
-                                                                <?php if ($row['months_paid'] * $monthly_payment >= $row['total_amount']): ?>
+                                                                <?php if ($remaining_balance <= 0): ?>
                                                                     <span class="label label-primary">Complete</span>
                                                                 <?php elseif(new DateTime($due_date) < new DateTime()): ?>
                                                                     <span class="label label-danger">Overdue</span>
@@ -203,7 +203,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                                 <button class="btn btn-primary btn-sm">
                                                                     <i class="fa fa-eye"></i> View
                                                                 </button>
-                                                                <button class="btn btn-success btn-sm">
+                                                                <button class="btn btn-success btn-sm" <?php echo ($remaining_balance <= 0)? 'disabled': ''?>>
                                                                     <i class="fa fa-money"></i> Record Payment
                                                                 </button>
                                                             </td>
