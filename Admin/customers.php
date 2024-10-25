@@ -204,6 +204,7 @@ if (isset($_GET['delete_return_id'])) {
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li class="active"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+                <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right navbar-user">
@@ -232,8 +233,8 @@ if (isset($_GET['delete_return_id'])) {
             <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
                 <thead>
                 <tr>
-                    <th>Customer Email</th>
                     <th>Order ID</th>
+                    <th>Customer Email</th>
                     <th>Order Status</th>
                     <th>Order Total</th>
                     <th>Actions</th>
@@ -249,8 +250,8 @@ if (isset($_GET['delete_return_id'])) {
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['user_email']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_id']); ?></td>
+                            <td><?php echo htmlspecialchars($row['user_email']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_status']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_total']); ?></td>
                             <td>
