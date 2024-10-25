@@ -1,7 +1,7 @@
 <?php
 session_start();;
 error_reporting(E_ALL);
-ini_set("display_errors", 0);
+ini_set("display_errors", 1);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
     $date = date('Y-m-d H:i:s');
     $message = "($date) Error: [$errno] $errstr - $errfile:$errline" . PHP_EOL;
@@ -185,10 +185,8 @@ extract($edit_row);
         <?php include_once("navigation.php") ?>
 
         <div id="page-wrapper">
-            <div class="alert alert-default" style="color:white;background-color:#008CBA">
-                <center>
-                    <h3> <span class="glyphicon glyphicon-shopping-cart"></span> This is our Paint & Brush stocks, Shop now!</h3>
-                </center>
+            <div class="alert alert-default" style="color:white;background-color:#008CBA; display: flex; align-items: center; justify-content: center;">
+                <h3> <span style="position: relative; top: 3px;" class="glyphicon glyphicon-heart"></span> <?php echo $_SESSION['user_firstname'] ?>&apos;s Wishlist </h3>
             </div>
 
             <br />
@@ -258,23 +256,14 @@ extract($edit_row);
                 $start = ($id - 1) * $limit;
             }
 
-            $query = mysqli_query($conn, "SELECT item_id FROM wishlist WHERE user_id = {$_SESSION['user_id']}");
-            $wishlist = mysqli_fetch_all($query, MYSQLI_NUM);
-
-            function inWishlist($item) {
-                global $wishlist;
-                foreach ($wishlist as $wish) {
-                    if ($wish[0] === $item) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            $query = mysqli_query($conn, "SELECT * FROM items LIMIT $start, $limit");
+            $query = mysqli_query($conn, 
+                "SELECT i.*, w.wish_id FROM wishlist w
+                JOIN items i ON w.item_id = i.item_id
+                JOIN users u ON w.user_id = u.user_id 
+                WHERE u.user_id = {$_SESSION['user_id']}
+                LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
-                $exist = inWishlist($query2['item_id']);
                 echo "<div style='min-width: 280px !important;' class='col-sm-3 panel-item' data-type='" . $query2['type'] . "' data-brand='" . $query2['brand_name'] . "'>
             <div class='panel panel-default' style='border-color:#008CBA;'>
                 <div class='panel-heading' style='color:white;background-color: #033c73;'>
@@ -282,20 +271,15 @@ extract($edit_row);
                         <div style='text-align:center;background-color: white;' class='form-control'>" . $query2['brand_name'] . "</div>
                     </center>
                 </div>
-                <div class='panel-body'>
+                <div class='panel-body' >
                     <a class='fancybox-buttons' href='../Admin/item_images/" . $query2['item_image'] . "' data-fancybox-group='button' title='Page " . $id . "- " . $query2['item_name'] . "'>
                         <img src='../Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
                     </a>
                     <center><h4> Item Name: " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
                     <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
                 <div style='display: flex;'>
-                    <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>";
-                if ($exist) {
-                    echo "<button class='btn btn-light' style='margin-left: 7px;' disabled><span class='glyphicon glyphicon-heart'></span></button>";
-                } else {
-                    echo "<a class='btn btn-primary' style='margin-left: 7px;' href='./add_to_wishlist.php?item={$query2['item_id']}&user={$_SESSION['user_id']}'><span class='glyphicon glyphicon-heart'></span></a>";
-                }
-                echo "
+                    <a class='btn btn-primary' style='flex: 1;' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
+                    <a class='btn btn-danger' style='flex: 1; margin-left: 4px;' href='delete-wish.php?wish=" . $query2['wish_id'] . "'><span class='glyphicon glyphicon-trash'></span> Remove </a>
                 </div>
                 </div>
             </div>

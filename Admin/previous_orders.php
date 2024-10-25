@@ -13,10 +13,17 @@ require_once 'config.php';
 
 if (isset($_GET['previous_id']) && !empty($_GET['previous_id'])) {
     $view_id = $_GET['previous_id'];
-    $stmt_edit = $DB_con->prepare('SELECT users.*, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_id = :order_id');
-    $stmt_edit->execute(array(':order_id' => $view_id));
+    $stmt_edit = $DB_con->prepare('SELECT users.*, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.payment_id = :previous_id');
+    
+    $stmt_edit->execute(array(':previous_id' => $view_id));
     $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
     extract($edit_row);
+
+    $_user_firstname = $edit_row['user_firstname'];
+    $_user_lastname = $edit_row['user_lastname'];
+    $_user_address = $edit_row['user_address'];
+    $_user_email = $edit_row['user_email'];
+
 } else {
     header("Location: customers.php");
     exit;
@@ -34,9 +41,6 @@ if ($payment_data) {
     $gcashnumber = $payment_data['gcash_number'];
     $gamount = $payment_data['amount'];
 } else {
-    // Handle the case where no data was found
-    echo "No payment data found for the given order ID and payment status.";
-    // You can also set default values or handle this case as needed
     $payment_image = null;
     $gcashname = null;
     $gcashnumber = null;
@@ -72,10 +76,13 @@ if ($payment_data) {
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav side-nav">
                 <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
-                <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Upload Items</a></li>
+                <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
+                <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
+                <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>                
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li class="active"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Order Details</a></li>
+                <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
+                <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right navbar-user">
@@ -131,20 +138,6 @@ if ($payment_data) {
                         </tr>
                         <?php
                     }
-                    echo "<tr>";
-                    echo "<td colspan='4' align='center' style='font-size:18px;'>"."Customer Name: <span style='color:red;'>{$user_firstname} {$user_lastname}</span> | Email: <span style='color:red;'>{$user_email}</span> | Address: <span style='color:red;'>{$user_address}</span>";
-                    echo "</td>";
-                    echo "<td><a class='btn btn-danger' href='customers.php'><span class='glyphicon glyphicon-backward'></span> Back</a></td>";
-                    echo "</tr>";
-                    echo "</tbody>";
-                    echo "</table>";
-                    echo "</div>";
-                    echo "<br />";
-                    echo '<div class="alert alert-default" style="background-color:#033c73;">
-                            <p style="color:white;text-align:center;">
-                            &copy;2024 CML Paint Trading Shop | All Rights Reserved
-                            </p>
-                          </div>';
                 } else {
                     ?>
                     <div class="col-xs-12">
@@ -154,6 +147,20 @@ if ($payment_data) {
                     </div>
                     <?php
                 }
+                echo "<tr>";
+                echo "<td colspan='4' align='center' style='font-size:18px;'>"."Customer Name: <span style='color:red;'>{$_user_firstname} {$_user_lastname}</span> | Email: <span style='color:red;'>{$_user_email}</span> | Address: <span style='color:red;'>{$_user_address}</span>";
+                echo "</td>";
+                echo "<td><a class='btn btn-danger' href='customers.php'><span class='glyphicon glyphicon-backward'></span> Back</a></td>";
+                echo "</tr>";
+                echo "</tbody>";
+                echo "</table>";
+                echo "</div>";
+                echo "<br />";
+                echo '<div class="alert alert-default" style="background-color:#033c73;">
+                        <p style="color:white;text-align:center;">
+                        &copy;2024 CML Paint Trading Shop | All Rights Reserved
+                        </p>
+                      </div>';
                 ?>
                 </tbody>
             </table>

@@ -421,7 +421,8 @@ CREATE TABLE `paymentform` (
   `payment_image_path` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `order_id` int(10) UNSIGNED DEFAULT NULL,
-  `payment_status` varchar(20) DEFAULT 'verification'
+  `payment_status` varchar(20) DEFAULT 'verification',
+  `months_paid` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -478,6 +479,12 @@ CREATE TABLE `users` (
 --
 -- Dumping data for table `users`
 --
+
+CREATE TABLE `wishlist` (
+    `wish_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`) VALUES
 (6, 'admin@email.com', 'admin', 'admin', 'r', 'r', '09123456778', 'Admin'),
@@ -629,6 +636,9 @@ ALTER TABLE `paymentform`
 ALTER TABLE `returnitems`
   ADD CONSTRAINT `returnitems_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 COMMIT;
+
+ALTER TABLE users
+ADD CONSTRAINT unique_email UNIQUE (user_email);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

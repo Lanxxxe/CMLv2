@@ -15,6 +15,7 @@
             <?php 
                 if ($_SESSION['user_type'] != 'Cashier'){
                 ?>
+                    <li><a href="wishlist.php?id=1">&nbsp; <span class='glyphicon glyphicon-heart'></span> Wishlist </a></li>
                     <li><a href="paint-match.php"> &nbsp; <span class='glyphicon glyphicon-tint'></span> Paint Match</a></li>
                     <li><a href="color-change.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Color Change</a></li>
                 <?php
@@ -33,6 +34,7 @@
             <?php 
                 if ($_SESSION['user_type'] != 'Cashier'){
                     ?>
+                    <li><a href="invoice.php"> &nbsp; <span class='fa fa-money'></span> Invoice </a></li>
                     <li><a href="returnItemPage.php"> &nbsp; <span class='glyphicon glyphicon-remove-sign'></span> Return An Item</a></li>
                     <?php
                 }   

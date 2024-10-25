@@ -34,7 +34,7 @@ $stmt_verification = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetail
 $stmt_verification->execute();
 $total_verification = $stmt_verification->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt_return = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status = "return"'); 
+$stmt_return = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status = "Returned"'); 
 $stmt_return->execute();
 $returnItems = $stmt_return->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -46,7 +46,7 @@ $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_SPECIAL_CHARS);
 $q = filter_input(INPUT_GET, 'q', FILTER_VALIDATE_INT);
 $activatedCircle = '';
 if ($q > 0 && $q < 6) {
-    $qc = $q;
+    $activatedCircle = $q;
 }
 $sql_cmd = '';
 $actions = [
@@ -192,7 +192,7 @@ function isActivated($s) {
                 <div style="text-align:center">Rejected<br><?php echo $total_rejected; ?></div>
             </div>
             <div class="dashboard-circle primary <?php isActivated('4') ?>" onclick="window.location.href='./orderdetails.php?action=return&q=4'">
-                <div style="text-align:center">Return Items<br><?php echo $returnItems; ?></div>
+                <div style="text-align:center">Returned Items<br><?php echo $returnItems; ?></div>
             </div>
             <div class="dashboard-circle success <?php isActivated('5') ?>" onclick="window.location.href='./orderdetails.php?action=confirmed&q=5'">
                 <div style="text-align:center">Total Confirmed Sum<br>&#8369; <?php echo number_format($total_sum_confirmed, 2); ?></div>
@@ -214,6 +214,7 @@ function isActivated($s) {
                     <th>Pick Up Date</th>
                     <th>Pick Up Place</th>
                     <th>Total</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -246,6 +247,24 @@ function isActivated($s) {
                             <td><?php echo htmlspecialchars($formattedDate); ?></td>
                             <td><?php echo htmlspecialchars($row['order_pick_place']); ?></td>
                             <td>&#8369; <?php echo htmlspecialchars($row['order_total']); ?></td>
+                            <td><?php
+                                $order_status = ucfirst($row['order_status']);
+                                $due = (new DateTime($row['order_date'])) < (new DateTime());
+
+                                if ($due && $order_status === 'Confirmed') {
+                                    echo 'Picked up';
+                                } elseif (!$due && $order_status === 'Confirmed') {
+                                    echo 'Waiting';
+                                } elseif ($order_status === 'Pending' || $order_status === 'Verification') {
+                                    echo 'Processing';  // Shows the order is being processed but not yet confirmed
+                                } elseif ($order_status === 'Rejected') {
+                                    echo 'Cancelled';   // Indicates the order was not accepted/cancelled
+                                } elseif ($order_status === 'Returned') {
+                                    echo 'Refunded';    // Shows the order was returned and likely refunded
+                                } else {
+                                    echo 'N/A';
+                                }
+                            ?></td>
 							<td><?php echo htmlspecialchars($row['order_status']); ?></td>
                         </tr>
                         <?php

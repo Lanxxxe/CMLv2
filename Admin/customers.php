@@ -1,17 +1,117 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
+require '../vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
+
+define('HOST', $_ENV['MAILER_HOST']);
+define('EMAIL_ADDRESS', $_ENV['MAILER_EMAIL']);
+define('EMAIL_PASSWORD', $_ENV['MAILER_PASS']);
+
 
 if (!isset($_SESSION['admin_username'])) {
     header("Location: ../index.php");
     exit;
 }
 
+include './approve_email.php';
+
+function sendEmailApprovedOrder($payment_id) {
+    include './config.php';
+    try {
+        $paymentformQ = $DB_con->prepare('SELECT email FROM paymentform WHERE id = :id');
+        $paymentformQ->execute([':id' => $payment_id]);
+        $email = $paymentformQ->fetch(PDO::FETCH_ASSOC)['email'];
+
+        $orderDetails = $DB_con->prepare('SELECT orderdetails.*, users.user_email FROM orderdetails JOIN users ON orderdetails.user_id = users.user_id WHERE payment_id = :payment_id');
+        $orderDetails->execute([':payment_id' => $payment_id]);
+        $orders = $orderDetails->fetchAll(PDO::FETCH_ASSOC);
+
+        $messageBody = composedMessage($orders);
+
+        $mail = new PHPMailer(true);
+        //Server settings
+        $mail->isSMTP();                                            //Send using SMTP
+        $mail->Host       = HOST;                     //Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+        $mail->Username   = EMAIL_ADDRESS;                     //SMTP username
+        $mail->Password   = EMAIL_PASSWORD;                               //SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
+        $mail->Port       = 587;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+        //Recipients
+        $mail->setFrom(EMAIL_ADDRESS, "CML Paint Trading");
+        //Add a recipient (Name is optional)
+        $mail->addAddress($email);
+
+        // Content
+        $mail->isHTML(true);                                     // Set email format to HTML
+        $mail->Subject = 'Order Approved';
+        $mail->Body = $messageBody;
+        $mail->send();
+        return json_encode([
+            "status" => "error",
+            "message" => "message sent",
+        ]);
+    } catch (Exception $e) {
+        return json_encode([
+            "status" => "error",
+            "message" => $e->getMessage(),
+        ]);
+    }
+}
+
 require_once 'config.php';
 
-if (isset($_GET['order_id'])) {
-    $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE order_id = :order_id');
-    $stmt_delete->bindParam(':order_id', $_GET['order_id']);
-    if ($stmt_delete->execute()) {
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CML Paint Trading</title>
+    <link rel="shortcut icon" href="../assets/img/logo.png" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/local.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+    #modal-product-im, #modal-receipt-image{
+        max-width: 150px;
+        max-height: 150px;
+    }
+    </style>
+</head>
+<body>
+<?php
+if (isset($_GET['delete_payment_id'])) {
+    $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE payment_id = :payment_id');
+    $stmt_delete->bindParam(':payment_id', $_GET['delete_payment_id']);
+    $delete_orders = $stmt_delete->execute();
+
+    $stmt_delete = $DB_con->prepare('DELETE FROM paymentform WHERE id = :payment_id');
+    $stmt_delete->bindParam(':payment_id', $_GET['delete_payment_id']);
+    $delete_payment = $stmt_delete->execute();
+
+    if ($delete_orders && $delete_payment) {
         echo "<script>
             Swal.fire({
                 icon: 'success',
@@ -25,19 +125,31 @@ if (isset($_GET['order_id'])) {
             });
         </script>";
     } else {
-        echo "Error deleting order: " . $stmt_delete->errorInfo()[2];
+        $error = json_encode($stmt_delete->errorInfo()[0]);
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Deleted Error',
+                text: $error,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'customers.php';
+                }
+            });
+        </script>";
     }
 }
 
-if (isset($_GET['reset_order_id'])) {
+if (isset($_GET['reset_payment_id'])) {
     $DB_con->beginTransaction();
     try {
-        $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "rejected" WHERE order_id = :order_id');
-        $stmt_reset->bindParam(':order_id', $_GET['reset_order_id']);
+        $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "rejected" WHERE payment_id = :payment_id');
+        $stmt_reset->bindParam(':payment_id', $_GET['reset_payment_id']);
         $stmt_reset->execute();
 
-        $stmt_update_payment = $DB_con->prepare('UPDATE paymentform SET payment_status = "failed" WHERE order_id = :order_id');
-        $stmt_update_payment->bindParam(':order_id', $_GET['reset_order_id']);
+        $stmt_update_payment = $DB_con->prepare('UPDATE paymentform SET payment_status = "failed" WHERE id = :payment_id');
+        $stmt_update_payment->bindParam(':payment_id', $_GET['reset_payment_id']);
         $stmt_update_payment->execute();
 
         $DB_con->commit();
@@ -56,16 +168,35 @@ if (isset($_GET['reset_order_id'])) {
         </script>";
     } catch (Exception $e) {
         $DB_con->rollBack();
-        echo "Error resetting order: " . $e->getMessage();
+        $error = json_encode($e->getMessage());
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Reset Failed',
+                text: $error,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'customers.php';
+                }
+            });
+        </script>";
     }
 }
 
-if (isset($_GET['confirm_order_id'])) {
-    $order_id = $_GET['confirm_order_id'];
+if (isset($_GET['confirm_payment_id'])) {
+    $payment_id = $_GET['confirm_payment_id'];
 
-    $stmt_confirmed = $DB_con->prepare('UPDATE orderdetails SET order_status = "Confirmed" WHERE order_id = :order_id');
-    $stmt_confirmed->bindParam(':order_id', $order_id);
-    if ($stmt_confirmed->execute()) {
+    $stmt_confirmed = $DB_con->prepare('UPDATE orderdetails SET order_status = "Confirmed" WHERE payment_id = :payment_id');
+    $stmt_confirmed->bindParam(':payment_id', $payment_id);
+    $order_confirmed = $stmt_confirmed->execute();
+
+    $stmt_confirmed = $DB_con->prepare('UPDATE paymentform SET payment_status = "Confirmed" WHERE id = :payment_id');
+    $stmt_confirmed->bindParam(':payment_id', $payment_id);
+    $payment_confirmed = $stmt_confirmed->execute();
+
+    if ($order_confirmed && $payment_confirmed) {
+        sendEmailApprovedOrder($payment_id);
         echo "<script>
             Swal.fire({
                 icon: 'success',
@@ -79,7 +210,19 @@ if (isset($_GET['confirm_order_id'])) {
             });
         </script>";
     } else {
-        echo "Error confirming order: " . $stmt_confirmed->errorInfo()[2];
+        $error = json_encode($stmt_confirmed->errorInfo()[2]);
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Reset Failed',
+                text: $error,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'customers.php';
+                }
+            });
+        </script>";
     }
 }
 
@@ -154,36 +297,6 @@ if (isset($_GET['delete_return_id'])) {
 }
 
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CML Paint Trading</title>
-    <link rel="shortcut icon" href="../assets/img/logo.png" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/local.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-    #modal-product-im, #modal-receipt-image{
-        max-width: 150px;
-        max-height: 150px;
-    }
-    </style>
-</head>
-<body>
 <div id="wrapper">
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="navbar-header">
@@ -242,8 +355,31 @@ if (isset($_GET['delete_return_id'])) {
                 </thead>
                 <tbody>
                 <?php
-                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
-                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status != "Confirmed"');
+                // $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
+                // INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status NOT IN ("Confirmed", "Returned", "rejected")');
+                $stmt = $DB_con->prepare("
+                    SELECT 
+                        u.user_email,
+                        u.user_firstname,
+                        u.user_lastname,
+                        u.user_address,
+                        pf.id AS order_id,
+                        pf.payment_status AS order_status,
+                        SUM(od.order_total) AS order_total
+                    FROM 
+                        users u
+                        INNER JOIN orderdetails od ON u.user_id = od.user_id
+                        INNER JOIN paymentform pf ON od.payment_id = pf.id
+                    WHERE 
+                        pf.payment_status NOT IN ('Confirmed', 'Returned')
+                    GROUP BY 
+                        u.user_email,
+                        u.user_firstname,
+                        u.user_lastname,
+                        u.user_address,
+                        pf.id,
+                        pf.payment_status;
+                ");
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -285,7 +421,6 @@ if (isset($_GET['delete_return_id'])) {
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
 <script>
-    $(document).ready(function() {
         function confirmOrder(orderId) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -297,7 +432,7 @@ if (isset($_GET['delete_return_id'])) {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'customers.php?confirm_order_id=' + orderId;
+                    window.location.href = 'customers.php?confirm_payment_id=' + orderId;
                 }
             });
         }
@@ -313,7 +448,7 @@ if (isset($_GET['delete_return_id'])) {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'customers.php?reset_order_id=' + orderId;
+                    window.location.href = 'customers.php?reset_payment_id=' + orderId;
                 }
             });
         }
@@ -329,61 +464,11 @@ if (isset($_GET['delete_return_id'])) {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'customers.php?order_id=' + orderId;
+                    window.location.href = 'customers.php?delete_payment_id=' + orderId;
                 }
             });
         }
-        $(document).ready(function() {
-            function confirmOrder(orderId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, confirm it!',
-                    cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'customers.php?confirm_order_id=' + orderId;
-                    }
-                });
-            }
 
-            function resetOrder(orderId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You are about to reject this order!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, reset it!',
-                    cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'customers.php?reset_order_id=' + orderId;
-                    }
-                });
-            }
-
-            function deleteUser(orderId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "This action will permanently delete the order!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'customers.php?order_id=' + orderId;
-                    }
-                });
-            }
-        });
-
-    });
 </script>
 
 </body>

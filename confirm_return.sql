@@ -56,7 +56,7 @@ BEGIN
         IF v_order_quantity <= current_qty THEN
             -- Update entire order to 'return' status
             UPDATE orderdetails 
-            SET order_status = 'return'
+            SET order_status = 'Returned'
             WHERE order_id = v_order_id;
             
             SET current_qty = current_qty - v_order_quantity;
@@ -75,7 +75,7 @@ BEGIN
             )
             VALUES (
                 v_user_id, v_order_name, v_order_price, current_qty,
-                v_order_price * current_qty, 'return', v_order_date, 
+                v_order_price * current_qty, 'Returned', v_order_date, 
                 v_order_pick_up, v_order_pick_place, v_gl,
                 v_payment_id, v_product_id
             );
