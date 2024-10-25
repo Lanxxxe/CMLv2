@@ -245,7 +245,7 @@ if (isset($_GET['delete_return_id'])) {
                 <?php
                 $stmt = $DB_con->prepare('SELECT returnitems.*,
                     (SELECT users.user_email FROM users WHERE users.user_id = returnitems.user_id) as user_email
-                FROM returnitems');
+                FROM returnitems WHERE status != "Confirmed"');
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {

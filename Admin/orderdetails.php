@@ -34,13 +34,35 @@ $stmt_verification = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetail
 $stmt_verification->execute();
 $total_verification = $stmt_verification->fetch(PDO::FETCH_ASSOC)['total'];
 
-$stmt_return = $DB_con->prepare('SELECT COUNT(*) AS total FROM  returnitems WHERE status = "Confirmed"');
+$stmt_return = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status = "return"'); 
 $stmt_return->execute();
 $returnItems = $stmt_return->fetch(PDO::FETCH_ASSOC)['total'];
 
 $stmt_rejected = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status = "Rejected"');
 $stmt_rejected->execute();
 $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
+
+$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_SPECIAL_CHARS);
+$q = filter_input(INPUT_GET, 'q', FILTER_VALIDATE_INT);
+$activatedCircle = '';
+if ($q > 0 && $q < 6) {
+    $qc = $q;
+}
+$sql_cmd = '';
+$actions = [
+    'confirmed',
+    'verification',
+    'rejected',
+    'return',
+];
+if (in_array($action, $actions)) {
+    $sql_cmd = "WHERE LCASE(orderdetails.order_status) = LCASE('$action')";
+}
+
+function isActivated($s) {
+    global $activatedCircle;
+    echo ($activatedCircle == $s)? 'activated': '';
+}
 
 ?>
 
@@ -95,6 +117,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             align-items: center;
             gap: 20px;
             margin-bottom: 20px;
+        }
+        .dashboard-circle.activated {
+            border: 3px solid #000;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -154,22 +179,22 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
         <br />
 
         <div class="dashboard-container">
-            <div class="dashboard-circle primary">
+            <div class="dashboard-circle primary" onclick="window.location.href='./orderdetails.php'">
                 <div style="text-align:center">Total Orders<br><?php echo $total_orders; ?></div>
             </div>
-            <div class="dashboard-circle success">
+                <div class="dashboard-circle success <?php isActivated('1') ?>" onclick="window.location.href='./orderdetails.php?action=confirmed&q=1'">
                 <div style="text-align:center">Confirmed<br><?php echo $total_confirmed; ?></div>
             </div>
-            <div class="dashboard-circle warning">
+            <div class="dashboard-circle warning <?php isActivated('2') ?>" onclick="window.location.href='./orderdetails.php?action=verification&q=2'">
                 <div style="text-align:center">Verification<br><?php echo $total_verification; ?></div>
             </div>
-            <div class="dashboard-circle danger">
+            <div class="dashboard-circle danger <?php isActivated('3') ?>" onclick="window.location.href='./orderdetails.php?action=rejected&q=3'">
                 <div style="text-align:center">Rejected<br><?php echo $total_rejected; ?></div>
             </div>
-            <div class="dashboard-circle primary">
+            <div class="dashboard-circle primary <?php isActivated('4') ?>" onclick="window.location.href='./orderdetails.php?action=return&q=4'">
                 <div style="text-align:center">Return Items<br><?php echo $returnItems; ?></div>
             </div>
-            <div class="dashboard-circle success">
+            <div class="dashboard-circle success <?php isActivated('5') ?>" onclick="window.location.href='./orderdetails.php?action=confirmed&q=5'">
                 <div style="text-align:center">Total Confirmed Sum<br>&#8369; <?php echo number_format($total_sum_confirmed, 2); ?></div>
             </div>
         </div>
@@ -194,7 +219,16 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 </thead>
                 <tbody>
                 <?php
-               $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id ORDER BY orderdetails.order_date DESC');
+                    $stmt = $DB_con->prepare(
+                            "SELECT
+                                users.user_email,
+                                users.user_firstname,
+                                users.user_lastname,
+                                users.user_address,
+                                orderdetails.*
+                            FROM users
+                                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id $sql_cmd
+                            ORDER BY orderdetails.order_date DESC");
 			   $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -240,9 +274,10 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
 <script>
     $(document).ready(function () {
         $('#example').DataTable({
-            columnDefs: [
-                { orderable: false, targets: '_all' } // Disable sorting for the second column (Position)
-            ]
+            "ordering": false, // Disable all sorting
+            "paging": true,
+            "info": true,
+            "searching": true,
         });
     });
 
