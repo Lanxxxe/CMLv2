@@ -126,6 +126,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
+                <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                 <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
@@ -239,7 +240,11 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
 
 <script>
     $(document).ready(function () {
-        $('#example').DataTable();
+        $('#example').DataTable({
+            columnDefs: [
+                { orderable: false, targets: '_all' } // Disable sorting for the second column (Position)
+            ]
+        });
     });
 
     $(document).ready(function () {

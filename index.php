@@ -580,12 +580,14 @@ session_start();
 
         let formData = null;
         function registerUser() {
+            setVisible("#loading", true);
             fetch('register.php', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => response.json())
                 .then(data => {
+                    setVisible("#loading", false);
                     if (data.status === 'success') {
                         Swal.fire({
                             icon: 'success',
@@ -606,7 +608,9 @@ session_start();
                         });
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error)
+                });
         }
 
         // Registration form submission
