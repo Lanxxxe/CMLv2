@@ -163,7 +163,7 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                     </tr>
                     <tr>
                         <td><label class="control-label">Pick up date.</label></td>
-                        <td><input class="form-control" type="datetime-local" name="order_pick_up" required /></td>
+                        <td><input class="form-control" type="datetime-local" id="order_pick_up" name="order_pick_up" required /></td>
                     </tr>
                     <tr>
                         <td><label class="control-label">Pick up place.</label></td>
@@ -259,6 +259,26 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                 }
             });
         }
+
+        // Get the current date
+        const today = new Date();
+
+        // Set the date to tomorrow
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        // Format the date to YYYY-MM-DDTHH:MM
+        const formattedTomorrow = tomorrow.toISOString().slice(0, 16);
+        
+        // Set the min attribute to tomorrow
+        const dateInput = document.getElementById('order_pick_up');
+        dateInput.setAttribute('min', formattedTomorrow);
+        dateInput.value = formattedTomorrow; // Set default to tomorrow
+
+        // Optional: Add an event listener to reset the date if clicked
+        dateInput.addEventListener('click', function () {
+            dateInput.value = formattedTomorrow; // Reset to tomorrow when clicked
+        });
     </script>
 </body>
 </html>
