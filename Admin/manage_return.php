@@ -226,47 +226,62 @@ if (isset($_GET['delete_return_id'])) {
 
     <div id="page-wrapper">
         <div class="alert alert-danger">
-            <center><h3><strong>Customer Management</strong></h3></center>
+            <center><h3><strong>Management Return Items</strong></h3></center>
         </div>
-        <br />
-        <div class="table-responsive" style="margin-bottom: 50px;">
-            <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
+        <div class="table-responsive">
+            <table class="display table table-bordered" id="returnsTable" cellspacing="0" width="100%">
                 <thead>
                 <tr>
-                    <th>Customer Email</th>
-                    <th>Order ID</th>
-                    <th>Order Status</th>
-                    <th>Order Total</th>
+                    <th>Return ID</th>
+                    <th>Product Name</th>
+                    <th>User Email</th>
+                    <th>Quantity</th>
+                    <th>Reason</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
-                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
-                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status != "Confirmed"');
+                $stmt = $DB_con->prepare('SELECT returnitems.*,
+                    (SELECT users.user_email FROM users WHERE users.user_id = returnitems.user_id) as user_email
+                FROM returnitems');
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         ?>
                         <tr>
+                            <td><?php echo htmlspecialchars($row['return_id']); ?></td>
+                            <td><?php echo htmlspecialchars($row['product_name']); ?></td>
                             <td><?php echo htmlspecialchars($row['user_email']); ?></td>
-                            <td><?php echo htmlspecialchars($row['order_id']); ?></td>
-                            <td><?php echo htmlspecialchars($row['order_status']); ?></td>
-                            <td><?php echo htmlspecialchars($row['order_total']); ?></td>
-                            <td>
-                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['order_id']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
-                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['order_id']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
-                                <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['order_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
-                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['order_id']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
-                            </td>
+                            <td><?php echo htmlspecialchars($row['quantity']); ?></td>
+                            <td><?php echo htmlspecialchars($row['reason']); ?></td>
+                            <td><?php echo htmlspecialchars($row['status']); ?></td>
+                              <td>
+                                    <?php if ($row['status'] !== 'Confirmed' && $row['status'] !== 'Rejected'): ?>
+                                        <button class="btn btn-success btn-sm confirm-return" data-id="<?php echo htmlspecialchars($row['return_id']); ?>">Confirm</button>
+                                        <button class="btn btn-warning btn-sm reject-return" data-id="<?php echo htmlspecialchars($row['return_id']); ?>">Reject</button>
+                                    <?php endif; ?>
+                                    <button class="btn btn-primary btn-sm preview-return" data-id="<?php echo htmlspecialchars($row['return_id']); ?>" 
+                                        data-product="<?php echo htmlspecialchars($row['product_name']); ?>"
+                                        data-email="<?php echo htmlspecialchars($row['user_email']); ?>"
+                                        data-quantity="<?php echo htmlspecialchars($row['quantity']); ?>"
+                                        data-reason="<?php echo htmlspecialchars($row['reason']); ?>"
+                                        data-status="<?php echo htmlspecialchars($row['status']); ?>"
+                                        data-image="<?php echo  '../Customers/' . ($row['product_image']); ?>"
+                                        data-receipt="<?php echo  '../Customers/' . ($row['receipt_image']); ?>">
+                                        Preview
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-return" data-id="<?php echo htmlspecialchars($row['return_id']); ?>">Delete</button>
+                                </td>
                         </tr>
                         <?php
                     }
                 } else {
                     ?>
                     <tr>
-                        <td colspan="5" class="text-center">No orders found</td>
+                        <td colspan="7" class="text-center">No return items found</td>
                     </tr>
                     <?php
                 }
@@ -274,13 +289,45 @@ if (isset($_GET['delete_return_id'])) {
                 </tbody>
             </table>
         </div>
-
         <div class="alert alert-default" style="background-color:#033c73;">
             <p style="color:white;text-align:center;">&copy 2024 CML Paint Trading Shop | All Rights Reserved</p>
         </div>
     </div>
 </div>
 
+    <div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Return Item Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Return ID:</strong> <span id="modal-return-id"></span></p>
+                            <p><strong>Product Name:</strong> <span id="modal-product-name"></span></p>
+                            <p><strong>User Email:</strong> <span id="modal-user-email"></span></p>
+                            <p><strong>Quantity:</strong> <span id="modal-quantity"></span></p>
+                            <p><strong>Reason:</strong> <span id="modal-reason"></span></p>
+                            <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Product Image:</strong></p>
+                            <img id="modal-product-image" src="" alt="Product Image">
+                            <p><strong>Receipt Image:</strong></p>
+                            <img id="modal-receipt-image" src="" alt="Receipt Image">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 	<!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
@@ -378,6 +425,118 @@ if (isset($_GET['delete_return_id'])) {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = 'customers.php?order_id=' + orderId;
+                    }
+                });
+            }
+
+            $('.confirm-return').click(function() {
+                var returnId = $(this).data('id');
+                confirmReturn(returnId);
+            });
+
+            $('.reject-return').click(function() {
+                var returnId = $(this).data('id');
+                rejectReturn(returnId);
+            });
+
+            $('.preview-return').click(function() {
+                var returnId = $(this).data('id');
+                var productName = $(this).data('product');
+                var userEmail = $(this).data('email');
+                var quantity = $(this).data('quantity');
+                var reason = $(this).data('reason');
+                var status = $(this).data('status');
+                var productImage = $(this).data('image');
+                var receiptImage = $(this).data('receipt');
+
+                $('#modal-return-id').text(returnId);
+                $('#modal-product-name').text(productName);
+                $('#modal-user-email').text(userEmail);
+                $('#modal-quantity').text(quantity);
+                $('#modal-reason').text(reason);
+                $('#modal-status').text(status);
+                $('#modal-product-image').attr('src', productImage);
+                $('#modal-receipt-image').attr('src', receiptImage);
+
+                $('#previewModal').modal('show');
+            });
+
+            $('.delete-return').click(function() {
+                var returnId = $(this).data('id');
+                deleteReturn(returnId);
+            });
+
+            function confirmReturn(returnId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to confirm this return!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, confirm it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.get('confirm_return.php', { return_id: returnId }, function(response) {
+                            var result = JSON.parse(response);
+                            if (result.success) {
+                                Swal.fire('Confirmed!', result.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', result.message, 'error');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function rejectReturn(returnId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to reject this return!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, reject it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.get('reject_return.php', { return_id: returnId }, function(response) {
+                            var result = JSON.parse(response);
+                            if (result.success) {
+                                Swal.fire('Rejected!', result.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', result.message, 'error');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function deleteReturn(returnId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This action will permanently delete the return. This cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.get('delete_return.php', { return_id: returnId }, function(response) {
+                            var result = JSON.parse(response);
+                            if (result.success) {
+                                Swal.fire('Deleted!', result.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', result.message, 'error');
+                            }
+                        });
                     }
                 });
             }

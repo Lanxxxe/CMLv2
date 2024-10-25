@@ -74,6 +74,7 @@ if (isset($_GET['delete_id'])) {
                     <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>                    
                     <li class="active"><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
+                    <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                     <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                     <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
                 </ul>
