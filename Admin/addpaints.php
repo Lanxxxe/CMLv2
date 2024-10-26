@@ -20,7 +20,7 @@ include("db_conection.php");
     $type = $_POST['paint_type_id'];
     $gl = $_POST['gl'];
 
-    $check_item = "SELECT * FROM items WHERE item_name='$item_name'";
+    $check_item = "SELECT * FROM items WHERE item_name='$item_name' AND gl='$gl'";
     $run_query = mysqli_query($dbcon, $check_item);
 
     if(mysqli_num_rows($run_query) > 0) {

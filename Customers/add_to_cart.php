@@ -151,7 +151,7 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                     </tr>
                     <tr>
                         <td><label class="control-label">Gallon/Liter.</label></td>
-                        <td><input class="form-control" type="text" value="<?php echo $gl; ?>" disabled /></td>
+                        <td><input class="form-control" type="text" value="<?php echo $gl; ?>" /></td>
                     </tr>
                     <tr>
                         <td><label class="control-label">Image.</label></td>
@@ -260,25 +260,30 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
             });
         }
 
-        // Get the current date
-        const today = new Date();
+        function calendarRestriction() {
+            // Get the current date
+            const today = new Date();
+    
+            // Set the date to tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+    
+            // Format the date to YYYY-MM-DDTHH:MM
+            const formattedTomorrow = tomorrow.toISOString().slice(0, 16);
+            
+            // Set the min attribute to tomorrow
+            const dateInput = document.getElementById('order_pick_up');
+            dateInput.setAttribute('min', formattedTomorrow);
+            dateInput.value = formattedTomorrow; // Set default to tomorrow
+    
+            // Optional: Add an event listener to reset the date if clicked
+            dateInput.addEventListener('click', function () {
+                dateInput.value = formattedTomorrow; // Reset to tomorrow when clicked
+            });
+        }
 
-        // Set the date to tomorrow
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
 
-        // Format the date to YYYY-MM-DDTHH:MM
-        const formattedTomorrow = tomorrow.toISOString().slice(0, 16);
-        
-        // Set the min attribute to tomorrow
-        const dateInput = document.getElementById('order_pick_up');
-        dateInput.setAttribute('min', formattedTomorrow);
-        dateInput.value = formattedTomorrow; // Set default to tomorrow
-
-        // Optional: Add an event listener to reset the date if clicked
-        dateInput.addEventListener('click', function () {
-            dateInput.value = formattedTomorrow; // Reset to tomorrow when clicked
-        });
+        calendarRestriction();
     </script>
 </body>
 </html>
