@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 29, 2024 at 06:16 AM
+-- Generation Time: Oct 26, 2024 at 05:17 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,19 +48,19 @@ INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
 
 CREATE TABLE `brands` (
   `brand_id` int(11) NOT NULL,
-  `brand_name` varchar(255) NOT NULL,
-  `brand_logo` varchar(255) NOT NULL
+  `brand_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brands`
 --
 
-INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_logo`) VALUES
-(1, 'Davies', 'https://phoenixgroup.com.pg/wp-content/uploads/2021/06/davies-img.png'),
-(2, 'Boysen', 'https://store.boysen.com.ph/images/boysenlogo2.png'),
-(3, 'Rain or Shine', 'https://seeklogo.com/images/R/rain-or-shine-logo-B658167B07-seeklogo.com.png'),
-(4, 'K92', 'https://baesacolorspaintcenter.com.ph/cdn/shop/collections/LznXc15m0F1XEBkW1FRyp8ciE6VIprKGnnYulMw3.png?v=1712806428');
+INSERT INTO `brands` (`brand_id`, `brand_name`) VALUES
+(1, 'Davies'),
+(2, 'Boysen'),
+(3, 'Rain or Shine'),
+(5, 'Euromax'),
+(6, 'K92');
 
 -- --------------------------------------------------------
 
@@ -74,6 +74,13 @@ CREATE TABLE `cartitems` (
   `palletCode` varchar(255) NOT NULL,
   `palletRGB` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cartitems`
+--
+
+INSERT INTO `cartitems` (`itemID`, `palletName`, `palletCode`, `palletRGB`) VALUES
+(115, 'Raspberry Run', 'BM-0002', 'rgb(188,112,134)');
 
 -- --------------------------------------------------------
 
@@ -99,8 +106,13 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`) VALUES
-(33, 'Latex Paint', 'Rain or Shine', '353368.jpg', '2024-09-28 00:00:00.000000', '2024-09-26', '100', 'Latex', 86, 'Gallon'),
-(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 140, 'Gallon');
+(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 133, 'Gallon'),
+(35, 'Boysend', 'Boysen', '712709.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrylic', 22, 'Gallon'),
+(37, 'Sample Paint', 'K92', '158008.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrytex', 17, 'Liter'),
+(41, 'Paint Brush', 'Davies', '396958.jpg', '2024-10-25 00:00:00.000000', NULL, '100', 'Brush', 100, ''),
+(43, 'Davies Paint', 'Davies', '2817.png', '2024-10-25 00:00:00.000000', '2024-11-09', '100', 'Paints', 100, 'Liter'),
+(44, 'Latex Paint', 'Rain or Shine', '770440.png', '2024-10-26 00:00:00.000000', '2024-11-08', '100', 'Paint', 20, 'Liter'),
+(45, 'Latex Paint', 'Rain or Shine', '87327.png', '2024-10-26 00:00:00.000000', '2024-11-09', '200', 'Paint', 20, 'Gallon');
 
 -- --------------------------------------------------------
 
@@ -129,11 +141,26 @@ CREATE TABLE `orderdetails` (
 --
 
 INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
-(69, 8, 'Latex Paint', 100, 10, 1000, 'Confirmed', '2024-09-28', '2024-10-04 02:52:00.000000', 'Quezon City', 'Gallon', 37, 33),
-(70, 8, 'Latex Paint (Ice Cubes)', 100, 2, 200, 'Confirmed', '2024-09-27', '2024-09-27 02:53:00.000000', 'San Jose de Monte', 'Gallon', 36, 33),
-(71, 8, 'Boysen Paint', 200, 50, 10000, 'Confirmed', '2024-09-28', '2024-09-26 02:55:00.000000', 'Quezon City', 'Gallon', 38, 34),
-(72, 8, 'Boysen Paint', 200, 5, 1000, 'Pending', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
-(73, 8, 'Boysen Paint', 200, 1, 200, 'Pending', '2024-09-29', '2024-10-02 02:03:00.000000', 'Valenzuela', 'Gallon', NULL, 34);
+(69, 8, 'Latex Paint', 100, 10, 1000, 'Confirmed', '2024-09-28', '2024-10-04 02:52:00.000000', 'Quezon City', 'Gallon', NULL, 33),
+(70, 8, 'Latex Paint (Ice Cubes)', 100, 2, 200, 'Confirmed', '2024-09-27', '2024-09-27 02:53:00.000000', 'San Jose de Monte', 'Gallon', NULL, 33),
+(71, 8, 'Boysen Paint', 200, 50, 10000, 'Confirmed', '2024-09-28', '2024-09-26 02:55:00.000000', 'Quezon City', 'Gallon', NULL, 34),
+(72, 8, 'Boysen Paint', 200, 5, 1000, 'Confirmed', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
+(73, 8, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-09-29', '2024-10-02 02:03:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
+(78, 8, 'Boysen Paint', 200, 2, 400, 'Confirmed', '2024-10-09', '2024-10-10 07:07:00.000000', 'Quezon City', 'Gallon', NULL, 34),
+(82, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-20 20:10:00.000000', 'Caloocan', 'Gallon', 40, 33),
+(83, 17, 'Boysend', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-17 20:39:00.000000', 'Valenzuela', 'Gallon', NULL, 35),
+(84, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-18 20:41:00.000000', 'Caloocan', 'Gallon', 41, 33),
+(85, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-10 21:06:00.000000', 'Caloocan', 'Gallon', NULL, 33),
+(87, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-15 21:16:00.000000', 'Caloocan', 'Gallon', 42, 33),
+(88, 8, 'Boysend', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-25 22:15:00.000000', 'Caloocan', 'Gallon', 43, 35),
+(90, 17, 'Boysen Paint', 200, 1, 200, '0', '2024-10-20', '2024-10-23 22:51:00.000000', 'Caloocan', 'Gallon', 44, 34),
+(93, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-15 23:13:00.000000', 'Caloocan', 'Gallon', NULL, 34),
+(94, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-20 23:14:00.000000', 'Caloocan', 'Gallon', NULL, 34),
+(95, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-20 23:17:00.000000', 'Caloocan', 'Gallon', 45, 34),
+(97, 8, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-24', '2024-10-25 22:40:00.000000', 'Caloocan', 'Gallon', 51, 34),
+(98, 8, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-24', '2024-10-26 22:41:00.000000', 'Caloocan', 'Gallon', 51, 33),
+(100, 17, 'Latex Paint', 15, 4, 60, 'Pending', '2024-10-25', '2024-10-26 00:02:00.000000', 'Caloocan', 'Gallon', NULL, 33),
+(101, 17, 'Paint Brush', 100, 7, 700, 'Pending', '2024-10-25', '2024-10-26 00:06:00.000000', 'Caloocan', '', NULL, 38);
 
 -- --------------------------------------------------------
 
@@ -416,7 +443,8 @@ CREATE TABLE `paymentform` (
   `payment_image_path` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `order_id` int(10) UNSIGNED DEFAULT NULL,
-  `payment_status` varchar(20) DEFAULT 'verification'
+  `payment_status` varchar(20) DEFAULT 'verification',
+  `months_paid` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -424,9 +452,40 @@ CREATE TABLE `paymentform` (
 --
 
 INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`) VALUES
-(36, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 0.00, 'uploaded_images/SUN AND RAIN CORNSILK.PNG', '2024-09-27 18:53:35', 70, 'verification'),
-(37, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Walk In', 'Down Payment', 50.00, 'uploaded_images/SUN AND RAIN ROSE WHITE.PNG', '2024-09-27 18:54:28', 69, 'verification'),
-(38, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Walk In', 'Full Payment', 0.00, 'uploaded_images/SUN AND RAIN CORNSILK.PNG', '2024-09-27 18:57:00', 71, 'verification');
+(40, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/Black.jpg', '2024-10-20 12:12:23', NULL, 'verification'),
+(41, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-10-20 12:42:16', NULL, 'verification'),
+(42, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, '', '2024-10-20 13:56:29', NULL, 'verification'),
+(43, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/Black.jpg', '2024-10-20 14:16:35', NULL, 'verification'),
+(44, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:01:19', NULL, 'Confirmed'),
+(45, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:26:24', NULL, 'Confirmed'),
+(46, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/august.png', '2024-10-24 14:33:54', NULL, 'verification'),
+(48, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:41:44', NULL, 'verification'),
+(49, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:44:07', NULL, 'verification'),
+(50, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:52:56', NULL, 'verification'),
+(51, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:53:09', NULL, 'verification');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_type`
+--
+
+CREATE TABLE `product_type` (
+  `type_id` int(11) NOT NULL,
+  `type_name` text NOT NULL,
+  `brand_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_type`
+--
+
+INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`) VALUES
+(1, 'Paints', 1),
+(2, 'Brush', 1),
+(3, 'Tape', 2),
+(5, 'Paint', 2),
+(6, 'Paint', 3);
 
 -- --------------------------------------------------------
 
@@ -466,7 +525,7 @@ CREATE TABLE `users` (
   `user_lastname` varchar(1000) NOT NULL,
   `user_address` varchar(1000) NOT NULL,
   `user_mobile` varchar(255) NOT NULL,
-  `type` enum('Customer','Admin') NOT NULL
+  `type` enum('Admin','Customer','Cashier') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -475,7 +534,14 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`) VALUES
 (6, 'admin@email.com', 'admin', 'admin', 'r', 'r', '09123456778', 'Admin'),
-(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer');
+(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer'),
+(17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier');
+
+CREATE TABLE `wishlist` (
+    `wish_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Indexes for dumped tables
@@ -529,6 +595,13 @@ ALTER TABLE `paymentform`
   ADD KEY `FK_paymentform_orderdetails` (`order_id`);
 
 --
+-- Indexes for table `product_type`
+--
+ALTER TABLE `product_type`
+  ADD PRIMARY KEY (`type_id`),
+  ADD KEY `fk_brand` (`brand_id`);
+
+--
 -- Indexes for table `returnitems`
 --
 ALTER TABLE `returnitems`
@@ -555,25 +628,25 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
+  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -585,7 +658,13 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+
+--
+-- AUTO_INCREMENT for table `product_type`
+--
+ALTER TABLE `product_type`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `returnitems`
@@ -597,7 +676,7 @@ ALTER TABLE `returnitems`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
@@ -617,6 +696,12 @@ ALTER TABLE `paymentform`
   ADD CONSTRAINT `FK_paymentform_orderdetails` FOREIGN KEY (`order_id`) REFERENCES `orderdetails` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `product_type`
+--
+ALTER TABLE `product_type`
+  ADD CONSTRAINT `fk_brand` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`brand_id`);
+
+--
 -- Constraints for table `returnitems`
 --
 ALTER TABLE `returnitems`
@@ -626,3 +711,112 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE ProcessReturnItems(IN p_return_id INT)
+BEGIN
+    DECLARE current_qty INT;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_order_id INT;
+    DECLARE v_order_quantity INT;
+    DECLARE v_user_id INT;
+    DECLARE v_order_name VARCHAR(1000);
+    DECLARE v_order_price DOUBLE;
+    DECLARE v_order_total DOUBLE;
+    DECLARE v_order_status VARCHAR(45);
+    DECLARE v_order_date DATE;
+    DECLARE v_order_pick_up DATETIME(6);
+    DECLARE v_order_pick_place VARCHAR(45);
+    DECLARE v_gl VARCHAR(45);
+    DECLARE v_payment_id INT;
+    DECLARE v_product_id INT;
+    
+    -- Cursor for orders sorted by date
+    DECLARE order_cursor CURSOR FOR 
+        SELECT order_id, order_quantity,
+               user_id, order_name, order_price, order_total,
+               order_status, order_date, order_pick_up, order_pick_place,
+               gl, payment_id, product_id
+        FROM orderdetails 
+        WHERE user_id = (SELECT user_id FROM returnitems WHERE return_id = p_return_id)
+        AND product_id = (SELECT product_id FROM orderdetails WHERE order_name = 
+                        (SELECT product_name FROM returnitems WHERE return_id = p_return_id) LIMIT 1)
+        ORDER BY order_date DESC;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    -- Start transaction
+    START TRANSACTION;
+    
+    -- Get initial return quantity
+    SELECT quantity INTO current_qty
+    FROM returnitems
+    WHERE return_id = p_return_id;
+    
+    -- Open cursor
+    OPEN order_cursor;
+    
+    read_loop: LOOP
+        FETCH order_cursor INTO v_order_id, v_order_quantity,
+                               v_user_id, v_order_name, v_order_price, v_order_total,
+                               v_order_status, v_order_date, v_order_pick_up, v_order_pick_place,
+                               v_gl, v_payment_id, v_product_id;
+                               
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        IF v_order_quantity <= current_qty THEN
+            -- Update entire order to 'return' status
+            UPDATE orderdetails 
+            SET order_status = 'Returned'
+            WHERE order_id = v_order_id;
+            
+            SET current_qty = current_qty - v_order_quantity;
+        ELSE
+            -- Split the order
+            UPDATE orderdetails
+            SET order_quantity = order_quantity - current_qty,
+                order_total = order_price * (order_quantity - current_qty)
+            WHERE order_id = v_order_id;
+            
+            -- Insert new order for the returned portion
+            INSERT INTO orderdetails (
+                user_id, order_name, order_price, order_quantity, 
+                order_total, order_status, order_date, order_pick_up,
+                order_pick_place, gl, payment_id, product_id
+            )
+            VALUES (
+                v_user_id, v_order_name, v_order_price, current_qty,
+                v_order_price * current_qty, 'Returned', v_order_date, 
+                v_order_pick_up, v_order_pick_place, v_gl,
+                v_payment_id, v_product_id
+            );
+            
+            SET current_qty = 0;
+            LEAVE read_loop;
+        END IF;
+        
+        IF current_qty = 0 THEN
+            LEAVE read_loop;
+        END IF;
+    END LOOP;
+    
+    -- Close cursor
+    CLOSE order_cursor;
+    
+    -- Update return item status
+    UPDATE returnitems 
+    SET status = 'Confirmed'
+    WHERE return_id = p_return_id;
+    
+    -- Commit transaction
+    COMMIT;
+    
+END //
+
+DELIMITER ;
+
