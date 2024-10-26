@@ -1,5 +1,5 @@
 <?php
-session_start();;
+session_start();
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
@@ -258,31 +258,6 @@ extract($edit_row);
                 $start = ($id - 1) * $limit;
             }
 
-<<<<<<< HEAD
-            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price FROM items LIMIT $start, $limit");
-
-            while ($query2 = mysqli_fetch_assoc($query)) {
-                ?>
-                <div class='col-sm-3 panel-item' data-type='<?php echo $query2['type'] ?>' data-brand='<?php echo $query2['brand_name'] ?>'>
-                    <div class='panel panel-default' style='border-color:#008CBA;'>
-                        <div class='panel-heading' style='color:white;background-color: #033c73;'>
-                            <center> 
-                                <textarea style='text-align:center;background-color: white;' class='form-control' rows='1' disabled><?php echo $query2['brand_name'] ?></textarea>
-                            </center>
-                        </div>
-                        <div class='panel-body'>
-                            <a class='fancybox-buttons' href='../Admin/item_images/<?php echo $query2['item_image'] ?>' data-fancybox-group='button' title='Page <?php echo $id . "- " . $query2['item_name'] ?>'>
-                                <img src='../Admin/item_images/<?php echo $query2['item_image'] ?>' class='img img-thumbnail' style='width:350px;height:150px;' />
-                            </a>
-                            <center><h4> Item Name: <?php echo $query2['item_name'] ?> 
-                            </h4></center>
-                            <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?></h4></center>
-                            <a class='btn btn-block btn-danger' href='add_to_cart.php?cart=<?php echo $query2['item_id'] ?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            <?php
-=======
             $query = mysqli_query($conn, "SELECT item_id FROM wishlist WHERE user_id = {$_SESSION['user_id']}");
             $wishlist = mysqli_fetch_all($query, MYSQLI_NUM);
 
@@ -325,7 +300,6 @@ extract($edit_row);
                 </div>
             </div>
         </div>";
->>>>>>> 556c5a1883fb9bf53c6ec251a71c00772fbcbe6a
             }
 
             echo "<div class='container'></div>";
