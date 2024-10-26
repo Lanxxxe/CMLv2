@@ -50,3 +50,11 @@
 (2024-10-19 17:21:44) Error: [2] Undefined variable $user_address - C:\xampp\htdocs\CMLv2\Customers\index.php:225
 (2024-10-19 17:21:44) Error: [2] Undefined variable $user_password - C:\xampp\htdocs\CMLv2\Customers\index.php:233
 (2024-10-19 17:21:44) Error: [2] Undefined variable $user_id - C:\xampp\htdocs\CMLv2\Customers\index.php:240
+(2024-10-26 05:52:19) Error: [2] Undefined array key "user_email" - C:\xampp\htdocs\CMLv2\Customers\add_to_cart.php:13
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265

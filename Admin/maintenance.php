@@ -256,6 +256,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
+                <li class="active"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                 <li class="active"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
@@ -325,7 +326,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                         <div class="brand-header">
                             <h3 class="brand-title"><?php echo htmlspecialchars($brand['name']); ?></h3>
                             <div class="brand-actions">
-                                <button class="btn btn-primary" onclick="showAddToolModal(<?php echo $brandId; ?>)">Add Tool</button>
+                                <button class="btn btn-primary" onclick="showAddToolModal(<?php echo $brandId; ?>)">Add Product</button>
                                 <button class="btn btn-warning" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']); ?>')">Edit Brand</button>
                                 <button class="btn btn-danger" onclick="confirmDeleteBrand(<?php echo $brandId; ?>)">Delete Brand</button>
                             </div>
@@ -495,10 +496,10 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     // Add Tool
     function showAddToolModal(brandId) {
         Swal.fire({
-            title: 'Add New Tool',
+            title: 'Add New Product',
             input: 'text',
             inputLabel: 'Tool Name',
-            inputPlaceholder: 'Enter tool name',
+            inputPlaceholder: 'Enter product name',
             showCancelButton: true,
             confirmButtonText: 'Add',
             cancelButtonText: 'Cancel',
@@ -540,7 +541,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     // Edit Tool
     function showEditToolModal(toolId, toolName) {
         Swal.fire({
-            title: 'Edit Tool',
+            title: 'Edit Product',
             input: 'text',
             inputLabel: 'Tool Name',
             inputValue: toolName,
@@ -585,7 +586,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     // Delete Tool
     function confirmDeleteTool(toolId) {
         Swal.fire({
-            title: 'Delete Tool',
+            title: 'Delete Product',
             text: 'Are you sure you want to delete this tool?',
             icon: 'warning',
             showCancelButton: true,

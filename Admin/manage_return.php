@@ -202,9 +202,10 @@ if (isset($_GET['delete_return_id'])) {
                 <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
                 <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>                
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
-                <li class="active"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
+                <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
+                <li class="active"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+                <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right navbar-user">
