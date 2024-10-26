@@ -543,6 +543,15 @@ CREATE TABLE `wishlist` (
     `item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+
+CREATE TABLE `payment_track` (
+    `track_id` int(11) NOT NULL PRIMARY AUTO_INCREMENT,
+    `payment_id` int(11) NOT NULL,
+    `status` varchar(32) NOT NULL DEFAULT 'Requested',
+    `amount` decimal(10, 2) NOT NULL,
+    `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+    CONSTRAINT paymentform_track_fk FOREIGN KEY (`payment_id`) REFERENCES paymentform(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 --
 -- Indexes for dumped tables
 --
@@ -820,3 +829,101 @@ END //
 
 DELIMITER ;
 
+
+
+
+-- Procedure to request a payment
+DELIMITER //
+
+CREATE PROCEDURE request_payment(
+    IN p_payment_id INT,
+    IN p_amount DECIMAL(10,2),
+    IN p_payment_image VARCHAR(255)
+)
+BEGIN
+    DECLARE last_track_status VARCHAR(20);
+    DECLARE v_payment_type VARCHAR(255);
+    
+    -- Get the status of the latest track record
+    SELECT status INTO last_track_status
+    FROM payment_track
+    WHERE payment_id = p_payment_id
+    ORDER BY track_id DESC
+    LIMIT 1;
+    
+    -- Get payment type
+    SELECT payment_type INTO v_payment_type
+    FROM paymentform
+    WHERE id = p_payment_id;
+    
+    -- Check if we can process new payment (no track or last track was confirmed)
+    IF (last_track_status IS NULL OR last_track_status = 'Confirmed') THEN
+        -- Insert new payment track record
+        INSERT INTO payment_track (payment_id, amount, status)
+        VALUES (p_payment_id, p_amount, 'Requested');
+        
+        -- Update payment image in paymentform
+        UPDATE paymentform
+        SET payment_image_path = p_payment_image
+        WHERE id = p_payment_id;
+        
+        SELECT 'success' as status, 'Payment request submitted successfully' as message;
+    ELSE
+        SELECT 'error' as status, 'Previous payment is still pending confirmation' as message;
+    END IF;
+END //
+
+-- Procedure to confirm payment
+CREATE PROCEDURE confirm_payment(
+    IN p_track_id INT
+)
+BEGIN
+    DECLARE v_payment_id INT;
+    DECLARE v_amount DECIMAL(10,2);
+    DECLARE v_payment_type VARCHAR(255);
+    DECLARE v_total_amount DECIMAL(10,2);
+    DECLARE v_current_amount DECIMAL(10,2);
+    
+    -- Get payment details
+    SELECT pt.payment_id, pt.amount, pf.payment_type, pf.amount, 
+           (SELECT SUM(order_total) FROM orderdetails WHERE payment_id = pt.payment_id)
+    INTO v_payment_id, v_amount, v_payment_type, v_current_amount, v_total_amount
+    FROM payment_track pt
+    JOIN paymentform pf ON pt.payment_id = pf.id
+    WHERE pt.track_id = p_track_id;
+    
+    START TRANSACTION;
+    
+    -- Update payment track status
+    UPDATE payment_track
+    SET status = 'Confirmed'
+    WHERE track_id = p_track_id;
+    
+    -- Update paymentform based on payment type
+    IF v_payment_type = 'Installment' THEN
+        UPDATE paymentform
+        SET months_paid = months_paid + 1,
+            payment_status = IF(months_paid + 1 >= 12, 'Comfirmed', payment_status)
+        WHERE id = v_payment_id;
+    ELSE -- Down payment
+        UPDATE paymentform
+        SET amount = amount + v_amount,
+            payment_status = IF(amount + v_amount >= v_total_amount, 'Comfirmed', payment_status)
+        WHERE id = v_payment_id;
+    END IF;
+    
+    -- Update orderdetails status if payment is complete
+    IF (v_payment_type = 'Installment' AND (SELECT months_paid FROM paymentform WHERE id = v_payment_id) >= 12)
+        OR (v_payment_type = 'Down payment' AND (v_current_amount + v_amount >= v_total_amount)) THEN
+        
+        UPDATE orderdetails
+        SET order_status = 'Confirmed'
+        WHERE payment_id = v_payment_id;
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 'success' as status, 'Payment confirmed successfully' as message;
+END //
+
+DELIMITER ;
