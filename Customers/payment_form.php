@@ -97,9 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // Insert form data into database
                     if ($_SESSION['user_type'] == 'Cashier'){
                         $stats = "Confirmed";
+                        $order_stats = 'Confirmed';
                         $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt_insert->bind_param('sssssssdss', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path, $stats);
                     } else {
+                        $order_stats = 'Verification';
                         $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt_insert->bind_param('sssssssds', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path);
                     }
@@ -131,14 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
                         if ($stmt_update->execute()) {
-                            foreach ($order_ids as $order_id) {
-                                $stmt = $conn->prepare("UPDATE orderdetails SET order_status = 'Confirmed' WHERE order_id = ?");
-                                $stmt->bind_param("i", $order_id);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                $stmt->close();
-                            }
-
                             date_default_timezone_set('Asia/Manila');
                             $currentDateTime = new DateTime();
                             $formattedDateTime = $currentDateTime->format('F j, Y - h:ia');
@@ -417,6 +411,9 @@ $conn->close();
             if (paymentType === 'Full Payment') {
                 amountField.readOnly = true;
                 amountField.value = <?php echo $total_amount; ?>;
+            } else if (paymentType === 'Down Payment') {
+                amountField.readOnly = true;
+                amountField.value = <?php echo $total_amount * 0.5; ?>;
             } else {
                 amountField.readOnly = false;
                 amountField.value = '';

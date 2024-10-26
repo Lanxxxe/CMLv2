@@ -7,18 +7,24 @@ if (!isset($_SESSION['admin_username'])) {
     exit;
 }
 
-if (isset($_GET['return_id'])) {
-    $return_id = $_GET['return_id'];
+try {
+    if (isset($_GET['return_id'])) {
+        $return_id = $_GET['return_id'];
 
-    $stmt_confirmed = $DB_con->prepare('UPDATE returnitems SET status = "Confirmed" WHERE return_id = :return_id');
-    $stmt_confirmed->bindParam(':return_id', $return_id);
-    
-    if ($stmt_confirmed->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Return has been successfully confirmed.']);
+        // $stmt_confirmed = $DB_con->prepare('UPDATE returnitems SET status = "Confirmed" WHERE return_id = :return_id');
+        $stmt_confirmed = $DB_con->prepare('CALL ProcessReturnItems(:return_id)');
+        $stmt_confirmed->bindParam(':return_id', $return_id);
+        
+        if ($stmt_confirmed->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Return has been successfully confirmed.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error confirming return: ' . $stmt_confirmed->errorInfo()[2]]);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error confirming return: ' . $stmt_confirmed->errorInfo()[2]]);
+        echo json_encode(['success' => false, 'message' => 'No return ID provided.']);
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'No return ID provided.']);
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    include '../error_log.php';
 }
 ?>
