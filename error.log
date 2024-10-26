@@ -58,3 +58,11 @@
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+(2024-10-26 04:33:08) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:33:08) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:34:21) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:34:21) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:34:56) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:34:56) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:35:33) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:35:33) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
