@@ -171,7 +171,7 @@ session_start();
                         <a class='fancybox-buttons' href='Admin/item_images/" . $query2['item_image'] . "' data-fancybox-group='button' title='Page " . $id . "- " . $query2['item_name'] . "'>
                             <img src='Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:350px;height:150px;' />
                         </a>
-                        <center><h4> Item Name: " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
+                        <center><h4> " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
                         <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
                         <a class='addToCart btn btn-block btn-danger' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
                     </div>
