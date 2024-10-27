@@ -206,3 +206,28 @@
 (2024-10-26 09:03:58) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
 (2024-10-27 13:27:18) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
 (2024-10-27 13:27:18) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-27 14:15:01) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:01) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:04) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:04) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:05) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:05) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:06) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:06) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:16) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:16) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] Undefined variable $availableStock - /var/www/html/projects/CMLv2/Customers/paint-match/step3.php:138

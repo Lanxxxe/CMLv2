@@ -222,10 +222,6 @@ include_once 'config.php';
             });
     });
 
-    $(document).ready(function() {
-    $('#brandSelect').change(handleBrandChange);
-    $('#paintBrandSelect').change(handlePaintBrandChange);
-
     document.querySelectorAll('input[name="quantity"]').forEach(input => {
         input.addEventListener('input', event => {
             const min = +input.getAttribute('min');
@@ -234,6 +230,11 @@ include_once 'config.php';
             }
         });
     });
+
+    $(document).ready(function() {
+    $('#brandSelect').change(handleBrandChange);
+    $('#paintBrandSelect').change(handlePaintBrandChange);
+
 
     function handleBrandChange() {
         var brandId = $(this).val();
