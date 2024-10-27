@@ -118,24 +118,13 @@ body{
 }
 
 .input_box label {
-    width: 50%;
+    width: 100%;
     padding: 13px;
     background-color: #fcfcfc;
     display: inline-block;
-    float: left;
     text-align: center;
     border: 1px solid #c0bfbf;
-}
-
-.input_box label:first-of-type {
-    border-top-left-radius: 3px;
-    border-bottom-right-radius: 3px;
-    border-right: none;
-}
-
-.input_box label:last-of-type {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
+    border-radius: 3px;
 }
 
 .radio:checked+label {

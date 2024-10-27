@@ -311,13 +311,17 @@ $conn->close();
                         <?php 
                         if ($_SESSION['user_type'] != 'Cashier'){
                             ?>
-                            <input type="radio" name="pay" class="radio" id="bc1" value="Gcash" checked>
+                            <input type="hidden" name="pay" id="bc1" value="Gcash" checked>
                             <label for="bc1"><span><i class="fa fa-cc-visa"></i> Gcash</span></label>
                         <?php
                         }
+                        else {
+                        ?>
+                            <input type="hidden" name="pay" id="bc2" value="Walk In" checked>
+                            <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Cash Payment</span></label>                
+                        <?php
+                        }
                     ?>
-                    <input type="radio" name="pay" class="radio" id="bc2" value="Walk In" checked>
-                    <label for="bc2"><span><i class="fa fa-cc-paypal"></i> Cash Payment</span></label>                
                 </div>
             </div>
           
