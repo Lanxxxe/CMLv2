@@ -222,6 +222,15 @@ extract($edit_row);
       $('#priceinput').keypress(function(event) {
         return isNumber(event, this)
       });
+
+        document.querySelectorAll('input[name="quantity"]').forEach(input => {
+            input.addEventListener('input', event => {
+                const min = +input.getAttribute('min');
+                if(+input.value < +min) {
+                    input.value = min;
+                }
+            });
+        });
     });
 
     function isNumber(evt, element) {
@@ -236,6 +245,7 @@ extract($edit_row);
 
       return true;
     }
+
   </script>
 </body>
 

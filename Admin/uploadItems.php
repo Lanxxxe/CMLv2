@@ -62,7 +62,7 @@ include_once 'config.php';
                         </div>
                         <p>Quantity:</p>
                         <div class="form-group">
-                            <input type="number" placeholder="Quantity" class="form-control" name="quantity" required>
+                            <input type="number" placeholder="Quantity" class="form-control" name="quantity" min="1" required>
                         </div>
                         <p>Expiration Date:</p>
                         <div class="form-group">
@@ -225,6 +225,15 @@ include_once 'config.php';
     $(document).ready(function() {
     $('#brandSelect').change(handleBrandChange);
     $('#paintBrandSelect').change(handlePaintBrandChange);
+
+    document.querySelectorAll('input[name="quantity"]').forEach(input => {
+        input.addEventListener('input', event => {
+            const min = +input.getAttribute('min');
+            if(+input.value < +min) {
+                input.value = min;
+            }
+        });
+    });
 
     function handleBrandChange() {
         var brandId = $(this).val();

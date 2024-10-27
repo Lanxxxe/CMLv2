@@ -204,3 +204,5 @@
 (2024-10-26 09:03:35) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
 (2024-10-26 09:03:58) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
 (2024-10-26 09:03:58) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-27 13:27:18) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-27 13:27:18) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
