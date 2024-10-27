@@ -77,7 +77,7 @@ extract($edit_row);
             </div>
             <div class="form-group">
               <label for="orderNumber">Quantity:</label>
-              <input type="number" class="form-control" id="quantity" name="quantity" required>
+              <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
             </div>
             <div class="form-group">
               <label for="image1">Product Image:</label>

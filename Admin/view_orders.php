@@ -258,7 +258,7 @@ include("config.php");
 							</div>
 							<p>Quantity:</p>
 							<div class="form-group">
-							    <input type="number" class="form-control" name="quantity" required>
+							    <input type="number" class="form-control" name="quantity" min="1" required>
 							</div>
 							<p>Gallon/Liter:</p>
 							<div class="form-group">

@@ -109,7 +109,7 @@ include_once 'config.php';
                         </div>
                         <p>Quantity:</p>
                         <div class="form-group">
-                            <input type="number" placeholder="Quantity" class="form-control" name="quantity" required>
+                            <input type="number" placeholder="Quantity" class="form-control" name="quantity" min="1" required>
                         </div>
 
                         <p>Brand:</p>
