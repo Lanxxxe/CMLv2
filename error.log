@@ -375,3 +375,28 @@
 (2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
 (2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
 (2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:32:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:38:12) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:38:12) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:38:12) Error: [2] Undefined array key "brand_logo" - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [2] Undefined array key "brand_logo" - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [2] Undefined array key "brand_logo" - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [2] Undefined array key "brand_logo" - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [2] Undefined array key "brand_logo" - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:38:12) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:29
+(2024-10-28 09:39:41) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:39:41) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:39:51) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:39:51) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:39:54) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-28 09:39:54) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14

@@ -226,6 +226,12 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             font-size: 1.5em;
         }
 
+        .custom-input {
+            width: 100%;                
+            box-sizing: border-box;    
+            margin-top: 10px;           
+        }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
@@ -256,7 +262,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Items</a></li>
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                <li class="active"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
+                <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
                 <li><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
                 <li class="active"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
                 <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
@@ -289,7 +295,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             <?php
             // SQL query to fetch brands and their product types
             $sql = "
-            SELECT b.brand_id, b.brand_name, pt.type_id, pt.type_name
+            SELECT b.brand_id, b.brand_name, b.brand_img, pt.type_id, pt.type_name
             FROM brands b
             LEFT JOIN product_type pt ON b.brand_id = pt.brand_id
             ORDER BY b.brand_name, pt.type_name
@@ -308,6 +314,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                     if (!isset($brandTools[$row['brand_id']])) {
                         $brandTools[$row['brand_id']] = [
                             'name' => $row['brand_name'],
+                            'img' => $row['brand_img'],
                             'tools' => []
                         ];
                     }
@@ -324,10 +331,11 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                     ?>
                     <div class="brand-card">
                         <div class="brand-header">
+                            <img src="<?php echo $brand["img"]; ?>" style="width:50px; height:50px;" alt="">
                             <h3 class="brand-title"><?php echo htmlspecialchars($brand['name']); ?></h3>
                             <div class="brand-actions">
                                 <button class="btn btn-primary" onclick="showAddToolModal(<?php echo $brandId; ?>)">Add Product</button>
-                                <button class="btn btn-warning" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']); ?>')">Edit Brand</button>
+                                <button class="btn btn-warning" style="color: #fff; !important" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']); ?>', '<?php echo htmlspecialchars($brand['img'] ?? ''); ?>')">Edit Brand</button>
                                 <button class="btn btn-danger" onclick="confirmDeleteBrand(<?php echo $brandId; ?>)">Delete Brand</button>
                             </div>
                         </div>
@@ -336,7 +344,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                                 <li class="tool-item">
                                     <span><?php echo htmlspecialchars($tool['name']); ?></span>
                                     <div>
-                                        <button class="btn btn-warning" onclick="showEditToolModal(<?php echo $tool['id']; ?>, '<?php echo htmlspecialchars($tool['name']); ?>')">Edit</button>
+                                        <button class="btn btn-warning" style="color: #fff; !important" onclick="showEditToolModal(<?php echo $tool['id']; ?>, '<?php echo htmlspecialchars($tool['name']); ?>')">Edit</button>
                                         <button class="btn btn-danger" onclick="confirmDeleteTool(<?php echo $tool['id']; ?>)">Delete</button>
                                     </div>
                                 </li>
@@ -362,6 +370,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
 <?php include_once("insertBrandsModal.php"); ?>
 
 <script>
+    let labelStyle = "font-size: 14px; margin-left: 2.5rem; margin-top: 1.5rem;";
+    let inputStyle = "width: 80%;";
+
     $(document).ready(function () {
         $('#example').DataTable();
     });
@@ -396,82 +407,141 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     function showAddBrandModal() {
         Swal.fire({
             title: 'Add New Brand',
-            input: 'text',
-            inputLabel: 'Brand Name',
-            inputPlaceholder: 'Enter brand name',
+            html: `
+                <div style="display: flex; flex-direction: column; align-items: start;"> 
+                    <label for="brandImage" style="${labelStyle}">Brand Name</label>
+                    <input 
+                        type="text" 
+                        id="brandName" 
+                        class="swal2-input" 
+                        style="width: 80%;" 
+                        placeholder="Enter brand name">
+                    
+                    <label for="brandImage" style="${labelStyle}">Brand Image</label>
+                    <input 
+                        type="file" 
+                        id="brandImage" 
+                        class="swal2-input" 
+                        style="width: 80%;" 
+                        accept="image/*">
+
+                    <div id="imagePreview" class="mb-3" style="display: none; width: 100%;">
+                        <img id="previewImg" src="" alt="Image Preview" style="max-width: 100px; margin: 1rem auto">
+                    </div>
+                </div>
+            `,
+            // width: '600px',
             showCancelButton: true,
             confirmButtonText: 'Add',
             cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Please enter a brand name';
+            didOpen: () => {
+                // Add image preview functionality
+                const imageInput = document.getElementById('brandImage');
+                const imagePreview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                
+                imageInput.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImg.src = e.target.result;
+                            imagePreview.style.display = 'block';
+                        }
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
+                });
+            },
+            preConfirm: () => {
+                const brandName = document.getElementById('brandName').value;
+                const brandImage = document.getElementById('brandImage').files[0];
+                
+                if (!brandName) {
+                    Swal.showValidationMessage('Please enter a brand name');
+                    return false;
                 }
+                
+                if (!brandImage) {
+                    Swal.showValidationMessage('Please upload a brand image');
+                    return false;
+                }
+                
+                return { brandName, brandImage };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'maintenanceprocess.php';
+                const formData = new FormData();
+                formData.append('action', 'add_brand');
+                formData.append('brand_name', result.value.brandName);
+                formData.append('brand_image', result.value.brandImage);
                 
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'add_brand';
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'brand_name';
-                nameInput.value = result.value;
-                
-                form.appendChild(actionInput);
-                form.appendChild(nameInput);
-                document.body.appendChild(form);
-                form.submit();
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to add brand', 'error');
+                    console.error('Error:', error);
+                });
             }
         });
     }
 
     // Edit Brand
-    function showEditBrandModal(brandId, brandName) {
+    function showEditBrandModal(brandId, brandName, currentImage) {
         Swal.fire({
             title: 'Edit Brand',
-            input: 'text',
-            inputLabel: 'Brand Name',
-            inputValue: brandName,
+            html: `
+                <div style="display: flex; flex-direction: column; align-items: start;">
+                        <label class="form-label" for="editBrandName" style="${labelStyle}">Brand Name</label>
+                        <input type="text" id="editBrandName" style="${inputStyle}" class="swal2-input" value="${brandName}">
+                        <label class="form-label" for="editBrandImage" style="${labelStyle}">Brand Image</label>
+                        <input type="file" id="editBrandImage" style="${inputStyle}" class="swal2-file" accept="image/*">                
+                </div>
+                ${currentImage ? `
+                    <div class="mb-3">
+                        <img src="${currentImage}" alt="Current Image" style="max-width: 100px; margin-top: 2rem;">
+                    </div>` : ''}
+            `,
             showCancelButton: true,
             confirmButtonText: 'Save Changes',
             cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Please enter a brand name';
+            preConfirm: () => {
+                const brandName = document.getElementById('editBrandName').value;
+                const brandImage = document.getElementById('editBrandImage').files[0];
+                
+                if (!brandName) {
+                    Swal.showValidationMessage('Please enter a brand name');
+                    return false;
                 }
+                
+                return { brandName, brandImage };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'maintenanceprocess.php';
+                const formData = new FormData();
+                formData.append('action', 'edit_brand');
+                formData.append('brand_id', brandId);
+                formData.append('brand_name', result.value.brandName);
+                if (result.value.brandImage) {
+                    formData.append('brand_image', result.value.brandImage);
+                }
                 
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'edit_brand';
-                
-                const idInput = document.createElement('input');
-                idInput.type = 'hidden';
-                idInput.name = 'brand_id';
-                idInput.value = brandId;
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'brand_name';
-                nameInput.value = result.value;
-                
-                form.appendChild(actionInput);
-                form.appendChild(idInput);
-                form.appendChild(nameInput);
-                document.body.appendChild(form);
-                form.submit();
+                // Using fetch to send FormData
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to update brand', 'error');
+                });
             }
         });
     }
