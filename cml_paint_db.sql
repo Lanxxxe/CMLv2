@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2024 at 05:17 AM
+-- Generation Time: Oct 28, 2024 at 11:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,19 +48,18 @@ INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
 
 CREATE TABLE `brands` (
   `brand_id` int(11) NOT NULL,
-  `brand_name` varchar(255) NOT NULL
+  `brand_name` varchar(255) NOT NULL,
+  `brand_img` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brands`
 --
 
-INSERT INTO `brands` (`brand_id`, `brand_name`) VALUES
-(1, 'Davies'),
-(2, 'Boysen'),
-(3, 'Rain or Shine'),
-(5, 'Euromax'),
-(6, 'K92');
+INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`) VALUES
+(2, 'Boysen', 'local_image/1730109970_boysen.jpg'),
+(9, 'Rain or Shine', 'local_image/1730110516_rain-or-shine.png'),
+(10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg');
 
 -- --------------------------------------------------------
 
@@ -451,18 +450,32 @@ CREATE TABLE `paymentform` (
 -- Dumping data for table `paymentform`
 --
 
-INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`) VALUES
-(40, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/Black.jpg', '2024-10-20 12:12:23', NULL, 'verification'),
-(41, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-10-20 12:42:16', NULL, 'verification'),
-(42, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, '', '2024-10-20 13:56:29', NULL, 'verification'),
-(43, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/Black.jpg', '2024-10-20 14:16:35', NULL, 'verification'),
-(44, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:01:19', NULL, 'Confirmed'),
-(45, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:26:24', NULL, 'Confirmed'),
-(46, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/august.png', '2024-10-24 14:33:54', NULL, 'verification'),
-(48, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:41:44', NULL, 'verification'),
-(49, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:44:07', NULL, 'verification'),
-(50, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:52:56', NULL, 'verification'),
-(51, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:53:09', NULL, 'verification');
+INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`, `months_paid`) VALUES
+(40, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/Black.jpg', '2024-10-20 12:12:23', NULL, 'verification', 0),
+(41, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-10-20 12:42:16', NULL, 'verification', 0),
+(42, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, '', '2024-10-20 13:56:29', NULL, 'verification', 0),
+(43, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/Black.jpg', '2024-10-20 14:16:35', NULL, 'verification', 0),
+(44, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:01:19', NULL, 'Confirmed', 0),
+(45, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:26:24', NULL, 'Confirmed', 0),
+(46, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/august.png', '2024-10-24 14:33:54', NULL, 'verification', 0),
+(48, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:41:44', NULL, 'verification', 0),
+(49, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:44:07', NULL, 'verification', 0),
+(50, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:52:56', NULL, 'verification', 0),
+(51, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:53:09', NULL, 'verification', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_track`
+--
+
+CREATE TABLE `payment_track` (
+  `track_id` int(11) NOT NULL,
+  `payment_id` int(11) NOT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'Requested',
+  `amount` decimal(10,2) NOT NULL,
+  `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -481,11 +494,8 @@ CREATE TABLE `product_type` (
 --
 
 INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`) VALUES
-(1, 'Paints', 1),
-(2, 'Brush', 1),
 (3, 'Tape', 2),
-(5, 'Paint', 2),
-(6, 'Paint', 3);
+(5, 'Paint', 2);
 
 -- --------------------------------------------------------
 
@@ -537,21 +547,18 @@ INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`,
 (8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer'),
 (17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlist`
+--
+
 CREATE TABLE `wishlist` (
-    `wish_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
-    `item_id` int(11) NOT NULL
+  `wish_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-
-CREATE TABLE `payment_track` (
-    `track_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `payment_id` int(11) NOT NULL,
-    `status` varchar(32) NOT NULL DEFAULT 'Requested',
-    `amount` decimal(10, 2) NOT NULL,
-    `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6),
-    CONSTRAINT paymentform_track_fk FOREIGN KEY (`payment_id`) REFERENCES paymentform(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 --
 -- Indexes for dumped tables
 --
@@ -604,6 +611,13 @@ ALTER TABLE `paymentform`
   ADD KEY `FK_paymentform_orderdetails` (`order_id`);
 
 --
+-- Indexes for table `payment_track`
+--
+ALTER TABLE `payment_track`
+  ADD PRIMARY KEY (`track_id`),
+  ADD KEY `paymentform_track_fk` (`payment_id`);
+
+--
 -- Indexes for table `product_type`
 --
 ALTER TABLE `product_type`
@@ -624,6 +638,12 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`);
 
 --
+-- Indexes for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD PRIMARY KEY (`wish_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -637,7 +657,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
@@ -670,6 +690,12 @@ ALTER TABLE `paymentform`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
+-- AUTO_INCREMENT for table `payment_track`
+--
+ALTER TABLE `payment_track`
+  MODIFY `track_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `product_type`
 --
 ALTER TABLE `product_type`
@@ -686,6 +712,12 @@ ALTER TABLE `returnitems`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -705,341 +737,12 @@ ALTER TABLE `paymentform`
   ADD CONSTRAINT `FK_paymentform_orderdetails` FOREIGN KEY (`order_id`) REFERENCES `orderdetails` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `product_type`
+-- Constraints for table `payment_track`
 --
-ALTER TABLE `product_type`
-  ADD CONSTRAINT `fk_brand` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`brand_id`);
-
---
--- Constraints for table `returnitems`
---
-ALTER TABLE `returnitems`
-  ADD CONSTRAINT `returnitems_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+ALTER TABLE `payment_track`
+  ADD CONSTRAINT `paymentform_track_fk` FOREIGN KEY (`payment_id`) REFERENCES `paymentform` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-
-DELIMITER //
-
-CREATE PROCEDURE ProcessReturnItems(IN p_return_id INT)
-BEGIN
-    DECLARE current_qty INT;
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE v_order_id INT;
-    DECLARE v_order_quantity INT;
-    DECLARE v_user_id INT;
-    DECLARE v_order_name VARCHAR(1000);
-    DECLARE v_order_price DOUBLE;
-    DECLARE v_order_total DOUBLE;
-    DECLARE v_order_status VARCHAR(45);
-    DECLARE v_order_date DATE;
-    DECLARE v_order_pick_up DATETIME(6);
-    DECLARE v_order_pick_place VARCHAR(45);
-    DECLARE v_gl VARCHAR(45);
-    DECLARE v_payment_id INT;
-    DECLARE v_product_id INT;
-    
-    -- Cursor for orders sorted by date
-    DECLARE order_cursor CURSOR FOR 
-        SELECT order_id, order_quantity,
-               user_id, order_name, order_price, order_total,
-               order_status, order_date, order_pick_up, order_pick_place,
-               gl, payment_id, product_id
-        FROM orderdetails 
-        WHERE user_id = (SELECT user_id FROM returnitems WHERE return_id = p_return_id)
-        AND product_id = (SELECT product_id FROM orderdetails WHERE order_name = 
-                        (SELECT product_name FROM returnitems WHERE return_id = p_return_id) LIMIT 1)
-        ORDER BY order_date DESC;
-    
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
-    -- Start transaction
-    START TRANSACTION;
-    
-    -- Get initial return quantity
-    SELECT quantity INTO current_qty
-    FROM returnitems
-    WHERE return_id = p_return_id;
-    
-    -- Open cursor
-    OPEN order_cursor;
-    
-    read_loop: LOOP
-        FETCH order_cursor INTO v_order_id, v_order_quantity,
-                               v_user_id, v_order_name, v_order_price, v_order_total,
-                               v_order_status, v_order_date, v_order_pick_up, v_order_pick_place,
-                               v_gl, v_payment_id, v_product_id;
-                               
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-        
-        IF v_order_quantity <= current_qty THEN
-            -- Update entire order to 'return' status
-            UPDATE orderdetails 
-            SET order_status = 'Returned'
-            WHERE order_id = v_order_id;
-            
-            SET current_qty = current_qty - v_order_quantity;
-        ELSE
-            -- Split the order
-            UPDATE orderdetails
-            SET order_quantity = order_quantity - current_qty,
-                order_total = order_price * (order_quantity - current_qty)
-            WHERE order_id = v_order_id;
-            
-            -- Insert new order for the returned portion
-            INSERT INTO orderdetails (
-                user_id, order_name, order_price, order_quantity, 
-                order_total, order_status, order_date, order_pick_up,
-                order_pick_place, gl, payment_id, product_id
-            )
-            VALUES (
-                v_user_id, v_order_name, v_order_price, current_qty,
-                v_order_price * current_qty, 'Returned', v_order_date, 
-                v_order_pick_up, v_order_pick_place, v_gl,
-                v_payment_id, v_product_id
-            );
-            
-            SET current_qty = 0;
-            LEAVE read_loop;
-        END IF;
-        
-        IF current_qty = 0 THEN
-            LEAVE read_loop;
-        END IF;
-    END LOOP;
-    
-    -- Close cursor
-    CLOSE order_cursor;
-    
-    -- Update return item status
-    UPDATE returnitems 
-    SET status = 'Confirmed'
-    WHERE return_id = p_return_id;
-    
-    -- Commit transaction
-    COMMIT;
-    
-END //
-
-DELIMITER ;
-
-
-
-
--- Procedure to request a payment
-DELIMITER //
-
-CREATE PROCEDURE request_payment(
-    IN p_payment_id INT,
-    IN p_amount DECIMAL(10,2),
-    IN p_payment_image VARCHAR(255)
-)
-BEGIN
-    DECLARE last_track_status VARCHAR(20);
-    DECLARE v_payment_type VARCHAR(255);
-    DECLARE v_payment_status VARCHAR(20);
-    
-    -- Get the status of the latest track record
-    SELECT status INTO last_track_status
-    FROM payment_track
-    WHERE payment_id = p_payment_id
-    ORDER BY track_id DESC
-    LIMIT 1;
-    
-    -- Get payment type
-    SELECT payment_type INTO v_payment_type
-    FROM paymentform
-    WHERE id = p_payment_id;
-    
-    SELECT payment_status INTO v_payment_status
-    FROM paymentform
-    WHERE id = p_payment_id;
-    -- Check if we can process new payment (no track or last track was confirmed)
-    IF (v_payment_status = 'Confirmed' AND (last_track_status IS NULL OR last_track_status = 'Confirmed')) THEN
-        -- Insert new payment track record
-        INSERT INTO payment_track (payment_id, amount, status)
-        VALUES (p_payment_id, p_amount, 'Requested');
-        
-        -- Update payment image in paymentform
-        UPDATE paymentform
-        SET payment_image_path = p_payment_image
-        WHERE id = p_payment_id;
-        
-        SELECT 'success' as status, 'Payment request submitted successfully' as message;
-    ELSE
-        SELECT 'error' as status, 'Previous payment is still pending confirmation' as message;
-    END IF;
-END //
-
-DELIMITER ;
-
-
-DELIMITER //
--- Procedure to confirm payment
-CREATE PROCEDURE confirm_payment(
-    IN p_track_id INT
-)
-BEGIN
-    DECLARE v_payment_id INT;
-    DECLARE v_amount DECIMAL(10,2);
-    DECLARE v_payment_type VARCHAR(255);
-    DECLARE v_total_amount DECIMAL(10,2);
-    DECLARE v_current_amount DECIMAL(10,2);
-    
-    -- Get payment details
-    SELECT pt.payment_id, pt.amount, pf.payment_type, pf.amount, 
-           (SELECT SUM(order_total) FROM orderdetails WHERE payment_id = pt.payment_id)
-    INTO v_payment_id, v_amount, v_payment_type, v_current_amount, v_total_amount
-    FROM payment_track pt
-    JOIN paymentform pf ON pt.payment_id = pf.id
-    WHERE pt.track_id = p_track_id;
-    
-    START TRANSACTION;
-    
-    -- Update payment track status
-    UPDATE payment_track
-    SET status = 'Confirmed'
-    WHERE track_id = p_track_id;
-    
-    -- Update paymentform based on payment type
-    IF v_payment_type = 'Installment' THEN
-        UPDATE paymentform
-        SET months_paid = months_paid + 1,
-            payment_status = IF(months_paid + 1 >= 12, 'Confirmed', payment_status)
-        WHERE id = v_payment_id;
-    ELSE -- Down payment
-        UPDATE paymentform
-        SET amount = amount + v_amount,
-            payment_status = IF(amount + v_amount >= v_total_amount, 'Confirmed', payment_status)
-        WHERE id = v_payment_id;
-    END IF;
-    
-    -- Update orderdetails status if payment is complete
-    IF (v_payment_type = 'Installment' AND (SELECT months_paid FROM paymentform WHERE id = v_payment_id) >= 12)
-        OR (v_payment_type = 'Down payment' AND (v_current_amount + v_amount >= v_total_amount)) THEN
-        
-        UPDATE orderdetails
-        SET order_status = 'Confirmed'
-        WHERE payment_id = v_payment_id;
-    END IF;
-    
-    COMMIT;
-    
-    SELECT 'success' as status, 'Payment confirmed successfully' as message;
-END //
-
-DELIMITER ;
-
-
-
-DELIMITER //
-
-CREATE PROCEDURE ProcessReturnItems(IN p_return_id INT)
-BEGIN
-    DECLARE current_qty INT;
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE v_order_id INT;
-    DECLARE v_order_quantity INT;
-    DECLARE v_user_id INT;
-    DECLARE v_order_name VARCHAR(1000);
-    DECLARE v_order_price DOUBLE;
-    DECLARE v_order_total DOUBLE;
-    DECLARE v_order_status VARCHAR(45);
-    DECLARE v_order_date DATE;
-    DECLARE v_order_pick_up DATETIME(6);
-    DECLARE v_order_pick_place VARCHAR(45);
-    DECLARE v_gl VARCHAR(45);
-    DECLARE v_payment_id INT;
-    DECLARE v_product_id INT;
-    
-    -- Cursor for orders sorted by date
-    DECLARE order_cursor CURSOR FOR 
-        SELECT order_id, order_quantity,
-               user_id, order_name, order_price, order_total,
-               order_status, order_date, order_pick_up, order_pick_place,
-               gl, payment_id, product_id
-        FROM orderdetails 
-        WHERE user_id = (SELECT user_id FROM returnitems WHERE return_id = p_return_id)
-        AND product_id = (SELECT product_id FROM orderdetails WHERE order_name = 
-                        (SELECT product_name FROM returnitems WHERE return_id = p_return_id) LIMIT 1)
-        ORDER BY order_date DESC;
-    
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
-    -- Start transaction
-    START TRANSACTION;
-    
-    -- Get initial return quantity
-    SELECT quantity INTO current_qty
-    FROM returnitems
-    WHERE return_id = p_return_id;
-    
-    -- Open cursor
-    OPEN order_cursor;
-    
-    read_loop: LOOP
-        FETCH order_cursor INTO v_order_id, v_order_quantity,
-                               v_user_id, v_order_name, v_order_price, v_order_total,
-                               v_order_status, v_order_date, v_order_pick_up, v_order_pick_place,
-                               v_gl, v_payment_id, v_product_id;
-                               
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-        
-        IF v_order_quantity <= current_qty THEN
-            -- Update entire order to 'return' status
-            UPDATE orderdetails 
-            SET order_status = 'Returned'
-            WHERE order_id = v_order_id;
-            
-            SET current_qty = current_qty - v_order_quantity;
-        ELSE
-            -- Split the order
-            UPDATE orderdetails
-            SET order_quantity = order_quantity - current_qty,
-                order_total = order_price * (order_quantity - current_qty)
-            WHERE order_id = v_order_id;
-            
-            -- Insert new order for the returned portion
-            INSERT INTO orderdetails (
-                user_id, order_name, order_price, order_quantity, 
-                order_total, order_status, order_date, order_pick_up,
-                order_pick_place, gl, payment_id, product_id
-            )
-            VALUES (
-                v_user_id, v_order_name, v_order_price, current_qty,
-                v_order_price * current_qty, 'Returned', v_order_date, 
-                v_order_pick_up, v_order_pick_place, v_gl,
-                v_payment_id, v_product_id
-            );
-            
-            SET current_qty = 0;
-            LEAVE read_loop;
-        END IF;
-        
-        IF current_qty = 0 THEN
-            LEAVE read_loop;
-        END IF;
-    END LOOP;
-    
-    -- Close cursor
-    CLOSE order_cursor;
-    
-    -- Update return item status
-    UPDATE returnitems 
-    SET status = 'Confirmed'
-    WHERE return_id = p_return_id;
-    
-    -- Commit transaction
-    COMMIT;
-    
-END //
-
-DELIMITER ;
