@@ -271,35 +271,39 @@ extract($edit_row);
                 return false;
             }
 
-            $query = mysqli_query($conn, "SELECT * FROM items LIMIT $start, $limit");
+
+            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price FROM items LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 $exist = inWishlist($query2['item_id']);
-                echo "<div style='min-width: 280px !important;' class='col-sm-3 panel-item' data-type='" . $query2['type'] . "' data-brand='" . $query2['brand_name'] . "'>
-            <div class='panel panel-default' style='border-color:#008CBA;'>
-                <div class='panel-heading' style='color:white;background-color: #033c73;'>
-                    <center> 
-                        <div style='text-align:center;background-color: white;' class='form-control'>" . $query2['brand_name'] . "</div>
-                    </center>
+                ?>
+                <div style='min-width: 280px !important;' class='col-sm-3 panel-item' data-type='<?php echo $query2['type'] ?>' data-brand='<?php echo $query2['brand_name'] ?>'>
+                    <div class='panel panel-default' style='border-color:#008CBA;'>
+                        <div class='panel-heading' style='color:white;background-color: #033c73;'>
+                            <center> 
+                                <textarea style='text-align:center;background-color: white;' class='form-control' rows='1' disabled><?php echo $query2['brand_name'] ?></textarea>
+                            </center>
+                        </div>
+                        <div class='panel-body'>
+                            <a class='fancybox-buttons' href='../Admin/item_images/<?php echo $query2['item_image'] ?>'data-fancybox-group='button' title='Page <?php $id . "- " . $query2['item_name'] ?>'>
+                                <img src='../Admin/item_images/<?php echo $query2['item_image'] ?>' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
+                            </a>
+                            <center><h4><?php echo $query2['item_name'] ?></h4></center>
+                            <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
+                            <div style='display: flex;'>
+                                <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
+                            <?php
+                                if ($exist) {
+                                echo "<button class='btn btn-light' style='margin-left: 7px;' disabled><span class='glyphicon glyphicon-heart'></span></button>";
+                            } else {
+                                echo "<a class='btn btn-primary' style='margin-left: 7px;' href='./add_to_wishlist.php?item={$query2['item_id']}&user={$_SESSION['user_id']}'><span class='glyphicon glyphicon-heart'></span></a>";
+                            }
+                            ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class='panel-body'>
-                    <a class='fancybox-buttons' href='../Admin/item_images/" . $query2['item_image'] . "' data-fancybox-group='button' title='Page " . $id . "- " . $query2['item_name'] . "'>
-                        <img src='../Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
-                    </a>
-                    <center><h4> " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
-                    <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
-                <div style='display: flex;'>
-                    <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>";
-                if ($exist) {
-                    echo "<button class='btn btn-light' style='margin-left: 7px;' disabled><span class='glyphicon glyphicon-heart'></span></button>";
-                } else {
-                    echo "<a class='btn btn-primary' style='margin-left: 7px;' href='./add_to_wishlist.php?item={$query2['item_id']}&user={$_SESSION['user_id']}'><span class='glyphicon glyphicon-heart'></span></a>";
-                }
-                echo "
-                </div>
-                </div>
-            </div>
-        </div>";
+                <?php
             }
 
             echo "<div class='container'></div>";

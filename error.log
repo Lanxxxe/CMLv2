@@ -240,3 +240,138 @@
 (2024-10-27 14:15:17) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
 (2024-10-27 14:15:17) Error: [2] Undefined variable $availableStock - /var/www/html/projects/CMLv2/Customers/paint-match/step3.php:138
 >>>>>>> 772adcaa4948ff66e77518e11faac681f3622844
+(2024-10-28 07:47:29) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
+(2024-10-28 07:47:29) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+(2024-10-28 07:47:35) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
+(2024-10-28 07:47:35) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+(2024-10-28 07:47:38) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
+(2024-10-28 07:47:38) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+(2024-10-28 07:47:59) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
+(2024-10-28 07:47:59) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:13:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:19) Error: [2] Undefined variable $DB_con - C:\xampp\htdocs\CMLv2\Customers\shop.php:31
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:14:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:16:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:36) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:36) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:27:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:27:51) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:48) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:52) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:52) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:28:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:28:55) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:01) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:29:13) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:279
+(2024-10-28 09:29:13) Error: [2] Undefined variable $exist - C:\xampp\htdocs\CMLv2\Customers\shop.php:295
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280
+(2024-10-28 09:30:20) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:280

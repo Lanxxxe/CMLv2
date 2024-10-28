@@ -545,7 +545,7 @@ CREATE TABLE `wishlist` (
 
 
 CREATE TABLE `payment_track` (
-    `track_id` int(11) NOT NULL PRIMARY AUTO_INCREMENT,
+    `track_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `payment_id` int(11) NOT NULL,
     `status` varchar(32) NOT NULL DEFAULT 'Requested',
     `amount` decimal(10, 2) NOT NULL,
