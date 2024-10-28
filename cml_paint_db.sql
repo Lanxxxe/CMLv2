@@ -843,6 +843,7 @@ CREATE PROCEDURE request_payment(
 BEGIN
     DECLARE last_track_status VARCHAR(20);
     DECLARE v_payment_type VARCHAR(255);
+    DECLARE v_payment_status VARCHAR(20);
     
     -- Get the status of the latest track record
     SELECT status INTO last_track_status
@@ -856,8 +857,11 @@ BEGIN
     FROM paymentform
     WHERE id = p_payment_id;
     
+    SELECT payment_status INTO v_payment_status
+    FROM paymentform
+    WHERE id = p_payment_id;
     -- Check if we can process new payment (no track or last track was confirmed)
-    IF (last_track_status IS NULL OR last_track_status = 'Confirmed') THEN
+    IF (v_payment_status = 'Confirmed' AND (last_track_status IS NULL OR last_track_status = 'Confirmed')) THEN
         -- Insert new payment track record
         INSERT INTO payment_track (payment_id, amount, status)
         VALUES (p_payment_id, p_amount, 'Requested');
@@ -873,6 +877,10 @@ BEGIN
     END IF;
 END //
 
+DELIMITER ;
+
+
+DELIMITER //
 -- Procedure to confirm payment
 CREATE PROCEDURE confirm_payment(
     IN p_track_id INT
@@ -903,12 +911,12 @@ BEGIN
     IF v_payment_type = 'Installment' THEN
         UPDATE paymentform
         SET months_paid = months_paid + 1,
-            payment_status = IF(months_paid + 1 >= 12, 'Comfirmed', payment_status)
+            payment_status = IF(months_paid + 1 >= 12, 'Confirmed', payment_status)
         WHERE id = v_payment_id;
     ELSE -- Down payment
         UPDATE paymentform
         SET amount = amount + v_amount,
-            payment_status = IF(amount + v_amount >= v_total_amount, 'Comfirmed', payment_status)
+            payment_status = IF(amount + v_amount >= v_total_amount, 'Confirmed', payment_status)
         WHERE id = v_payment_id;
     END IF;
     

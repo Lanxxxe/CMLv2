@@ -1,7 +1,7 @@
 <?php
-session_start();;
+session_start();
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
     $date = date('Y-m-d H:i:s');
     $message = "($date) Error: [$errno] $errstr - $errfile:$errline" . PHP_EOL;
@@ -352,13 +352,6 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                 $('#payment-tracking').hide();
                             }
                             
-                            if (payment.payment_image_path) {
-                                $('#view-payment-proof').attr('src', './uploaded_images/' + payment.payment_image_path);
-                                $('#payment-proof-section').show();
-                            } else {
-                                $('#payment-proof-section').hide();
-                            }
-                            
                             if (payment.payment_type === 'Installment') {
                                 $('#installment-details').show();
                                 $('#view-monthly').text(payment.monthly_payment.toFixed(2));
@@ -400,13 +393,20 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                             const payment = data.data;
                             
                             // If there's a pending payment request, show error
-                            if (payment.track_status === 'Requested') {
+                            if (payment.track_status === 'Requested' || payment.payment_status !== 'Confirmed') {
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Pending Payment',
                                     text: 'There is already a pending payment request for this order.'
                                 });
                                 return;
+                            }
+                            
+                            if (payment.payment_image_path) {
+                                $('#view-payment-proof').attr('src', payment.payment_image_path);
+                                $('#payment-proof-section').show();
+                            } else {
+                                $('#payment-proof-section').hide();
                             }
                             
                             // Continue with payment modal if no pending requests

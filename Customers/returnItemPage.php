@@ -20,11 +20,14 @@ extract($edit_row);
 
 <?php
 include("config.php");
-$stmt_edit = $DB_con->prepare("select sum(order_total) as total from orderdetails where user_id=:user_id and order_status='Ordered'");
+$stmt_edit = $DB_con->prepare("select sum(order_total) as total from orderdetails where user_id=:user_id and order_status='Confirmed'");
 $stmt_edit->execute(array(':user_id' => $user_id));
 $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
 extract($edit_row);
 
+$stmt_orders = $DB_con->prepare("select order_id, order_name from orderdetails where user_id=:user_id and order_status='Confirmed'");
+$stmt_orders->execute(array(':user_id' => $user_id));
+$order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -72,8 +75,17 @@ extract($edit_row);
               </select>
             </div>
             <div class="form-group">
+
               <label for="productName">Product Name</label>
-              <input type="text" class="form-control" id="productName" name="productName" required>
+              <input list="userOrders" type="text" class="form-control" id="productName" name="productName" autocomplete="on" required>
+            <datalist id="userOrders">
+                <?php 
+                foreach ($order_data as $order) {?>
+                    <option value="<?= $order['order_name'] ?>">
+                <?php 
+                }
+                ?>
+            </datalist>
             </div>
             <div class="form-group">
               <label for="orderNumber">Quantity:</label>
