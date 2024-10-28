@@ -159,7 +159,7 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                     </tr>
                     <tr>
                         <td><label class="control-label">Quantity.</label></td>
-                        <td><input class="form-control" type="number" placeholder="Quantity" max="<?= $quantity ?>" name="order_quantity" value="1" onkeypress="return isNumber(event)" required /></td>
+                        <td><input class="form-control" type="number" placeholder="Quantity" min="1" max="<?= $quantity ?>" name="order_quantity" value="1" onkeypress="return isNumber(event)" required /></td>
                     </tr>
                     <tr>
                         <td><label class="control-label">Pick up date.</label></td>
@@ -178,7 +178,7 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button type="submit" name="order_save" class="btn btn-primary">
+                            <button type="submit" value="submit" name="order_save" class="btn btn-primary" <?= ($quantity <= 0)? 'disabled': '' ?> >
                                 <span class="glyphicon glyphicon-shopping-cart"></span> OK
                             </button>
                             <a class="btn btn-danger" href="shop.php?id=1"><span class="glyphicon glyphicon-backward"></span> Cancel</a>
@@ -234,6 +234,21 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[name="order_quantity"]').forEach(input => {
+                input.addEventListener('input', event => {
+                    const min = +input.getAttribute('min');
+                    const max = +input.getAttribute('max');
+                    if(+input.value < min) {
+                        input.value = min;
+                    }
+                    if(+input.value > max) {
+                        input.value = max;
+                    }
+                });
+            });
+        });
+
         function isNumber(evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;

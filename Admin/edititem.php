@@ -180,7 +180,7 @@ if (isset($_POST['btn_save_updates'])) {
 
                     <tr>
                         <td><label for="quantity" class="control-label">Quantity.</label></td>
-                        <td><input type="number" class="form-control" name="quantity" value="<?php echo $quantity; ?>">
+                        <td><input type="number" class="form-control" name="quantity" min="1" value="<?php echo $quantity; ?>">
                         </td>
                     </tr>
 
@@ -310,6 +310,17 @@ if (isset($_POST['btn_save_updates'])) {
                 confirmButtonText: 'OK'
             });
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[name="quantity"]').forEach(input => {
+                input.addEventListener('input', event => {
+                    const min = +input.getAttribute('min');
+                    if(+input.value < +min) {
+                        input.value = min;
+                    }
+                });
+            });
+        })
     </script>
 </body>
 </html>

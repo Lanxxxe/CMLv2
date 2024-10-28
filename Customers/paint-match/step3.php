@@ -91,7 +91,7 @@
                                     
                                     <div class="form-group">
                                         <label for="quantity">Quantity:</label>
-                                        <input type="number" id="quantity" name="quantity" required>
+                                        <input type="number" id="quantity" name="quantity" min="0" required>
                                     </div>
 
                                     <div class="form-group">
@@ -148,4 +148,15 @@ function checkQuantity() {
     }
     return true; 
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[name="quantity"]').forEach(input => {
+        input.addEventListener('input', event => {
+            const min = +input.getAttribute('min');
+            if(+input.value < +min) {
+                input.value = min;
+            }
+        });
+    });
+});
 </script>

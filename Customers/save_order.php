@@ -1,6 +1,10 @@
 <?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
 session_start();
 include("db_conection.php");
+include("../sweet_alert.php");
 
 if (isset($_POST['order_save'])) {
     $user_id = $_POST['user_id'];
@@ -13,6 +17,18 @@ if (isset($_POST['order_save'])) {
     $order_total = $order_price * $order_quantity;
     $order_status = 'Pending';
     $product_id = $_POST['product_id'];
+
+    $stmt_item = mysqli_prepare($dbcon, 'SELECT quantity FROM items WHERE item_id = ?');
+    mysqli_stmt_bind_param($stmt_item, 'i', $product_id);
+    mysqli_stmt_execute($stmt_item);
+    $result = mysqli_stmt_get_result($stmt_item);
+    $item_data = mysqli_fetch_assoc($result);
+    extract($item_data);
+
+    if ($quantity <= 0) {
+        callSweetAlert('error', 'Error', 'This item is out of stock. Please try again later.', 'shop.php?id=1');
+        exit(1);
+    }
 
     $save_order_details = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) 
                            VALUES ('$user_id', '$order_name', '$order_price', '$order_quantity', '$order_total', '$order_status', CURDATE(), '$order_pick_up', '$order_pick_place', '$gl', '$product_id')";

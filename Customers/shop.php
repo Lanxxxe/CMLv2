@@ -1,5 +1,5 @@
 <?php
-session_start();;
+session_start();
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
@@ -286,7 +286,7 @@ extract($edit_row);
                     <a class='fancybox-buttons' href='../Admin/item_images/" . $query2['item_image'] . "' data-fancybox-group='button' title='Page " . $id . "- " . $query2['item_name'] . "'>
                         <img src='../Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
                     </a>
-                    <center><h4> Item Name: " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
+                    <center><h4> " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
                     <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
                 <div style='display: flex;'>
                     <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>";

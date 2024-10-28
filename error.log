@@ -58,9 +58,185 @@
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
 (2024-10-26 05:58:41) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:265
+<<<<<<< HEAD
 (2024-10-26 06:14:33) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
 (2024-10-26 06:14:33) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
 (2024-10-26 06:14:36) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
 (2024-10-26 06:14:36) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
 (2024-10-28 07:31:38) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
 (2024-10-28 07:31:38) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+=======
+(2024-10-26 04:33:08) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:33:08) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:34:21) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:34:21) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:34:56) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:34:56) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:35:33) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:35:33) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 04:53:05) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 04:53:05) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 05:41:34) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 05:41:34) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 05:41:49) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 05:41:49) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 05:47:36) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 05:47:36) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 05:50:02) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 05:50:02) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 05:57:45) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 05:57:45) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 06:02:45) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 06:02:45) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 06:03:11) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 06:03:11) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:22:48) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:22:48) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:22:50) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:22:50) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:23:24) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:23:24) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:23:26) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:23:26) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:23:28) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:23:28) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:23:55) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:23:55) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:24:17) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:24:17) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:24:22) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:24:22) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:27:33) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:27:33) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:28:40) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:28:40) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:29:23) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:29:23) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:30:31) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:30:31) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:30:57) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:30:57) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:33:02) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:33:02) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:33:41) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:33:41) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:34:06) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:34:06) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:37:30) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:37:30) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:37:32) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:37:32) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:37:37) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:37:37) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:38:15) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:38:15) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:38:30) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:38:30) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:40:10) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:40:10) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:41:05) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:41:05) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:42:34) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:42:34) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:43:11) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:43:11) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:43:56) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:43:56) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:44:21) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:44:21) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:46:02) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:46:02) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:47:11) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:47:11) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:48:18) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:48:18) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:51:04) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:51:04) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:53:02) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:53:02) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:53:30) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:53:30) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:53:47) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:53:47) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:55:36) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:55:36) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:56:22) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:56:22) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:56:23) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:56:23) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:56:23) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:56:23) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:56:54) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:56:54) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:57:05) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:57:05) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:57:26) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:57:26) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:57:26) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:57:26) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:57:27) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:57:27) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:58:58) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:58:58) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:58:58) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:58:58) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:58:59) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:58:59) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:58:59) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:58:59) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:59:28) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:59:28) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:59:52) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:59:52) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 08:59:53) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 08:59:53) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:05) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:05) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:06) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:06) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:13) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:13) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:14) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:14) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:53) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:53) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:00:54) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:00:54) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:01:21) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:01:21) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:01:46) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:01:46) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:03:24) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:03:24) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:03:35) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:03:35) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-26 09:03:58) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-26 09:03:58) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-27 13:27:18) Error: [2] Undefined variable $total - /var/www/html/projects/CMLv2/Customers/navigation.php:57
+(2024-10-27 13:27:18) Error: [2] Undefined variable $user_email - /var/www/html/projects/CMLv2/Customers/navigation.php:63
+(2024-10-27 14:15:01) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:01) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:04) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:04) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:05) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:05) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:06) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:06) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:12) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:13) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:14) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:16) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:16) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='.:/usr/share/pear:/usr/share/php') - /var/www/html/projects/CMLv2/Customers/paint-match/db-connect.php:14
+(2024-10-27 14:15:17) Error: [2] Undefined variable $availableStock - /var/www/html/projects/CMLv2/Customers/paint-match/step3.php:138
+>>>>>>> 772adcaa4948ff66e77518e11faac681f3622844

@@ -103,12 +103,20 @@ require_once 'config.php';
 <body>
 <?php
 if (isset($_GET['delete_payment_id'])) {
+    $payment_id = $_GET['delete_payment_id'];
+    $payment_type = $_GET['payment_type'];
+    if ($payment_type === 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
+        $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
+        $stmt_id->execute([':track_id' => $payment_id]);
+        $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
+    }
+
     $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE payment_id = :payment_id');
-    $stmt_delete->bindParam(':payment_id', $_GET['delete_payment_id']);
+    $stmt_delete->bindParam(':payment_id', $payment_id);
     $delete_orders = $stmt_delete->execute();
 
     $stmt_delete = $DB_con->prepare('DELETE FROM paymentform WHERE id = :payment_id');
-    $stmt_delete->bindParam(':payment_id', $_GET['delete_payment_id']);
+    $stmt_delete->bindParam(':payment_id', $payment_id);
     $delete_payment = $stmt_delete->execute();
 
     if ($delete_orders && $delete_payment) {
@@ -144,12 +152,22 @@ if (isset($_GET['delete_payment_id'])) {
 if (isset($_GET['reset_payment_id'])) {
     $DB_con->beginTransaction();
     try {
+        $payment_id = $_GET['reset_payment_id'];
+        $payment_type = $_GET['payment_type'];
+        if($payment_type == 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
+            $stmt_reject = $DB_con->prepare("UPDATE payment_track SET status = 'Rejected' WHERE track_id = :track_id");
+            $stmt_reject->execute([':track_id' => $payment_id]);
+
+            $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
+            $stmt_id->execute([':track_id' => $payment_id]);
+            $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
+        }
         $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "rejected" WHERE payment_id = :payment_id');
-        $stmt_reset->bindParam(':payment_id', $_GET['reset_payment_id']);
+        $stmt_reset->bindParam(':payment_id', $payment_id);
         $stmt_reset->execute();
 
         $stmt_update_payment = $DB_con->prepare('UPDATE paymentform SET payment_status = "failed" WHERE id = :payment_id');
-        $stmt_update_payment->bindParam(':payment_id', $_GET['reset_payment_id']);
+        $stmt_update_payment->bindParam(':payment_id', $payment_id);
         $stmt_update_payment->execute();
 
         $DB_con->commit();
@@ -186,16 +204,44 @@ if (isset($_GET['reset_payment_id'])) {
 
 if (isset($_GET['confirm_payment_id'])) {
     $payment_id = $_GET['confirm_payment_id'];
+    $payment_type = $_GET['payment_type'];
+    
+    if ($payment_type == 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
+        // Prepare and execute the stored procedure
+        $stmt_confirmed = $DB_con->prepare("CALL confirm_payment(:track_id)");
+        $stmt_confirmed->bindParam(':track_id', $payment_id);
+        $stmt_confirmed->execute();
 
-    $stmt_confirmed = $DB_con->prepare('UPDATE orderdetails SET order_status = "Confirmed" WHERE payment_id = :payment_id');
-    $stmt_confirmed->bindParam(':payment_id', $payment_id);
-    $order_confirmed = $stmt_confirmed->execute();
+        // Close the cursor to free up resources
+        $stmt_confirmed->closeCursor();
 
-    $stmt_confirmed = $DB_con->prepare('UPDATE paymentform SET payment_status = "Confirmed" WHERE id = :payment_id');
-    $stmt_confirmed->bindParam(':payment_id', $payment_id);
-    $payment_confirmed = $stmt_confirmed->execute();
+        // Now prepare and execute the select statement
+        $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
+        $stmt_id->execute([':track_id' => $payment_id]);
+        $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
 
-    if ($order_confirmed && $payment_confirmed) {
+        // Close the cursor again
+        $stmt_id->closeCursor();
+    }
+
+    // Prepare and execute the update statements
+    $stmt_order = $DB_con->prepare('UPDATE orderdetails SET order_status = "Confirmed" WHERE payment_id = :payment_id');
+    $stmt_order->bindParam(':payment_id', $payment_id);
+    $order_confirmed = $stmt_order->execute();
+
+    // Close the cursor
+    $stmt_order->closeCursor();
+
+    $stmt_payment = $DB_con->prepare('UPDATE paymentform SET payment_status = "Confirmed" WHERE id = :payment_id');
+    $stmt_payment->bindParam(':payment_id', $payment_id);
+    $payment_confirmed = $stmt_payment->execute();
+
+    // Close the cursor
+    $stmt_payment->closeCursor();
+
+    // Final confirmation status
+    $confirmed = $payment_confirmed && $order_confirmed;
+    if ($confirmed) {
         sendEmailApprovedOrder($payment_id);
         echo "<script>
             Swal.fire({
@@ -365,14 +411,16 @@ if (isset($_GET['delete_return_id'])) {
                         u.user_lastname,
                         u.user_address,
                         pf.id AS order_id,
+                        pf.id AS payment_id,
                         pf.payment_status AS order_status,
+                        pf.payment_type,
                         SUM(od.order_total) AS order_total
                     FROM 
                         users u
                         INNER JOIN orderdetails od ON u.user_id = od.user_id
                         INNER JOIN paymentform pf ON od.payment_id = pf.id
                     WHERE 
-                        pf.payment_status NOT IN ('Confirmed', 'Returned')
+                        (pf.payment_status NOT IN ('Confirmed', 'Returned') AND pf.payment_type = 'Full Payment')
                     GROUP BY 
                         u.user_email,
                         u.user_firstname,
@@ -382,20 +430,51 @@ if (isset($_GET['delete_return_id'])) {
                         pf.payment_status;
                 ");
                 $stmt->execute();
+                $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                if ($stmt->rowCount() > 0) {
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $stmt = $DB_con->prepare("
+                    SELECT 
+                        u.user_email,
+                        u.user_firstname,
+                        u.user_lastname,
+                        u.user_address,
+                        pt.track_id AS order_id,
+                        pt.status AS order_status,
+                        pf.payment_type,
+                        pf.id as payment_id,
+                        pt.amount AS order_total
+                    FROM 
+                        users u
+                        INNER JOIN orderdetails od ON u.user_id = od.user_id
+                        INNER JOIN paymentform pf ON od.payment_id = pf.id
+                        LEFT JOIN payment_track pt ON pt.payment_id = pf.id
+                    WHERE 
+                       pt.status = 'Requested'
+                    GROUP BY 
+                        u.user_email,
+                        u.user_firstname,
+                        u.user_lastname,
+                        u.user_address,
+                        pf.id,
+                        pf.payment_status;
+                ");
+                $stmt->execute();
+                $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $data = array_merge($payments, $tracks);
+
+                if (count($data) > 0) {
+                    foreach ($data as $row) {
                         ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row['order_id']); ?></td>
                             <td><?php echo htmlspecialchars($row['user_email']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_status']); ?></td>
-                            <td><?php echo htmlspecialchars($row['order_total']); ?></td>
+                            <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
                             <td>
-                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['order_id']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
-                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['order_id']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
+                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
+                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
                                 <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['order_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
-                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['order_id']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
+                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
                             </td>
                         </tr>
                         <?php
@@ -422,54 +501,53 @@ if (isset($_GET['delete_return_id'])) {
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
 <script>
-        function confirmOrder(orderId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, confirm it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'customers.php?confirm_payment_id=' + orderId;
-                }
-            });
-        }
+    function confirmOrder(orderId, paymentType) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, confirm it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'customers.php?confirm_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+            }
+        });
+    }
 
-        function resetOrder(orderId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to reject this order!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, reset it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'customers.php?reset_payment_id=' + orderId;
-                }
-            });
-        }
+    function resetOrder(orderId, paymentType) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to reject this order!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'customers.php?reset_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+            }
+        });
+    }
 
-        function deleteUser(orderId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This action will permanently delete the order!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'customers.php?delete_payment_id=' + orderId;
-                }
-            });
-        }
-
+    function deleteUser(orderId, paymentType) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action will permanently delete the order!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'customers.php?delete_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+            }
+        });
+    }
 </script>
 
 </body>

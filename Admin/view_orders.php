@@ -258,7 +258,7 @@ include("config.php");
 							</div>
 							<p>Quantity:</p>
 							<div class="form-group">
-							    <input type="number" class="form-control" name="quantity" required>
+							    <input type="number" class="form-control" name="quantity" min="1" required>
 							</div>
 							<p>Gallon/Liter:</p>
 							<div class="form-group">
@@ -322,6 +322,14 @@ include("config.php");
     $(document).ready(function() {
         $('#priceinput').keypress(function (event) {
             return isNumber(event, this)
+        });
+        document.querySelectorAll('input[name="quantity"]').forEach(input => {
+            input.addEventListener('input', event => {
+                const min = +input.getAttribute('min');
+                if(+input.value < +min) {
+                    input.value = min;
+                }
+            });
         });
     });
   

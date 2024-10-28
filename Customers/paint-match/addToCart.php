@@ -29,3 +29,4 @@ if (isset($_POST['addPallet'])) {
     echo "<script>alert('Error adding pallet to the database: " . addslashes($errorInfo[2]) . "');</script>";
     }
 }
+?>

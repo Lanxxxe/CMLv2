@@ -128,17 +128,19 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             <td>₱<?= $row['total_amount'] ?></td>
                                                             <td>₱<?= $row['total_amount'] - $row['amount'] ?></td>
                                                             <td><?php
-                                                                if ($paid) {
-                                                                   echo '<span class="label label-success">Paid</span>';
-                                                                } else {
-                                                                   echo '<span class="label label-secondary">Payment Pending</span>';
-                                                                }
-                                                            ?></td>
+                                                                if ($row['payment_status'] === 'failed') {?>
+                                                                   <span>Rejected</span>
+                                                                <?php } elseif ($paid) {?>
+                                                                   <span>Paid</span>
+                                                                <?php } else {?>
+                                                                   <span>Payment Pending</span>
+                                                                <?php } ?>
+                                                            </td>
                                                             <td>
                                                                 <button class="btn btn-primary btn-sm">
                                                                     <i class="fa fa-eye"></i> View
                                                                 </button>
-                                                                <?php if ($paid): ?>
+                                                                <?php if ($paid || $row['payment_status'] === 'failed'): ?>
                                                                     <button class="btn btn-success btn-sm" disabled>
                                                                         <i class="fa fa-check"></i> Process Payment
                                                                     </button>
@@ -191,7 +193,10 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                             <td><?= $row['months_paid']+1 ?>&sol;12 </td>
                                                             <td>₱<?= number_format($remaining_balance, 2) ?></td>
                                                             <td>
-                                                                <?php if ($remaining_balance <= 0): ?>
+
+                                                                <?php if ($row['payment_status'] == 'failed'): ?>
+                                                                    <span class="label label-danger">Rejected</span>
+                                                                <?php elseif ($remaining_balance <= 0): ?>
                                                                     <span class="label label-primary">Complete</span>
                                                                 <?php elseif(new DateTime($due_date) < new DateTime()): ?>
                                                                     <span class="label label-danger">Overdue</span>
@@ -203,7 +208,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                                 <button class="btn btn-primary btn-sm">
                                                                     <i class="fa fa-eye"></i> View
                                                                 </button>
-                                                                <button class="btn btn-success btn-sm" <?php echo ($remaining_balance <= 0)? 'disabled': ''?>>
+                                                                <button class="btn btn-success btn-sm" <?php echo ($remaining_balance <= 0 || $row['payment_status'] == 'failed')? 'disabled': ''?>>
                                                                     <i class="fa fa-money"></i> Record Payment
                                                                 </button>
                                                             </td>
@@ -337,6 +342,16 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                             $('#view-type').text(payment.payment_type);
                             $('#view-items').text(payment.items);
                             
+                            // Add payment tracking information
+                            if (payment.track_status) {
+                                $('#payment-tracking').show();
+                                $('#track-status').text(payment.track_status);
+                                $('#track-amount').text(payment.track_amount);
+                                $('#track-date').text(new Date(payment.date_tracked).toLocaleString());
+                            } else {
+                                $('#payment-tracking').hide();
+                            }
+                            
                             if (payment.payment_image_path) {
                                 $('#view-payment-proof').attr('src', './uploaded_images/' + payment.payment_image_path);
                                 $('#payment-proof-section').show();
@@ -373,34 +388,53 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                         }
                     });
                 }
-
                 // Process payment handler - Modified to handle different payment types
                 function showPaymentModal(paymentId, paymentType, remainingBalance, monthlyPayment = null) {
-                    // $('#processPaymentModal').data('paymentId', paymentId);
-                    $('#payment-id').val(paymentId);
-                    $('#payment-type').val(paymentType);
-                    $('#remaining-balance').text(remainingBalance.toFixed(2));
-                    
-                    // Show/hide and configure amount input based on payment type
-                    if (paymentType === 'installment') {
-                        $('#payment-amount').val(monthlyPayment.toFixed(2));
-                        $('#payment-amount').prop('readonly', true);
-                        $('#payment-amount-group').show();
-                        $('.payment-amount-help').text('Monthly installment amount (fixed)');
-                    } else {
-                        $('#payment-amount').val('');
-                        $('#payment-amount').prop('readonly', false);
-                        $('#payment-amount-group').show();
-                        $('#payment-amount').attr({
-                            'min': remainingBalance * 0.2,  // Minimum 20% of remaining
-                            'max': remainingBalance
-                        });
-                        $('.payment-amount-help').text('Enter payment amount (min: ₱' + (remainingBalance * 0.2).toFixed(2) + ', max: ₱' + remainingBalance.toFixed(2) + ')');
-                    }
+                    // Check for pending payments first
+                    $.post('process_invoice.php', {
+                        action: 'get_payment_details',
+                        payment_id: paymentId
+                    }, function(response) {
+                        const data = JSON.parse(response);
+                        if (data.status === 'success') {
+                            const payment = data.data;
+                            
+                            // If there's a pending payment request, show error
+                            if (payment.track_status === 'Requested') {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pending Payment',
+                                    text: 'There is already a pending payment request for this order.'
+                                });
+                                return;
+                            }
+                            
+                            // Continue with payment modal if no pending requests
+                            $('#payment-id').val(paymentId);
+                            $('#payment-type').val(paymentType);
+                            $('#remaining-balance').text(remainingBalance.toFixed(2));
+                            
+                            if (paymentType === 'installment') {
+                                $('#payment-amount').val(monthlyPayment.toFixed(2));
+                                $('#payment-amount').prop('readonly', true);
+                                $('#payment-amount-group').show();
+                                $('.payment-amount-help').text('Monthly installment amount (fixed)');
+                            } else {
+                                $('#payment-amount').val('');
+                                $('#payment-amount').prop('readonly', false);
+                                $('#payment-amount-group').show();
+                                $('#payment-amount').attr({
+                                    'min': remainingBalance * 0.2,
+                                    'max': remainingBalance
+                                });
+                                $('.payment-amount-help').text('Enter payment amount (min: ₱' + (remainingBalance * 0.2).toFixed(2) + 
+                                                             ', max: ₱' + remainingBalance.toFixed(2) + ')');
+                            }
 
-                    $('#processPaymentModal').modal('show');
+                            $('#processPaymentModal').modal('show');
+                        }
+                    });
                 }
-
                 // Attach view button handlers
                 $('.btn-primary').click(function() {
                     const paymentId = $(this).closest('tr').find('td:first').text().trim();

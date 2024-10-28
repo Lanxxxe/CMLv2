@@ -13,6 +13,13 @@ require_once 'config.php';
 
 if (isset($_GET['previous_id']) && !empty($_GET['previous_id'])) {
     $view_id = $_GET['previous_id'];
+    $payment_type = $_GET['payment_type'];
+
+    if ($payment_type === 'Installment' || $payment_type === 'Down payment') {
+        $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
+        $stmt_id->execute([':track_id' => $view_id]);
+        $view_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
+    }
     $stmt_edit = $DB_con->prepare('SELECT users.*, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.payment_id = :previous_id');
     
     $stmt_edit->execute(array(':previous_id' => $view_id));
