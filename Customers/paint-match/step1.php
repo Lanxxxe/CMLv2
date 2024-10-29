@@ -26,7 +26,7 @@
                             ?>
                             <a href="paint-match.php?step=2&brandName=<?php echo htmlspecialchars($result['brand_name']) ?>">
                                 <div class="flex flex-col">
-                                    <img src="../Admin/local_image/daily.jpeg" alt="<?php echo htmlspecialchars($result['brand_name']) ?>">
+                                    <img src="../Admin/<?php echo htmlspecialchars($result['brand_img']); ?>" alt="<?php echo htmlspecialchars($result['brand_name']) ?>">
                                 </div>
                             </a>
                             <?php

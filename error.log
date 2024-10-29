@@ -23,3 +23,53 @@
 (2024-10-28 09:39:54) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
 (2024-10-28 09:39:54) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
 (2024-10-28 16:47:34) Error: [2] Undefined variable $DB_con - C:\xampp\htdocs\CMLv2\Customers\index.php:27
+(2024-10-29 06:13:40) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:13:40) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:32) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:32) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:37) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:37) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:40) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:19:40) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:20:29) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:29) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:32) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:32) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:35) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:20:35) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:21:39) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:57
+(2024-10-29 06:21:39) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:63
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:21:58) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:00) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:22:00) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:01) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-10-29 06:30:03) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:30:03) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-10-29 06:32:45) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:58
+(2024-10-29 06:32:45) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64

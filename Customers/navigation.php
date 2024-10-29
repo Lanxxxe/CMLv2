@@ -18,6 +18,7 @@
                     <li><a href="wishlist.php?id=1">&nbsp; <span class='glyphicon glyphicon-heart'></span> Wishlist </a></li>
                     <li><a href="paint-match.php"> &nbsp; <span class='glyphicon glyphicon-tint'></span> Paint Match</a></li>
                     <li><a href="color-change.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Color Change</a></li>
+                    <li><a href="calculator.php"> &nbsp; <span class='glyphicon glyphicon-edit'></span> Paint Calculator</a></li>
                 <?php
                 }
             ?>
