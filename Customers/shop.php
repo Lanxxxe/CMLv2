@@ -1,7 +1,7 @@
 <?php
 session_start();
 error_reporting(E_ALL);
-ini_set("display_errors", 0);
+ini_set("display_errors", 1);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
     $date = date('Y-m-d H:i:s');
     $message = "($date) Error: [$errno] $errstr - $errfile:$errline" . PHP_EOL;

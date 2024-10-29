@@ -30,10 +30,126 @@ extract($edit_row);
     <script type="text/javascript" src="jquery.fancybox.js?v=2.1.5"></script>
     <link rel="stylesheet" type="text/css" href="jquery.fancybox.css?v=2.1.5" media="screen" />
     <link rel="stylesheet" type="text/css" href="jquery.fancybox-buttons.css?v=1.0.5" />
+
     <script type="text/javascript" src="jquery.fancybox-buttons.js?v=1.0.5"></script>
     <link rel="stylesheet" type="text/css" href="jquery.fancybox-thumbs.css?v=1.0.7" />
     <script type="text/javascript" src="jquery.fancybox-thumbs.js?v=1.0.7"></script>
     <script type="text/javascript" src="jquery.fancybox-media.js?v=1.0.6"></script>
+
+<style>
+.cart-sidebar {
+    position: fixed;
+    right: 0;
+    top: 50px;
+    width: 370px;
+    height: calc(100vh - 50px);
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+#page-wrapper {
+    width: calc(100% - 370px);
+    margin-right: 370px !important;
+}
+
+.cart-header {
+    padding: 15px;
+    background-color: #033c73;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2em;
+}
+
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+}
+
+.remove-item {
+    color: red;
+    cursor: pointer;
+}
+
+.cart-footer {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
+
+.payment-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.payment-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.change-amount {
+    font-size: 1.2em;
+    color: #033c73;
+    font-weight: bold;
+}
+
+.cart-total {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+</style>
     <script type="text/javascript">
         $(document).ready(function() {
             $('.fancybox').fancybox();
@@ -231,7 +347,7 @@ extract($edit_row);
                 $start = ($id - 1) * $limit;
             }
 
-            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price FROM items LIMIT $start, $limit");
+            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price, quantity as item_quantity FROM items LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 ?>
@@ -249,7 +365,7 @@ extract($edit_row);
                             <center><h4><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
-                                <button class='btn btn-danger' style='flex: 1;' data-item-id='<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
+                                <button class='btn btn-danger' style='flex: 1;' onclick='addToCart(<?= $query2['item_id'] ?>, <?= json_encode($query2['item_name']) ?>,<?= $query2['item_price'] ?>, <?= $query2['item_quantity'] ?>, <?= json_encode($query2['item_image']) ?>)'><span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
                             </div>
                         </div>
                     </div>
@@ -297,6 +413,22 @@ extract($edit_row);
     </div>
     <!-- /#wrapper -->
 
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <!-- <button class="btn btn-sm btn-default" onclick="toggleCart()">×</button> -->
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total: ₱</strong>
+                <span id="cart-total-amount">0.00</span>
+            </div>
+            <button class="btn btn-success btn-block" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
 
     <!-- Mediul Modal -->
     <div class="modal fade" id="setAccount" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
@@ -457,6 +589,308 @@ extract($edit_row);
         document.addEventListener('DOMContentLoaded', updateFilterOptions);
     </script>
 
+<script>
+let cart = new FormData();
+
+function addToCart(itemId, name, price, maxQuantity, itemImage) {
+    const item = cart.get(itemId);
+    let quantity = 1;
+    if (item) {
+        quantity = JSON.parse(item).quantity + 1;
+    }
+
+    if (quantity > maxQuantity) {
+        showAlert('warning', 'Quantity Limit Reached', `Maximum quantity of ${maxQuantity} reached for this item.`);
+        return;
+    }
+
+    cart.set(itemId, JSON.stringify({ name, price, quantity, maxQuantity, itemImage }));
+    updateCartDisplay();
+}
+
+function removeItem(itemId) {
+    showConfirmation('Remove Item', 'Are you sure you want to remove this item?', () => {
+        cart.delete(itemId);
+        updateCartDisplay();
+        showAlert('success', 'Removed!', 'The item has been removed from your cart.');
+    });
+}
+
+function updateQuantity(itemId, quantity) {
+    const maxQuantity = JSON.parse(cart.get(itemId)).maxQuantity;
+    const newQuantity = Math.max(1, Math.min(parseInt(quantity) || 1, maxQuantity));
+    
+    if (newQuantity < 1 || newQuantity > maxQuantity) {
+        showAlert('warning', 'Invalid Quantity', `Quantity must be between 1 and ${maxQuantity}.`);
+        return;
+    }
+
+    if (cart.has(itemId)) {
+        const item = JSON.parse(cart.get(itemId));
+        item.quantity = newQuantity;
+        cart.set(itemId, JSON.stringify(item));
+        updateCartDisplay();
+    }
+}
+
+function updateCartDisplay() {
+    const cartItems = document.querySelector('.cart-items');
+    cartItems.innerHTML = ''; // Clear previous items
+    let total = 0;
+
+    for (let [itemId, itemData] of cart.entries()) {
+        const item = JSON.parse(itemData);
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        itemElement.innerHTML = `
+            <img src="../Admin/item_images/${item.itemImage}" alt="${item.name}">
+            <div class="cart-item-details">
+                <div class="cart-item-header">
+                    <h4>${item.name}</h4>
+                    <button class="btn btn-sm btn-danger" onclick="removeItem('${itemId}')">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+                <div class="cart-item-controls">
+                    <div>₱${item.price.toFixed(2)}</div>
+                    <input type="number" 
+                        class="form-control quantity-input" 
+                        value="${item.quantity}"
+                        min="1"
+                        max="${item.maxQuantity}"
+                        onchange="updateQuantity('${itemId}', this.value)">
+                    <strong>₱${itemTotal.toFixed(2)}</strong>
+                </div>
+            </div>
+        `;
+        cartItems.appendChild(itemElement);
+    }
+
+    document.getElementById('cart-total-amount').textContent = total.toFixed(2);
+    updatePaymentSection(total);
+}
+
+
+document.addEventListener('input', event => {
+    const quantityInput = event.target.closest('.quantity-input');
+    if (quantityInput) {
+        if (+quantityInput.value < +quantityInput.min) {
+            quantityInput.value = +quantityInput.min;
+        }
+        if (+quantityInput.value > +quantityInput.max) {
+            quantityInput.value = +quantityInput.max;
+        }
+    }
+});
+
+function updatePaymentSection(total) {
+    const paymentInput = document.getElementById('payment-amount');
+    if (paymentInput) {
+        const payment = parseFloat(paymentInput.value) || 0;
+        const change = payment - total;
+        document.getElementById('change-amount').textContent = change >= 0 ? change.toFixed(2) : '0.00';
+    }
+}
+
+function processPayment() {
+    const total = parseFloat(document.getElementById('cart-total-amount').textContent);
+    const payment = parseFloat(document.getElementById('payment-amount').value) || 0;
+
+    if (cart.size === 0) {
+        showAlert('warning', 'Empty Cart', 'Please add items to the cart before processing payment.');
+        return;
+    }
+
+    if (payment < total) {
+        showAlert('error', 'Insufficient Payment', 'The payment amount must be equal to or greater than the total amount.');
+        return;
+    }
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Payment Successful',
+        text: `Change: ₱${(payment - total).toFixed(2)}`,
+        confirmButtonText: 'Print Receipt'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            printReceipt();
+            cart = new FormData(); // Reset cart
+            updateCartDisplay();
+            document.getElementById('payment-amount').value = '';
+        }
+    });
+}
+
+function printReceipt() {
+    const receiptWindow = window.open('', '_blank');
+    const total = parseFloat(document.getElementById('cart-total-amount').textContent);
+    const payment = parseFloat(document.getElementById('payment-amount').value) || 0;
+    const change = payment - total;
+    
+    let receiptContent = `
+        <html>
+        <head>
+            <title>Receipt - CML Paint Trading</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .receipt-header { text-align: center; margin-bottom: 20px; }
+                .receipt-item { margin: 10px 0; }
+                .receipt-total { margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
+                .receipt-footer { margin-top: 30px; text-align: center; font-size: 0.9em; }
+            </style>
+        </head>
+        <body>
+            <div class="receipt-header">
+                <h2>CML Paint Trading</h2>
+                <p>Official Receipt</p>
+                <p>${new Date().toLocaleString()}</p>
+            </div>
+            <div class="receipt-items">
+    `;
+
+    for (let [itemId, itemData] of cart.entries()) {
+        const item = JSON.parse(itemData);
+        const itemTotal = item.price * item.quantity;
+        receiptContent += `
+            <div class="receipt-item">
+                <p>${item.name} x ${item.quantity}</p>
+                <p>Unit Price: ₱${item.price.toFixed(2)}</p>
+                <p>Subtotal: ₱${itemTotal.toFixed(2)}</p>
+            </div>
+        `;
+    }
+
+    receiptContent += `
+            </div>
+            <div class="receipt-total">
+                <p><strong>Total Amount: ₱${total.toFixed(2)}</strong></p>
+                <p>Payment: ₱${payment.toFixed(2)}</p>
+                <p>Change: ₱${change.toFixed(2)}</p>
+            </div>
+            <div class="receipt-footer">
+                <p>Thank you for shopping at CML Paint Trading!</p>
+                <p>Please come again</p>
+            </div>
+        </body>
+        </html>
+    `;
+
+    receiptWindow.document.write(receiptContent);
+    receiptWindow.document.close();
+    
+    setTimeout(() => {
+        receiptWindow.print();
+        receiptWindow.close();
+    }, 500);
+}
+
+// Utility functions for alerts and confirmations
+function showAlert(icon, title, text) {
+    Swal.fire({ icon, title, text });
+}
+
+function showConfirmation(title, text, onConfirm) {
+    Swal.fire({
+        title,
+        text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+        if (result.isConfirmed) onConfirm();
+    });
+}
+
+// Initialize cart display on page load
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartDisplay();
+});
+
+function checkout() {
+    const items = new FormData();
+    for (const [key, val] of cart.entries()) {
+        const qty = JSON.parse(val).quantity;
+        items.append('qtys[]', qty);
+        items.append('item_ids[]', key);
+    }
+
+    fetch('./cashier_checkout.php', {
+        method: 'POST',
+        body: items,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message,
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Optionally redirect or update the UI
+                printReceipt(data.payment_id);
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: data.message,
+                confirmButtonText: 'Try Again'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'An unexpected error occurred. Please try again.',
+            confirmButtonText: 'Close'
+        });
+    });
+}
+
+function printReceipt(payment_id) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = './cashier_reciept.php'; // Your receipt generation script
+    form.target = '_blank'; // Open in a new tab
+
+    for (const [key, val] of cart.entries()) {
+        const qty = JSON.parse(val).quantity;
+
+        // Create hidden input for item ID
+        const itemIdInput = document.createElement('input');
+        itemIdInput.type = 'hidden';
+        itemIdInput.name = 'item_ids[]';
+        itemIdInput.value = key;
+        form.appendChild(itemIdInput);
+
+        // Create hidden input for quantity
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'hidden';
+        qtyInput.name = 'qtys[]';
+        qtyInput.value = qty;
+        form.appendChild(qtyInput);
+    }
+    form.append('payment_id', payment_id);
+
+    // Append the form to the body
+    document.body.appendChild(form);
+
+    // Submit the form
+    form.submit();
+
+    // Remove the form after submission
+    form.remove();
+}
+</script>
 </body>
 
 </html>
