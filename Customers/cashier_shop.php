@@ -1,36 +1,4 @@
 <?php
-session_start();
-error_reporting(E_ALL);
-ini_set("display_errors", 0);
-function customErrorHandler($errno, $errstr, $errfile, $errline) {
-    $date = date('Y-m-d H:i:s');
-    $message = "($date) Error: [$errno] $errstr - $errfile:$errline" . PHP_EOL;
-    error_log($message, 3, '../error.log');
-}
-
-set_error_handler("customErrorHandler");
-
-if (!$_SESSION['user_email']) {
-    echo '<script type="text/javascript">
-            Swal.fire({
-                icon: "warning",
-                title: "Unauthorized Access",
-                text: "You need to log in to access this page.",
-                confirmButtonText: "OK"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "../index.php";
-                }
-            });
-          </script>';
-    exit();
-}
-
-if ($_SESSION['user_type'] === 'Cashier') {
-    include './cashier_shop.php';
-    exit;
-}
-
 include("config.php");
 extract($_SESSION);
 $stmt_edit = $DB_con->prepare('SELECT * FROM users WHERE user_email =:user_email');
@@ -263,24 +231,9 @@ extract($edit_row);
                 $start = ($id - 1) * $limit;
             }
 
-            $query = mysqli_query($conn, "SELECT item_id FROM wishlist WHERE user_id = {$_SESSION['user_id']}");
-            $wishlist = mysqli_fetch_all($query, MYSQLI_NUM);
-
-            function inWishlist($item) {
-                global $wishlist;
-                foreach ($wishlist as $wish) {
-                    if ($wish[0] === $item) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-
             $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price FROM items LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
-                $exist = inWishlist($query2['item_id']);
                 ?>
                 <div style='min-width: 280px !important;' class='col-sm-3 panel-item' data-type='<?php echo $query2['type'] ?>' data-brand='<?php echo $query2['brand_name'] ?>'>
                     <div class='panel panel-default' style='border-color:#008CBA;'>
@@ -296,14 +249,7 @@ extract($edit_row);
                             <center><h4><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
-                                <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
-                            <?php
-                                if ($exist) {
-                                echo "<button class='btn btn-light' style='margin-left: 7px;' disabled><span class='glyphicon glyphicon-heart'></span></button>";
-                            } else {
-                                echo "<a class='btn btn-primary' style='margin-left: 7px;' href='./add_to_wishlist.php?item={$query2['item_id']}&user={$_SESSION['user_id']}'><span class='glyphicon glyphicon-heart'></span></a>";
-                            }
-                            ?>
+                                <button class='btn btn-danger' style='flex: 1;' data-item-id='<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
                             </div>
                         </div>
                     </div>
@@ -514,3 +460,4 @@ extract($edit_row);
 </body>
 
 </html>
+

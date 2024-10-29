@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.1-4.fc40
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Oct 28, 2024 at 11:20 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Oct 28, 2024 at 07:14 PM
+-- Server version: 8.0.39
+-- PHP Version: 8.3.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -21,6 +21,199 @@ SET time_zone = "+00:00";
 -- Database: `cml_paint_db`
 --
 
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
+    DECLARE v_payment_id INT;
+    DECLARE v_amount DECIMAL(10,2);
+    DECLARE v_payment_type VARCHAR(255);
+    DECLARE v_total_amount DECIMAL(10,2);
+    DECLARE v_current_amount DECIMAL(10,2);
+    
+    -- Get payment details
+    SELECT pt.payment_id, pt.amount, pf.payment_type, pf.amount, 
+           (SELECT SUM(order_total) FROM orderdetails WHERE payment_id = pt.payment_id)
+    INTO v_payment_id, v_amount, v_payment_type, v_current_amount, v_total_amount
+    FROM payment_track pt
+    JOIN paymentform pf ON pt.payment_id = pf.id
+    WHERE pt.track_id = p_track_id;
+    
+    START TRANSACTION;
+    
+    -- Update payment track status
+    UPDATE payment_track
+    SET status = 'Confirmed'
+    WHERE track_id = p_track_id;
+    
+    -- Update paymentform based on payment type
+    IF v_payment_type = 'Installment' THEN
+        UPDATE paymentform
+        SET months_paid = months_paid + 1,
+            payment_status = IF(months_paid + 1 >= 12, 'Confirmed', payment_status)
+        WHERE id = v_payment_id;
+    ELSE -- Down payment
+        UPDATE paymentform
+        SET amount = amount + v_amount,
+            payment_status = IF(amount + v_amount >= v_total_amount, 'Confirmed', payment_status)
+        WHERE id = v_payment_id;
+    END IF;
+    
+    -- Update orderdetails status if payment is complete
+    IF (v_payment_type = 'Installment' AND (SELECT months_paid FROM paymentform WHERE id = v_payment_id) >= 12)
+        OR (v_payment_type = 'Down payment' AND (v_current_amount + v_amount >= v_total_amount)) THEN
+        
+        UPDATE orderdetails
+        SET order_status = 'Confirmed'
+        WHERE payment_id = v_payment_id;
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 'success' as status, 'Payment confirmed successfully' as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
+    DECLARE current_qty INT;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_order_id INT;
+    DECLARE v_order_quantity INT;
+    DECLARE v_user_id INT;
+    DECLARE v_order_name VARCHAR(1000);
+    DECLARE v_order_price DOUBLE;
+    DECLARE v_order_total DOUBLE;
+    DECLARE v_order_status VARCHAR(45);
+    DECLARE v_order_date DATE;
+    DECLARE v_order_pick_up DATETIME(6);
+    DECLARE v_order_pick_place VARCHAR(45);
+    DECLARE v_gl VARCHAR(45);
+    DECLARE v_payment_id INT;
+    DECLARE v_product_id INT;
+    
+    -- Cursor for orders sorted by date
+    DECLARE order_cursor CURSOR FOR 
+        SELECT order_id, order_quantity,
+               user_id, order_name, order_price, order_total,
+               order_status, order_date, order_pick_up, order_pick_place,
+               gl, payment_id, product_id
+        FROM orderdetails 
+        WHERE user_id = (SELECT user_id FROM returnitems WHERE return_id = p_return_id)
+        AND product_id = (SELECT product_id FROM orderdetails WHERE order_name = 
+                        (SELECT product_name FROM returnitems WHERE return_id = p_return_id) LIMIT 1)
+        ORDER BY order_date DESC;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    -- Start transaction
+    START TRANSACTION;
+    
+    -- Get initial return quantity
+    SELECT quantity INTO current_qty
+    FROM returnitems
+    WHERE return_id = p_return_id;
+    
+    -- Open cursor
+    OPEN order_cursor;
+    
+    read_loop: LOOP
+        FETCH order_cursor INTO v_order_id, v_order_quantity,
+                               v_user_id, v_order_name, v_order_price, v_order_total,
+                               v_order_status, v_order_date, v_order_pick_up, v_order_pick_place,
+                               v_gl, v_payment_id, v_product_id;
+                               
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        IF v_order_quantity <= current_qty THEN
+            -- Update entire order to 'return' status
+            UPDATE orderdetails 
+            SET order_status = 'Returned'
+            WHERE order_id = v_order_id;
+            
+            SET current_qty = current_qty - v_order_quantity;
+        ELSE
+            -- Split the order
+            UPDATE orderdetails
+            SET order_quantity = order_quantity - current_qty,
+                order_total = order_price * (order_quantity - current_qty)
+            WHERE order_id = v_order_id;
+            
+            -- Insert new order for the returned portion
+            INSERT INTO orderdetails (
+                user_id, order_name, order_price, order_quantity, 
+                order_total, order_status, order_date, order_pick_up,
+                order_pick_place, gl, payment_id, product_id
+            )
+            VALUES (
+                v_user_id, v_order_name, v_order_price, current_qty,
+                v_order_price * current_qty, 'Returned', v_order_date, 
+                v_order_pick_up, v_order_pick_place, v_gl,
+                v_payment_id, v_product_id
+            );
+            
+            SET current_qty = 0;
+            LEAVE read_loop;
+        END IF;
+        
+        IF current_qty = 0 THEN
+            LEAVE read_loop;
+        END IF;
+    END LOOP;
+    
+    -- Close cursor
+    CLOSE order_cursor;
+    
+    -- Update return item status
+    UPDATE returnitems 
+    SET status = 'Confirmed'
+    WHERE return_id = p_return_id;
+    
+    -- Commit transaction
+    COMMIT;
+    
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `request_payment` (IN `p_payment_id` INT, IN `p_amount` DECIMAL(10,2), IN `p_payment_image` VARCHAR(255))   BEGIN
+    DECLARE last_track_status VARCHAR(20);
+    DECLARE v_payment_type VARCHAR(255);
+    DECLARE v_payment_status VARCHAR(20);
+    
+    -- Get the status of the latest track record
+    SELECT status INTO last_track_status
+    FROM payment_track
+    WHERE payment_id = p_payment_id
+    ORDER BY track_id DESC
+    LIMIT 1;
+    
+    -- Get payment type
+    SELECT payment_type INTO v_payment_type
+    FROM paymentform
+    WHERE id = p_payment_id;
+    
+    SELECT payment_status INTO v_payment_status
+    FROM paymentform
+    WHERE id = p_payment_id;
+    -- Check if we can process new payment (no track or last track was confirmed)
+    IF (v_payment_status = 'Confirmed' AND (last_track_status IS NULL OR last_track_status = 'Confirmed')) THEN
+        -- Insert new payment track record
+        INSERT INTO payment_track (payment_id, amount, status)
+        VALUES (p_payment_id, p_amount, 'Requested');
+        
+        -- Update payment image in paymentform
+        UPDATE paymentform
+        SET payment_image_path = p_payment_image
+        WHERE id = p_payment_id;
+        
+        SELECT 'success' as status, 'Payment request submitted successfully' as message;
+    ELSE
+        SELECT 'error' as status, 'Previous payment is still pending confirmation' as message;
+    END IF;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -28,10 +221,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int(10) UNSIGNED NOT NULL,
+  `admin_id` int UNSIGNED NOT NULL,
   `admin_username` varchar(500) NOT NULL DEFAULT '',
   `admin_password` varchar(500) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `admin`
@@ -47,9 +240,9 @@ INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
 --
 
 CREATE TABLE `brands` (
-  `brand_id` int(11) NOT NULL,
-  `brand_name` varchar(255) NOT NULL,
-  `brand_img` text DEFAULT NULL
+  `brand_id` int NOT NULL,
+  `brand_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_img` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -68,10 +261,10 @@ INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`) VALUES
 --
 
 CREATE TABLE `cartitems` (
-  `itemID` int(11) NOT NULL,
-  `palletName` varchar(255) NOT NULL,
-  `palletCode` varchar(255) NOT NULL,
-  `palletRGB` varchar(255) NOT NULL
+  `itemID` int NOT NULL,
+  `palletName` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `palletCode` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `palletRGB` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -88,7 +281,7 @@ INSERT INTO `cartitems` (`itemID`, `palletName`, `palletCode`, `palletRGB`) VALU
 --
 
 CREATE TABLE `items` (
-  `item_id` int(10) UNSIGNED NOT NULL,
+  `item_id` int UNSIGNED NOT NULL,
   `item_name` varchar(5000) NOT NULL DEFAULT '',
   `brand_name` varchar(255) NOT NULL,
   `item_image` varchar(5000) NOT NULL DEFAULT '',
@@ -96,9 +289,9 @@ CREATE TABLE `items` (
   `expiration_date` varchar(255) DEFAULT NULL,
   `item_price` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `quantity` int(255) NOT NULL,
+  `quantity` int NOT NULL,
   `gl` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `items`
@@ -120,20 +313,20 @@ INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_d
 --
 
 CREATE TABLE `orderdetails` (
-  `order_id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL DEFAULT 0,
+  `order_id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL DEFAULT '0',
   `order_name` varchar(1000) NOT NULL DEFAULT '',
-  `order_price` double NOT NULL DEFAULT 0,
-  `order_quantity` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `order_total` double NOT NULL DEFAULT 0,
+  `order_price` double NOT NULL DEFAULT '0',
+  `order_quantity` int UNSIGNED NOT NULL DEFAULT '0',
+  `order_total` double NOT NULL DEFAULT '0',
   `order_status` varchar(45) NOT NULL DEFAULT '',
   `order_date` date DEFAULT NULL,
   `order_pick_up` datetime(6) DEFAULT NULL,
   `order_pick_place` enum('Quezon City','Caloocan','Valenzuela','San Jose de Monte') DEFAULT NULL,
   `gl` enum('Gallon','Liter') DEFAULT NULL,
-  `payment_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `payment_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `orderdetails`
@@ -168,10 +361,10 @@ INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, 
 --
 
 CREATE TABLE `pallets` (
-  `pallet_id` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `rgb` varchar(255) NOT NULL
+  `pallet_id` int NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `rgb` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -430,20 +623,20 @@ INSERT INTO `pallets` (`pallet_id`, `code`, `name`, `rgb`) VALUES
 --
 
 CREATE TABLE `paymentform` (
-  `id` int(11) NOT NULL,
-  `firstname` varchar(255) DEFAULT NULL,
-  `lastname` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `mobile` varchar(255) NOT NULL,
-  `payment_method` varchar(255) NOT NULL,
-  `payment_type` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `firstname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `lastname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_general_ci,
+  `mobile` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `payment_method` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `payment_type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `amount` decimal(10,2) DEFAULT NULL,
-  `payment_image_path` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `order_id` int(10) UNSIGNED DEFAULT NULL,
-  `payment_status` varchar(20) DEFAULT 'verification',
-  `months_paid` int(11) NOT NULL DEFAULT 0
+  `payment_image_path` text COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `order_id` int UNSIGNED DEFAULT NULL,
+  `payment_status` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'verification',
+  `months_paid` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -470,12 +663,12 @@ INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `m
 --
 
 CREATE TABLE `payment_track` (
-  `track_id` int(11) NOT NULL,
-  `payment_id` int(11) NOT NULL,
+  `track_id` int NOT NULL,
+  `payment_id` int NOT NULL,
   `status` varchar(32) NOT NULL DEFAULT 'Requested',
   `amount` decimal(10,2) NOT NULL,
-  `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `date_tracked` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -484,9 +677,9 @@ CREATE TABLE `payment_track` (
 --
 
 CREATE TABLE `product_type` (
-  `type_id` int(11) NOT NULL,
-  `type_name` text NOT NULL,
-  `brand_id` int(11) NOT NULL
+  `type_id` int NOT NULL,
+  `type_name` text COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -504,14 +697,14 @@ INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`) VALUES
 --
 
 CREATE TABLE `returnitems` (
-  `return_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `product_image` varchar(255) DEFAULT NULL,
-  `receipt_image` varchar(255) DEFAULT NULL,
-  `product_name` varchar(255) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL
+  `return_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `product_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `receipt_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -528,7 +721,7 @@ INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `produc
 --
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int NOT NULL,
   `user_email` varchar(1000) NOT NULL,
   `user_password` varchar(1000) NOT NULL,
   `user_firstname` varchar(1000) NOT NULL,
@@ -536,7 +729,7 @@ CREATE TABLE `users` (
   `user_address` varchar(1000) NOT NULL,
   `user_mobile` varchar(255) NOT NULL,
   `type` enum('Admin','Customer','Cashier') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `users`
@@ -554,10 +747,10 @@ INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`,
 --
 
 CREATE TABLE `wishlist` (
-  `wish_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `item_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `wish_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `item_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
@@ -651,73 +844,73 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `brand_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `itemID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `item_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `order_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `pallet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
+  MODIFY `pallet_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
 
 --
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
 --
 ALTER TABLE `payment_track`
-  MODIFY `track_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `track_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `product_type`
 --
 ALTER TABLE `product_type`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `type_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `returnitems`
 --
 ALTER TABLE `returnitems`
-  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `return_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `wish_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
