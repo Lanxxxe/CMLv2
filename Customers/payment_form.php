@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<p><strong>Name:</strong> $firstName $lastName</p>";
                             $receipt .= "<p><strong>Email:</strong> $email</p>";
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
-                            $receipt .= "<p><strong>Gcash Number:</strong> $mobile</p>";
+                            $receipt .= "<p><strong>Mobile Number:</strong> $mobile</p>";
                             $receipt .= "<p style=\"padding-bottom: 16px; border-bottom: 1px solid #6c757d;\"><strong>Payment Type:</strong> $pay ($paymentType)</p>";
 
                             $receipt .= "<table style=\"width: 100%; margin-bottom: 16px;\">";
@@ -161,8 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             foreach ($order_list as $order_data) {
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
                                     $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['name']} </td>";
-                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['price']} </td>";
                                     $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['qty']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['price']} </td>";
                                 $receipt .= "</tr>";
                             }
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";

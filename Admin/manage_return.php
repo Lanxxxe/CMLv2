@@ -177,10 +177,87 @@ if (isset($_GET['delete_return_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-    #modal-product-im, #modal-receipt-image{
-        max-width: 150px;
-        max-height: 150px;
-    }
+        #modal-product-im, #modal-receipt-image{
+            max-width: 150px;
+            max-height: 150px;
+        }
+
+        .item-preview.modal-body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .item-preview .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -10px;
+        }
+
+        .item-preview .col-md-6 {
+            flex: 0 0 50%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .item-preview .detail-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .item-preview .detail-group strong {
+            display: inline-block;
+            width: 120px;
+            color: #495057;
+        }
+
+        .item-preview .detail-group span {
+            color: #212529;
+        }
+
+        .item-preview .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .item-preview .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .item-preview .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .item-preview .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .item-preview .image-container {
+            margin-bottom: 20px;
+        }
+
+        .item-preview .image-container strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .item-preview .image-container img {
+            min-width: 300px;
+            min-height: 300px;
+            max-width: 300px;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -305,21 +382,43 @@ if (isset($_GET['delete_return_id'])) {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="item-preview modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Return ID:</strong> <span id="modal-return-id"></span></p>
-                            <p><strong>Product Name:</strong> <span id="modal-product-name"></span></p>
-                            <p><strong>User Email:</strong> <span id="modal-user-email"></span></p>
-                            <p><strong>Quantity:</strong> <span id="modal-quantity"></span></p>
-                            <p><strong>Reason:</strong> <span id="modal-reason"></span></p>
-                            <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                            <div class="detail-group">
+                                <strong>Return ID:</strong>
+                                <span id="modal-return-id"></span>
+                            </div>
+                            <div class="detail-group">
+                                <strong>Product Name:</strong>
+                                <span id="modal-product-name"></span>
+                            </div>
+                            <div class="detail-group">
+                                <strong>User Email:</strong>
+                                <span id="modal-user-email"></span>
+                            </div>
+                            <div class="detail-group">
+                                <strong>Quantity:</strong>
+                                <span id="modal-quantity"></span>
+                            </div>
+                            <div class="detail-group">
+                                <strong>Reason:</strong>
+                                <span id="modal-reason"></span>
+                            </div>
+                            <div class="detail-group">
+                                <strong>Status:</strong>
+                                <span id="modal-status" class="status-badge status-pending"></span>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Product Image:</strong></p>
-                            <img id="modal-product-image" src="" alt="Product Image">
-                            <p><strong>Receipt Image:</strong></p>
-                            <img id="modal-receipt-image" src="" alt="Receipt Image">
+                            <div class="image-container">
+                                <strong>Product Image:</strong>
+                                <img id="modal-product-image" src="" alt="Product Image">
+                            </div>
+                            <div class="image-container">
+                                <strong>Receipt Image:</strong>
+                                <img id="modal-receipt-image" src="" alt="Receipt Image">
+                            </div>
                         </div>
                     </div>
                 </div>

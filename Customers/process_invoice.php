@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (move_uploaded_file($payment_image['tmp_name'], $target_file)) {
                         // Call the request_payment stored procedure
                         $stmt = $DB_con->prepare("CALL request_payment(?, ?, ?)");
-                        $stmt->execute([$payment_id, $amount, $new_filename]);
+                        $stmt->execute([$payment_id, $amount,  './uploaded_images/' . $new_filename]);
                         $result = $stmt->fetch(PDO::FETCH_ASSOC);
                         
                         echo json_encode([

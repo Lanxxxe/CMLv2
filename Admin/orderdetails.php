@@ -53,7 +53,7 @@ $actions = [
     'confirmed',
     'verification',
     'rejected',
-    'return',
+    'returned',
 ];
 if (in_array($action, $actions)) {
     $sql_cmd = "WHERE LCASE(orderdetails.order_status) = LCASE('$action')";
@@ -192,7 +192,7 @@ function isActivated($s) {
             <div class="dashboard-circle danger <?php isActivated('3') ?>" onclick="window.location.href='./orderdetails.php?action=rejected&q=3'">
                 <div style="text-align:center">Rejected<br><?php echo $total_rejected; ?></div>
             </div>
-            <div class="dashboard-circle primary <?php isActivated('4') ?>" onclick="window.location.href='./orderdetails.php?action=return&q=4'">
+            <div class="dashboard-circle primary <?php isActivated('4') ?>" onclick="window.location.href='./orderdetails.php?action=returned&q=4'">
                 <div style="text-align:center">Returned Items<br><?php echo $returnItems; ?></div>
             </div>
             <div class="dashboard-circle success <?php isActivated('5') ?>" onclick="window.location.href='./orderdetails.php?action=confirmed&q=5'">

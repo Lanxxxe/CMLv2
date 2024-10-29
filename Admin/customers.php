@@ -26,15 +26,101 @@ include './approve_email.php';
 function sendEmailApprovedOrder($payment_id) {
     include './config.php';
     try {
-        $paymentformQ = $DB_con->prepare('SELECT email FROM paymentform WHERE id = :id');
+        $paymentformQ = $DB_con->prepare('SELECT email, payment_type FROM paymentform WHERE id = :id');
         $paymentformQ->execute([':id' => $payment_id]);
-        $email = $paymentformQ->fetch(PDO::FETCH_ASSOC)['email'];
+        $paymentformFetch = $paymentformQ->fetch(PDO::FETCH_ASSOC);
+        $email = $paymentformFetch['email'];
+        $payment_type = $paymentformFetch['payment_type'];
 
-        $orderDetails = $DB_con->prepare('SELECT orderdetails.*, users.user_email FROM orderdetails JOIN users ON orderdetails.user_id = users.user_id WHERE payment_id = :payment_id');
+        $amountCalculation = $DB_con->prepare("
+            SELECT 
+                pf.id AS payment_id,
+                pf.firstname,
+                pf.lastname,
+                pf.payment_type,
+                pf.payment_status,
+                COALESCE(
+                    (
+                        SELECT pt.amount 
+                        FROM payment_track pt 
+                        WHERE pt.payment_id = pf.id 
+                        ORDER BY pt.date_tracked DESC 
+                        LIMIT 1
+                    ),
+                    pf.amount
+                ) AS latest_payment_amount,
+                COALESCE(
+                    (
+                        SELECT pt.date_tracked 
+                        FROM payment_track pt 
+                        WHERE pt.payment_id = pf.id 
+                        ORDER BY pt.date_tracked DESC 
+                        LIMIT 1
+                    ),
+                    pf.created_at
+                ) AS payment_date,
+                (
+                    COALESCE(pf.amount, 0) + 
+                    CASE 
+                        WHEN pf.payment_type = 'Installment' THEN 
+                            COALESCE(
+                                (
+                                    SELECT SUM(pt.amount) 
+                                    FROM payment_track pt 
+                                    WHERE pt.payment_id = pf.id 
+                                    AND pt.status = 'Confirmed'
+                                ),
+                                0
+                            )
+                        ELSE 0
+                    END
+                ) AS total_amount_paid,
+                (
+                    SELECT SUM(od.order_total) 
+                    FROM orderdetails od 
+                    WHERE od.payment_id = pf.id
+                ) AS total_order_amount,
+                (
+                    SELECT SUM(od.order_total) 
+                    FROM orderdetails od 
+                    WHERE od.payment_id = pf.id
+                ) - 
+                (
+                    COALESCE(pf.amount, 0) + 
+                    CASE 
+                        WHEN pf.payment_type = 'Installment' THEN 
+                            COALESCE(
+                                (
+                                    SELECT SUM(pt.amount) 
+                                    FROM payment_track pt 
+                                    WHERE pt.payment_id = pf.id 
+                                    AND pt.status = 'Confirmed'
+                                ),
+                                0
+                            )
+                        ELSE 0
+                    END
+                ) AS remaining_balance
+            FROM 
+                paymentform pf
+            WHERE
+                pf.id = :pfid
+            ORDER BY 
+                payment_date DESC;
+            ");
+        $amountCalculation->execute([':pfid' => $payment_id]);
+        $amountCalculationFetch = $amountCalculation->fetch(PDO::FETCH_ASSOC);
+        $latest_payment_amount = $amountCalculationFetch['latest_payment_amount'] ?? 0;
+        $total_amount_paid = $amountCalculationFetch['total_amount_paid'] ?? 0;
+        $remaining_balance = $amountCalculationFetch['remaining_balance'] ?? 0;
+
+
+
+        $orderDetails = $DB_con->prepare('SELECT orderdetails.*, users.user_email, users.user_firstname, users.user_lastname, users.user_mobile FROM orderdetails JOIN users ON orderdetails.user_id = users.user_id WHERE payment_id = :payment_id');
         $orderDetails->execute([':payment_id' => $payment_id]);
         $orders = $orderDetails->fetchAll(PDO::FETCH_ASSOC);
 
-        $messageBody = composedMessage($orders);
+        $messageBody = composedMessage($orders, $payment_type, $latest_payment_amount, $total_amount_paid, $remaining_balance);
 
         $mail = new PHPMailer(true);
         //Server settings
@@ -106,9 +192,8 @@ if (isset($_GET['delete_payment_id'])) {
     $payment_id = $_GET['delete_payment_id'];
     $payment_type = $_GET['payment_type'];
     if ($payment_type === 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
-        $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
-        $stmt_id->execute([':track_id' => $payment_id]);
-        $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
+        $stmt_reject = $DB_con->prepare("DELETE FROM payment_track WHERE payment_id = :payment_id");
+        $stmt_reject->execute([':payment_id' => $payment_id]);
     }
 
     $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE payment_id = :payment_id');
@@ -155,12 +240,8 @@ if (isset($_GET['reset_payment_id'])) {
         $payment_id = $_GET['reset_payment_id'];
         $payment_type = $_GET['payment_type'];
         if($payment_type == 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
-            $stmt_reject = $DB_con->prepare("UPDATE payment_track SET status = 'Rejected' WHERE track_id = :track_id");
-            $stmt_reject->execute([':track_id' => $payment_id]);
-
-            $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
-            $stmt_id->execute([':track_id' => $payment_id]);
-            $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
+            $stmt_reject = $DB_con->prepare("UPDATE payment_track SET status = 'Rejected' WHERE payment_id = :payment_id");
+            $stmt_reject->execute([':payment_id' => $payment_id]);
         }
         $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "rejected" WHERE payment_id = :payment_id');
         $stmt_reset->bindParam(':payment_id', $payment_id);
@@ -207,21 +288,23 @@ if (isset($_GET['confirm_payment_id'])) {
     $payment_type = $_GET['payment_type'];
     
     if ($payment_type == 'Installment' || strcasecmp($payment_type, 'Down Payment') === 0) {
-        // Prepare and execute the stored procedure
-        $stmt_confirmed = $DB_con->prepare("CALL confirm_payment(:track_id)");
-        $stmt_confirmed->bindParam(':track_id', $payment_id);
-        $stmt_confirmed->execute();
 
-        // Close the cursor to free up resources
-        $stmt_confirmed->closeCursor();
+        $stmt_track = $DB_con->prepare("SELECT track_id
+            FROM payment_track
+            WHERE payment_id = :payment_id 
+            ORDER BY track_id DESC
+            LIMIT 1");
+        $stmt_track->execute([':payment_id' => $payment_id]);
 
-        // Now prepare and execute the select statement
-        $stmt_id = $DB_con->prepare("SELECT payment_id FROM payment_track WHERE track_id = :track_id");
-        $stmt_id->execute([':track_id' => $payment_id]);
-        $payment_id = $stmt_id->fetch(PDO::FETCH_NUM)[0];
-
-        // Close the cursor again
-        $stmt_id->closeCursor();
+        if ($stmt_track->rowCount() > 0) {
+            $track_id = $stmt_track->fetch(PDO::FETCH_NUM)[0];
+            // Prepare and execute the stored procedure
+            $stmt_confirmed = $DB_con->prepare("CALL confirm_payment(:track_id)");
+            $stmt_confirmed->bindParam(':track_id', $track_id);
+            $stmt_confirmed->execute();
+            // Close the cursor to free up resources
+            $stmt_confirmed->closeCursor();
+        }
     }
 
     // Prepare and execute the update statements
@@ -242,7 +325,7 @@ if (isset($_GET['confirm_payment_id'])) {
     // Final confirmation status
     $confirmed = $payment_confirmed && $order_confirmed;
     if ($confirmed) {
-        sendEmailApprovedOrder($payment_id);
+        // sendEmailApprovedOrder($payment_id);
         echo "<script>
             Swal.fire({
                 icon: 'success',
@@ -420,7 +503,7 @@ if (isset($_GET['delete_return_id'])) {
                         INNER JOIN orderdetails od ON u.user_id = od.user_id
                         INNER JOIN paymentform pf ON od.payment_id = pf.id
                     WHERE 
-                        (pf.payment_status NOT IN ('Confirmed', 'Returned') AND pf.payment_type = 'Full Payment')
+                        (pf.payment_status NOT IN ('Confirmed', 'Returned'))
                     GROUP BY 
                         u.user_email,
                         u.user_firstname,
@@ -466,15 +549,15 @@ if (isset($_GET['delete_return_id'])) {
                     foreach ($data as $row) {
                         ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['order_id']); ?></td>
+                            <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
                             <td><?php echo htmlspecialchars($row['user_email']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_status']); ?></td>
                             <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
                             <td>
-                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
-                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
-                                <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['order_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
-                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['order_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
+                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
+                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
+                                <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
+                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
                             </td>
                         </tr>
                         <?php

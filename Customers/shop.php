@@ -281,7 +281,7 @@ extract($edit_row);
                     <div class='panel panel-default' style='border-color:#008CBA;'>
                         <div class='panel-heading' style='color:white;background-color: #033c73;'>
                             <center> 
-                                <textarea style='text-align:center;background-color: white;' class='form-control' rows='1' disabled><?php echo $query2['brand_name'] ?></textarea>
+                                <div style='text-align:center;background-color: white;' class='form-control'><?php echo $query2['brand_name'] ?></div>
                             </center>
                         </div>
                         <div class='panel-body'>
@@ -291,7 +291,7 @@ extract($edit_row);
                             <center><h4><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
-                                <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
+                                <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
                             <?php
                                 if ($exist) {
                                 echo "<button class='btn btn-light' style='margin-left: 7px;' disabled><span class='glyphicon glyphicon-heart'></span></button>";

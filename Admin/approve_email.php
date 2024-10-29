@@ -1,5 +1,5 @@
 <?php
-function composedMessage($orders) {
+function composedMessage($orders, $payment_type, $latest_payment_amount, $total_amount_paid, $remaining_balance) {
     // Get the first order to access user details
     $order = $orders[0];
     date_default_timezone_set('Asia/Manila');
@@ -129,7 +129,6 @@ function composedMessage($orders) {
                     margin: -10px -10px 0;
                     padding: 15px 10px;
                 }
-                
                 .header h1 {
                     font-size: 20px;
                 }
@@ -172,6 +171,10 @@ function composedMessage($orders) {
                     <h2>Order Receipt</h2>
                     <p><strong>Date Approved:</strong> ' . $formattedDateTime . '</p>
                     <p><strong>Order ID:</strong> ' . htmlspecialchars($order['order_id']) . '</p>
+                    <p><strong>Name:</strong> ' . htmlspecialchars($order['user_firstname'] . ' ' . $order['user_lastname']) . '</p>
+                    <p><strong>Email:</strong> ' . htmlspecialchars($order['user_email']) . '</p>
+                    <p><strong>Mobile Number:</strong> ' . htmlspecialchars($order['user_mobile']) . '</p>
+                    <p><strong>Payment Type:</strong> ' . htmlspecialchars($payment_type) . '</p>
                     <p><strong>Order Status:</strong> <span class="status">Approved</span></p>
                     <p><strong>Pick-up Location:</strong> ' . htmlspecialchars($order['order_pick_place']) . '</p>
                     <p><strong>Pick-up Date:</strong> ' . date('F j, Y - h:ia', strtotime($order['order_pick_up'])) . '</p>
@@ -209,8 +212,18 @@ function composedMessage($orders) {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
+                    </div>';
+                    
+                if (strcasecmp($payment_type, 'Full Payment') !== 0) {
+                    $html .= 
+                    '<br>
+                     <p><strong>Current Amount Paid:</strong>₱' . number_format($latest_payment_amount) . '</p>
+                     <p><strong>Total Amount Paid:</strong>₱' .   number_format($total_amount_paid) . '</p>
+                     <p><strong>Remaining Balance:</strong>₱' .   number_format($remaining_balance) . '</p>
+                     <br>';
+                }
+
+                $html .= '</div>
                 
                 <p><strong>Important Notes:</strong></p>
                 <ul>
