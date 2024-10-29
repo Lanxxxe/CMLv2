@@ -140,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $message .= ' Payment Document Successfully Submitted for all selected orders.';
                             // Generate receipt HTML
                             $receipt .= "<div id=\"cmlReciept\" class=\"receipt\">";
+                            $receipt .= "<h2 style='font-size: 26; font-weight: 900; border: none; color: #044C92; padding: 2px;'>CML Pain Trading</h2>";
                             $receipt .= "<h2>Payment Receipt</h2>";
                             $receipt .= "<p><strong>Date Ordered:</strong> $formattedDateTime</p>";
                             $receipt .= "<p><strong>Order ID/s:</strong> " . implode(', ', $order_ids) . "</p>";
