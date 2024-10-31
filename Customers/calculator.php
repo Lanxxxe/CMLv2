@@ -55,8 +55,6 @@ try {
 
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-
-   
     
 </head>
 <body>
@@ -75,6 +73,33 @@ try {
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
+                        <div class="form-group" style="font-size: 20px;">
+                            <label class="form-label" for="brandSelect">Brand:</label>
+                            <select name="brand_id" id="brandSelect" class="form-control" required>
+                                <option value="">Select Brand</option>
+                                <?php
+                                // Fetch all brands from database
+                                $stmt = $DB_con->prepare("SELECT brand_id, brand_name FROM brands ORDER BY brand_name");
+                                $stmt->execute();
+                                $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                foreach ($brands as $brand) {
+                                    ?>
+                                    <option value='<?php echo htmlspecialchars($brand['brand_id']) ?>'>
+                                        <?php echo htmlspecialchars($brand['brand_name']) ?></option>";
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="font-size: 20px;">
+                            <label for="typeSelect">Type:</label>
+                            <select name="type_id" id="typeSelect" class="form-control" required disabled>
+                                <option value="">Select Brand First</option>
+                            </select>
+                        </div>
+
                         <div class="row">
                             <div class="form-group col-md-6" style="font-size: 20px;">
                                 <label class="form-label">Width (m): </label>
@@ -85,37 +110,24 @@ try {
                                 <input class="form-control" placeholder="Enter height of wall" id="height" type="text">
                             </div>
                         </div>
+
+
                         <div class="form-group" style="font-size: 20px;">
                             <label class="form-label">Surface Area (m2): </label>
                             <input class="form-control" id="surfaceArea" type="text">
                         </div>
+                        
                         <div class="row">
                             <div class="form-group col-md-6" style="font-size: 20px;">
                                 <label class="form-label">No. of coats: </label>
-                                <input class="form-control" placeholder="Enter number of coats" id="coatsNumber" type="number">
+                                <input class="form-control" placeholder="Enter number of coats" id="coatsNumber" value="1" min="1" onkeypress="return isNumber(event)" type="number">
                             </div>
                             <div class="form-group col-md-6" style="font-size: 20px;">
                                 <label class="form-label">Gallons in Total: </label>
-                                <input class="form-control" id="liters" type="text">
+                                <input class="form-control" id="totalGallons" type="text">
                             </div>
                         </div>
-                        <div class="form-group" style="font-size: 20px;">
-                            <label class="form-label">Paint Type: </label>
-                            <select id="paint" class="form-control">
-                                <option value="Gloss">Gloss</option>
-                                <option value="Oil Paint">Oil Paint</option>
-                                <option value="Aluminum Paint">Aluminum Paint</option>
-                                <option value="Semi Gloss Paint">Semi Gloss Paint</option>
-                                <option value="Enamel">Enamel</option>
-                                <option value="Exterior Paint">Exterior Paint</option>
-                                <option value="Interior Paint">Interior Paint</option>
-                                <option value="Emulsion">Emulsion</option>
-                                <option value="Primer">Primer</option>
-                                <option value="Acrylic">Acrylic</option>
-                                <option value="Flat Paint">Flat Paint</option>
-                                <option value="Matte Finish">Matte Finish</option>
-                            </select>
-                        </div>
+
                         <div class="form-group" style="font-size: 20px;">
                             <label class="form-label">Total Price: </label>
                             <input class="form-control" id="totalPrice" value="0" type="text">
@@ -195,108 +207,91 @@ try {
             </div>
           </div>
         </div>
-
+        
 <script>
-   
-    $(document).ready(function() {
-        $('#priceinput').keypress(function (event) {
-            return isNumber(event, this)
-        });
-    });
-  
-    function isNumber(evt, element) {
 
-        var charCode = (evt.which) ? evt.which : event.keyCode
-
-        if (
-            (charCode != 45 || $(element).val().indexOf('-') != -1) &&      
-            (charCode != 46 || $(element).val().indexOf('.') != -1) &&      
-            (charCode < 48 || charCode > 57))
+    // Function to restrict input to numbers, decimals, and hyphen for negative numbers
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
             return false;
-
+        }
         return true;
-    }    
-
-    // Function to compute surface area
-    const updateSurfaceArea = () => {
-        var width = parseFloat(document.getElementById("width").value);
-        var height = parseFloat(document.getElementById("height").value);
-        var surfaceArea = 0; // Default value
-        if (!isNaN(width) && !isNaN(height)) {
-            surfaceArea = (width * height).toFixed(2);
-        }
-        document.getElementById("surfaceArea").value = surfaceArea;
     }
 
-    const updateTotalGallons = () => {
-        var surfaceArea = parseFloat(document.getElementById("surfaceArea").value);
-        var coatsNumber = parseFloat(document.getElementById("coatsNumber").value);
-        var totalLiters = 0; // Default value
-        var pricePerLiter = 200; // Price per liter
-        var paintType = document.getElementById("paint").value;
-
-        switch (paintType) {
-            case "Gloss":
-                pricePerLiter += 0; // No additional charge for Gloss paint
-                break;
-            case "Oil Paint":
-                pricePerLiter += 12; // No additional charge for Gloss paint
-                break;
-            case "Aluminum Paint":
-                pricePerLiter += 20; // No additional charge for Gloss paint
-                break;
-            case "Semi Gloss Paint":
-                pricePerLiter += 27; // No additional charge for Gloss paint
-                break;
-            case "Enamel":
-                pricePerLiter += 32; // No additional charge for Gloss paint
-                break;
-            case "Exterior Paint":
-                pricePerLiter += 36; // No additional charge for Gloss paint
-                break;
-            case "Exterior Paint":
-                pricePerLiter += 42; // No additional charge for Gloss paint
-                break;
-            case "Emulsion":
-                pricePerLiter += 46; // No additional charge for Gloss paint
-                break;
-            case "Primer":
-                pricePerLiter += 49; // No additional charge for Gloss paint
-                break;
-            case "Acrylic":
-                pricePerLiter += 21; // No additional charge for Gloss paint
-                break;
-            case "Flat Paint":
-                pricePerLiter += 13; // No additional charge for Gloss paint
-                break;
-            case "Matte Finish":
-                pricePerLiter += 60; // No additional charge for Gloss paint
-                break;
-            default:
-                pricePerLiter += 10; // Add 10 pesos for other paint types
-                break;
-        }
-        if (!isNaN(surfaceArea) && !isNaN(coatsNumber) && coatsNumber > 0) {
-            totalLiters = (surfaceArea * coatsNumber).toFixed(2);
-
-            var totalGallons = (totalLiters * 0.264172).toFixed(2);
-
-            var totalPrice = (totalLiters * pricePerLiter).toFixed(2);
-            
-            document.getElementById("liters").value = totalGallons;
-            document.getElementById("totalPrice").value = totalPrice;
-        }
+    // Function to calculate the surface area
+    function calculateSurfaceArea() {
+        const width = parseFloat(document.getElementById("width").value) || 0;
+        const height = parseFloat(document.getElementById("height").value) || 0;
+        const surfaceArea = width * height;
+        document.getElementById("surfaceArea").value = surfaceArea.toFixed(2);
     }
 
-    // Attach event listeners to width and height input fields
-    document.getElementById("width").addEventListener("input", updateSurfaceArea);
-    document.getElementById("height").addEventListener("input", updateSurfaceArea);
-    document.getElementById("coatsNumber").addEventListener("input", updateTotalGallons);
-    document.getElementById("paint").addEventListener("change", updateTotalGallons);
+    // Function to calculate total gallons and price
+    function updateTotalPrice() {
+        const surfaceArea = parseFloat(document.getElementById("surfaceArea").value) || 0;
+        const coatsNumber = parseFloat(document.getElementById("coatsNumber").value) || 1;
+        const priceText = document.getElementById("typeSelect").selectedOptions[0]?.text || "";
+        const pricePerGallon = parseFloat(priceText.split("-")[1]) || 0;
 
-    // Initialize color on page load
-    updateSurfaceArea();
-    updateTotalGallons();
+        // Calculate total gallons and total price
+        const totalGallons = (surfaceArea * coatsNumber) / 10; // Example calculation
+        const totalPrice = totalGallons * pricePerGallon;
+
+        document.getElementById("totalGallons").value = totalGallons.toFixed(2);
+        document.getElementById("totalPrice").value = totalPrice.toFixed(2);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Restrict input to numbers only for price
+        document.getElementById("totalPrice").addEventListener("keypress", function(event) {
+            return isNumber(event, this);
+        });
+
+
+        // Set up event listeners for brand and type select elements
+        document.getElementById("brandSelect").addEventListener("change", function() {
+            const brandId = this.value;
+            console.log(brandId);
+            const typeSelect = document.getElementById("typeSelect");
+
+            // Fetch available types for selected brand
+            if (brandId) {
+                const xhr = new XMLHttpRequest();
+                xhr.open("GET", `getPaintTypes.php?brand_id=${brandId}`, false);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const types = JSON.parse(xhr.responseText);
+                        console.log(types);
+
+                        // Populate typeSelect with available types in gallons only
+                        typeSelect.innerHTML = '<option value="">Select Type</option>';
+                        types.forEach(type => {
+                            if (type.gl === "Gallon") {
+                                typeSelect.innerHTML += `<option value="${type.type}">${type.type} - ${type.item_price} per gallon</option>`;
+                            }
+                        });
+                        typeSelect.disabled = false;
+                    } else {
+                        console.error("Error fetching paint types");
+                    }
+                };
+                xhr.send();
+            } else {
+                typeSelect.innerHTML = '<option value="">Select Brand First</option>';
+                typeSelect.disabled = true;
+            }
+        });
+
+            // Other event listeners for updates
+            document.getElementById("typeSelect").addEventListener("change", updateTotalPrice);
+            document.getElementById("width").addEventListener("input", calculateSurfaceArea);
+            document.getElementById("height").addEventListener("input", calculateSurfaceArea);
+            document.getElementById("coatsNumber").addEventListener("input", updateTotalPrice);
+    });
+
 </script>
+
 </body>
 </html>

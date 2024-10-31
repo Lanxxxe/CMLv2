@@ -123,9 +123,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
         }
 
 
-        .brand-container {
+        .brand-container, .pallet-container {
             margin: 20px;
-            max-width: 800px;
+            max-width: 100%;
         }
         
         .brand-card {
@@ -193,8 +193,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             color: white;
         }
         
-        .add-brand-btn {
-            margin: 20px;
+        .add-brand-btn, .add-pallet-btn {
+            margin: 20px 0;
             padding: 10px 20px;
             background-color: #28a745;
             color: white;
@@ -230,6 +230,36 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             width: 100%;                
             box-sizing: border-box;    
             margin-top: 10px;           
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sw-custom-label {
+            font-size: 14px !important;
+            margin-left: 2.5rem;
+            margin-top: 1.5rem;
+            align-self: start;
+        }
+
+        .sw-custom-input {
+            width: 80% !important;
+        }
+
+        .sw-custom-form-control {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
         }
 
     </style>
@@ -288,14 +318,15 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
         <div class="alert alert-danger">
             <center><h3><strong>Maintenance</strong></h3></center>
         </div>
-        <div class="brand-container">
+        <div class="brand-container container">
+            <h1>Brand Management</h1>
             <!-- Add Brand Button -->
             <button class="btn add-brand-btn" onclick="showAddBrandModal()">Add New Brand</button>
 
             <?php
             // SQL query to fetch brands and their product types
             $sql = "
-            SELECT b.brand_id, b.brand_name, b.brand_img, pt.type_id, pt.type_name
+            SELECT b.brand_id, b.brand_name, b.brand_img, pt.type_id, pt.type_name, pt.prod_type
             FROM brands b
             LEFT JOIN product_type pt ON b.brand_id = pt.brand_id
             ORDER BY b.brand_name, pt.type_name
@@ -321,7 +352,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                     if (!empty($row['type_name'])) {
                         $brandTools[$row['brand_id']]['tools'][] = [
                             'id' => $row['type_id'],
-                            'name' => $row['type_name']
+                            'name' => $row['type_name'],
+                            'prod_type' => $row['prod_type']
                         ];
                     }
                 }
@@ -334,8 +366,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                             <img src="<?php echo $brand["img"]; ?>" style="width:50px; height:50px;" alt="">
                             <h3 class="brand-title"><?php echo htmlspecialchars($brand['name']); ?></h3>
                             <div class="brand-actions">
-                                <button class="btn btn-primary" onclick="showAddToolModal(<?php echo $brandId; ?>)">Add Product</button>
-                                <button class="btn btn-warning" style="color: #fff; !important" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']); ?>', '<?php echo htmlspecialchars($brand['img'] ?? ''); ?>')">Edit Brand</button>
+                                <button class="btn btn-primary" onclick="showAddProductModal(<?php echo $brandId; ?>)">Add Product</button>
+                                <button class="btn btn-warning" style="color: #fff !important;" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']) ?? ''; ?>', '<?php echo htmlspecialchars($brand['img'] ?? ''); ?>')">Edit Brand</button>
                                 <button class="btn btn-danger" onclick="confirmDeleteBrand(<?php echo $brandId; ?>)">Delete Brand</button>
                             </div>
                         </div>
@@ -344,8 +376,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                                 <li class="tool-item">
                                     <span><?php echo htmlspecialchars($tool['name']); ?></span>
                                     <div>
-                                        <button class="btn btn-warning" style="color: #fff; !important" onclick="showEditToolModal(<?php echo $tool['id']; ?>, '<?php echo htmlspecialchars($tool['name']); ?>')">Edit</button>
-                                        <button class="btn btn-danger" onclick="confirmDeleteTool(<?php echo $tool['id']; ?>)">Delete</button>
+                                    <button class="btn btn-warning" style="color: #fff !important;" onclick="showEditProductModal(<?php echo $tool['id']; ?>, '<?php echo htmlspecialchars($tool['name'] ?? ''); ?>', '<?php echo htmlspecialchars($tool['prod_type'] ?? ''); ?>')">Edit Product</button>                                    
+                                    <button class="btn btn-danger" onclick="confirmDeleteProduct(<?php echo $tool['id']; ?>)">Delete</button>
                                     </div>
                                 </li>
                             <?php } ?>
@@ -357,7 +389,61 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 echo "<p>No brands or product types found.</p>";
             }
             ?>
+
         </div>
+        
+        <div class="container pallet-container">
+            <div class="mb-4">
+                <h2>Pallet Management</h2>
+                <button type="button" class="btn add-pallet-btn" onclick="showAddPallet()">
+                    Add New Pallet
+                </button>
+            </div>
+
+            <div class="table-container" style="margin-top: 20px;">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Color</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $stmt = $DB_con->prepare("SELECT * FROM pallets ORDER BY code");
+                        $stmt->execute();
+                        $pallets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        foreach($pallets as $pallet) {
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($pallet['code']); ?></td>
+                                <td><?php echo htmlspecialchars($pallet['name']); ?></td>
+                                <td>
+                                    <div class="color-preview" style="background-color: <?php echo htmlspecialchars($pallet['rgb']); ?>"></div>
+                                    <?php echo htmlspecialchars($pallet['rgb']); ?>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"
+                                            onclick="showEditPallet(<?php echo htmlspecialchars(json_encode($pallet)); ?>)" style="color: #fff !important;">
+                                        edit
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" 
+                                            onclick="confirmDeletePallet(<?php echo $pallet['pallet_id']; ?>)">
+                                        delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="alert alert-default" style="background-color:#033c73;">
             <p style="color:white;text-align:center;">&copy 2024 CML Paint Trading Shop | All Rights Reserved</p>
         </div>
@@ -370,8 +456,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
 <?php include_once("insertBrandsModal.php"); ?>
 
 <script>
-    let labelStyle = "font-size: 14px; margin-left: 2.5rem; margin-top: 1.5rem;";
-    let inputStyle = "width: 80%;";
+    let labelStyle = "sw-custom-label";
+    let inputStyle = "sw-custom-input";
+    let formControlStyle = "sw-custom-form-control";
 
     $(document).ready(function () {
         $('#example').DataTable();
@@ -408,21 +495,21 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
         Swal.fire({
             title: 'Add New Brand',
             html: `
-                <div style="display: flex; flex-direction: column; align-items: start;"> 
-                    <label for="brandImage" style="${labelStyle}">Brand Name</label>
+                <div class="${formControlStyle}"> 
+                    <label for="brandImage" class="${labelStyle}">Brand Name</label>
                     <input 
                         type="text" 
                         id="brandName" 
-                        class="swal2-input" 
-                        style="width: 80%;" 
+                        class="swal2-input ${inputStyle}" 
+                        
                         placeholder="Enter brand name">
                     
-                    <label for="brandImage" style="${labelStyle}">Brand Image</label>
+                    <label for="brandImage" class="${labelStyle}">Brand Image</label>
                     <input 
                         type="file" 
                         id="brandImage" 
-                        class="swal2-input" 
-                        style="width: 80%;" 
+                        class="swal2-input ${inputStyle}" 
+                        
                         accept="image/*">
 
                     <div id="imagePreview" class="mb-3" style="display: none; width: 100%;">
@@ -495,11 +582,12 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
         Swal.fire({
             title: 'Edit Brand',
             html: `
-                <div style="display: flex; flex-direction: column; align-items: start;">
-                        <label class="form-label" for="editBrandName" style="${labelStyle}">Brand Name</label>
-                        <input type="text" id="editBrandName" style="${inputStyle}" class="swal2-input" value="${brandName}">
-                        <label class="form-label" for="editBrandImage" style="${labelStyle}">Brand Image</label>
-                        <input type="file" id="editBrandImage" style="${inputStyle}" class="swal2-file" accept="image/*">                
+                <div class="${formControlStyle}">
+                    <label class="form-label ${labelStyle}" for="editBrandName">Brand Name</label>
+                    <input type="text" id="editBrandName" class="swal2-input ${inputStyle}" value="${brandName}">
+                    
+                    <label class="form-label ${labelStyle}" for="editBrandImage">Brand Image</label>
+                    <input type="file" id="editBrandImage" class="swal2-file ${inputStyle}"  accept="image/*">                
                 </div>
                 ${currentImage ? `
                     <div class="mb-3">
@@ -558,103 +646,133 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             confirmButtonColor: '#dc3545'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `maintenanceprocess.php?action=delete_brand&id=${brandId}`;
+                const formData = new FormData();
+                formData.append('action', 'delete_brand');
+                formData.append('brand_id', brandId);
+                
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to add brand', 'error');
+                    console.error('Error:', error);
+                });
             }
         });
     }
 
     // Add Tool
-    function showAddToolModal(brandId) {
+    function showAddProductModal(brandId) {
         Swal.fire({
             title: 'Add New Product',
-            input: 'text',
-            inputLabel: 'Tool Name',
-            inputPlaceholder: 'Enter product name',
+            html: `
+
+                <div class="${formControlStyle}">
+                    <label class="form-label ${labelStyle}">Product Name</label>
+                    <input type="text" id="productName" class="swal2-input ${inputStyle}" placeholder="Enter product name">
+                    <label class="form-label ${labelStyle}">Product Type</label>
+                    <input type="text" id="productType" class="swal2-input ${inputStyle}" placeholder="paint, tool, etc...">
+                </div>
+            `,
             showCancelButton: true,
             confirmButtonText: 'Add',
             cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Please enter a tool name';
+            preConfirm: () => {
+                const productName = document.getElementById('productName').value;
+                const productType = document.getElementById('productType').value;
+                
+                if (!productName || !productType) {
+                    Swal.showValidationMessage('Please fill in the fields');
+                    return false;
                 }
+                
+                return { productName, productType };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'maintenanceprocess.php';
+                const formData = new FormData();
+                formData.append('action', 'add_tool');
+                formData.append('brand_id', brandId);
+                formData.append('tool_name', result.value.productName);
+                formData.append('prod_type', result.value.productType);
                 
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'add_tool';
-                
-                const brandIdInput = document.createElement('input');
-                brandIdInput.type = 'hidden';
-                brandIdInput.name = 'brand_id';
-                brandIdInput.value = brandId;
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'tool_name';
-                nameInput.value = result.value;
-                
-                form.appendChild(actionInput);
-                form.appendChild(brandIdInput);
-                form.appendChild(nameInput);
-                document.body.appendChild(form);
-                form.submit();
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to add product', 'error');
+                });
             }
         });
     }
 
     // Edit Tool
-    function showEditToolModal(toolId, toolName) {
+    function showEditProductModal(toolId, toolName, productType = '') {
         Swal.fire({
             title: 'Edit Product',
-            input: 'text',
-            inputLabel: 'Tool Name',
-            inputValue: toolName,
+            html: `
+                <div class="mb-3">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" id="productName" class="swal2-input" value="${toolName}" placeholder="Enter product name">
+                </div>
+                <div class="mb-3" style="margin-top: 20px;">
+                    <label class="form-label">Product Type</label>
+                    <input type="text" id="productType" class="swal2-input" value="${productType}" placeholder="${productType}">
+                </div>
+            `,
             showCancelButton: true,
             confirmButtonText: 'Save Changes',
             cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Please enter a tool name';
+            preConfirm: () => {
+                const productName = document.getElementById('productName').value;
+                const productType = document.getElementById('productType').value;
+                
+                if (!productName) {
+                    Swal.showValidationMessage('Please enter a product name');
+                    return false;
                 }
+                if (!productType) {
+                    Swal.showValidationMessage('Please enter a product type');
+                    return false;
+                }
+                
+                return { productName, productType };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'maintenanceprocess.php';
+                const formData = new FormData();
+                formData.append('action', 'edit_tool');
+                formData.append('tool_id', toolId);
+                formData.append('tool_name', result.value.productName);
+                formData.append('prod_type', result.value.productType);
                 
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'edit_tool';
-                
-                const idInput = document.createElement('input');
-                idInput.type = 'hidden';
-                idInput.name = 'tool_id';
-                idInput.value = toolId;
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'tool_name';
-                nameInput.value = result.value;
-                
-                form.appendChild(actionInput);
-                form.appendChild(idInput);
-                form.appendChild(nameInput);
-                document.body.appendChild(form);
-                form.submit();
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to update product', 'error');
+                });
             }
         });
     }
 
     // Delete Tool
-    function confirmDeleteTool(toolId) {
+    function confirmDeleteProduct(toolId) {
         Swal.fire({
             title: 'Delete Product',
             text: 'Are you sure you want to delete this tool?',
@@ -665,7 +783,203 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             confirmButtonColor: '#dc3545'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `maintenanceprocess.php?action=delete_tool&id=${toolId}`;
+                const formData = new FormData();
+                formData.append('action', 'delete_tool');
+                formData.append('tool_id', toolId);
+
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: `Pallet has been deleted.`,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to delete pallet'
+                    });
+                });
+            }
+        });
+    }
+
+    function showAddPallet() {
+        Swal.fire({
+            title: 'Add New Pallet',
+            html: `
+                <form id="addForm">
+                    <div class="mb-3">
+                        <label class="form-label">Code</label>
+                        <input type="text" class="form-control" id="code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="margin-top: 15px">Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="margin-top: 15px">Color (RGB)</label>
+                        <input type="text" class="form-control" id="rgb" placeholder="rgb(0, 0, 0)" required>
+                    </div>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Add',
+            cancelButtonText: 'Cancel',
+            preConfirm: () => {
+                const code = document.getElementById('code').value;
+                const name = document.getElementById('name').value;
+                const rgb = document.getElementById('rgb').value;
+                
+                if (!code || !name || !rgb) {
+                    Swal.showValidationMessage('Please fill in all fields');
+                    return false;
+                }
+                
+                return { code, name, rgb };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('action', 'add_pallet');
+                formData.append('pallet_code', result.value.code);
+                formData.append('pallet_name', result.value.name);
+                formData.append('pallet_rgb', result.value.rgb);
+                // Send data to server
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Pallet added successfully',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to add pallet'
+                    });
+                });
+            }
+        });
+    }
+
+    function showEditPallet(pallet) {
+        Swal.fire({
+            title: 'Edit Pallet',
+            html: `
+                <form id="editForm">
+                    <div class="mb-3">
+                        <label class="form-label">Code</label>
+                        <input type="text" class="form-control" id="edit_code" value="${pallet.code}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="margin-top: 15px">Name</label>
+                        <input type="text" class="form-control" id="edit_name" value="${pallet.name}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="margin-top: 15px">Color (RGB)</label>
+                        <input type="text" class="form-control" id="edit_rgb" value="${pallet.rgb}" required>
+                    </div>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            cancelButtonText: 'Cancel',
+            preConfirm: () => {
+                const code = document.getElementById('edit_code').value;
+                const name = document.getElementById('edit_name').value;
+                const rgb = document.getElementById('edit_rgb').value;
+                
+                if (!code || !name || !rgb) {
+                    Swal.showValidationMessage('Please fill in all fields');
+                    return false;
+                }
+                
+                return { code, name, rgb };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('process.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `update=1&pallet_id=${pallet.pallet_id}&code=${encodeURIComponent(result.value.code)}&name=${encodeURIComponent(result.value.name)}&rgb=${encodeURIComponent(result.value.rgb)}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Pallet updated successfully',
+                        timer: 1500
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to update pallet'
+                    });
+                });
+            }
+        });
+    }
+
+    function confirmDeletePallet(palletId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Are you sure you want to delete this tool?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('action', 'delete_pallet');
+                formData.append('pallet_id', palletId);
+
+                fetch('maintenanceprocess.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: `Pallet has been deleted.`,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to delete pallet'
+                    });
+                });
             }
         });
     }

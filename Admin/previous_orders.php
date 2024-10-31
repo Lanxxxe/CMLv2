@@ -13,7 +13,7 @@ require_once 'config.php';
 
 if (isset($_GET['previous_id']) && !empty($_GET['previous_id'])) {
     $view_id = $_GET['previous_id'];
-    $payment_type = $_GET['payment_type'];
+    // $payment_type = $_GET['payment_type'];
 
     $stmt_edit = $DB_con->prepare('SELECT users.*, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.payment_id = :previous_id');
     

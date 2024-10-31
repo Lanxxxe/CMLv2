@@ -31,8 +31,10 @@ include_once 'config.php';
                                 $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 
                                 foreach ($brands as $brand) {
-                                    echo "<option value='" . htmlspecialchars($brand['brand_id']) . "'>" . 
-                                        htmlspecialchars($brand['brand_name']) . "</option>";
+                                    ?>
+                                    <option value='<?php echo htmlspecialchars($brand['brand_id']) ?>'>
+                                        <?php echo htmlspecialchars($brand['brand_name']) ?></option>";
+                                    <?php
                                 }
                                 ?>
                             </select>
@@ -42,6 +44,28 @@ include_once 'config.php';
                         <div class="form-group">
                             <select name="paint_type_id" id="paintTypeSelect" class="form-control" required disabled>
                                 <option value="">Select Brand First</option>
+                            </select>
+                        </div>
+
+                        <p class="mt-3">Pallet:</p>
+                        <div class="form-group">
+                            <select name="pallet" id="pallet" class="form-control" required>
+                            <option value="">Select Pallet</option>
+                                <?php 
+                                    // Fetch all brands from database
+                                    $stmt = $DB_con->prepare("SELECT * FROM pallets ORDER BY code");
+                                    $stmt->execute();
+                                    $pallets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                    foreach ($pallets as $pallet) {
+                                        ?>
+                                            <option value="<?php echo htmlspecialchars($pallet['pallet_id']) ?>" style="display: flex; gap: 7px;">
+                                                <?php echo htmlspecialchars($pallet['name']) ?> -
+                                                <?php echo htmlspecialchars($pallet['code']) ?>
+                                            </option>
+                                        <?php
+                                    }
+                                ?>                                
                             </select>
                         </div>
 
@@ -232,59 +256,59 @@ include_once 'config.php';
     });
 
     $(document).ready(function() {
-    $('#brandSelect').change(handleBrandChange);
-    $('#paintBrandSelect').change(handlePaintBrandChange);
+        $('#brandSelect').change(handleBrandChange);
+        $('#paintBrandSelect').change(handlePaintBrandChange);
 
 
-    function handleBrandChange() {
-        var brandId = $(this).val();
-        var typeSelect = $('#typeSelect');
-        updateTypeOptions(typeSelect, brandId);
-    }
-
-    function handlePaintBrandChange() {
-        var brandId = $(this).val();
-        var typeSelect = $('#paintTypeSelect');
-        updateTypeOptions(typeSelect, brandId);
-    }
-
-    function updateTypeOptions(typeSelect, brandId) {
-        if (brandId) {
-            typeSelect.prop('disabled', false);
-            
-            $.ajax({
-                url: 'get_types.php',
-                method: 'GET',
-                data: { brand_id: brandId },
-                dataType: 'json'
-            })
-            .done(function(types) {
-                if (types.error) {
-                    console.error('Server Error:', types.error);
-                    alert('Error fetching types. Please try again.');
-                    return;
-                }
-                
-                typeSelect.empty();
-                typeSelect.append('<option value="">Select Type</option>');
-                
-                types.forEach(function(type) {
-                    typeSelect.append(
-                        $('<option></option>')
-                            .val(type.type_id)
-                            .text(type.type_name)
-                    );
-                });
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.error('AJAX Error:', textStatus, errorThrown);
-                alert('Error fetching types. Please try again.');
-            });
-        } else {
-            typeSelect.prop('disabled', true);
-            typeSelect.empty();
-            typeSelect.append('<option value="">Select Brand First</option>');
+        function handleBrandChange() {
+            var brandId = $(this).val();
+            var typeSelect = $('#typeSelect');
+            updateTypeOptions(typeSelect, brandId);
         }
-    }
-});
+
+        function handlePaintBrandChange() {
+            var brandId = $(this).val();
+            var typeSelect = $('#paintTypeSelect');
+            updateTypeOptions(typeSelect, brandId);
+        }
+
+        function updateTypeOptions(typeSelect, brandId) {
+            if (brandId) {
+                typeSelect.prop('disabled', false);
+                
+                $.ajax({
+                    url: 'get_types.php',
+                    method: 'GET',
+                    data: { brand_id: brandId },
+                    dataType: 'json'
+                })
+                .done(function(types) {
+                    if (types.error) {
+                        console.error('Server Error:', types.error);
+                        alert('Error fetching types. Please try again.');
+                        return;
+                    }
+                    
+                    typeSelect.empty();
+                    typeSelect.append('<option value="">Select Type</option>');
+                    
+                    types.forEach(function(type) {
+                        typeSelect.append(
+                            $('<option></option>')
+                                .val(type.type_id)
+                                .text(type.type_name)
+                        );
+                    });
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                    alert('Error fetching types. Please try again.');
+                });
+            } else {
+                typeSelect.prop('disabled', true);
+                typeSelect.empty();
+                typeSelect.append('<option value="">Select Brand First</option>');
+            }
+        }
+    });
 </script>

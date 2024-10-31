@@ -196,7 +196,7 @@ function isActivated($s) {
                 <div style="text-align:center">Returned Items<br><?php echo $returnItems; ?></div>
             </div>
             <div class="dashboard-circle success <?php isActivated('5') ?>" onclick="window.location.href='./orderdetails.php?action=confirmed&q=5'">
-                <div style="text-align:center">Total Confirmed Sum<br>&#8369; <?php echo number_format($total_sum_confirmed, 2); ?></div>
+                <div style="text-align:center">Total Confirmed Sum<br>&#8369; <?php echo number_format($total_sum_confirmed ?? 0, 2); ?></div>
             </div>
         </div>
 

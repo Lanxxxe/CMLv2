@@ -19,8 +19,18 @@ include("db_conection.php");
     $quantity = $_POST['quantity'];
     $type = $_POST['paint_type_id'];
     $gl = $_POST['gl'];
+    $pallet_id = $_POST['pallet'];
 
-    $check_item = "SELECT * FROM items WHERE item_name='$item_name' AND gl='$gl'";
+
+    // Fetch brand name
+    $get_name_query = "SELECT brand_name FROM brands WHERE brand_id = '$brand'";
+    $brand_result = mysqli_query($dbcon, $get_name_query);
+    $brand_row = mysqli_fetch_assoc($brand_result);
+    $brand_name = $brand_row['brand_name'];
+
+
+
+    $check_item = "SELECT * FROM items WHERE item_name='$item_name' AND brand_name='$brand_name' AND type='$type' AND pallet_id='$pallet_id' AND gl='$gl'";
     $run_query = mysqli_query($dbcon, $check_item);
 
     if(mysqli_num_rows($run_query) > 0) {
@@ -38,11 +48,6 @@ include("db_conection.php");
 
         if(in_array($imgExt, $valid_extensions) && $imgSize < 5000000) {
             if(move_uploaded_file($tmp_dir, $upload_dir . $itempic)) {
-                // Fetch brand name
-                $get_name_query = "SELECT brand_name FROM brands WHERE brand_id = '$brand'";
-                $brand_result = mysqli_query($dbcon, $get_name_query);
-                $brand_row = mysqli_fetch_assoc($brand_result);
-                $brand_name = $brand_row['brand_name'];
                 
                 // Fetch type name
                 $get_type_query = "SELECT type_name FROM product_type WHERE type_id = '$type'";
@@ -51,8 +56,8 @@ include("db_conection.php");
                 $type_name = $type_row['type_name'];
 
 
-                $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, expiration_date, item_price, type, quantity, gl)
-                            VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$expiration_date', '$item_price', '$type_name', '$quantity', '$gl')";
+                $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, expiration_date, item_price, type, quantity, gl, pallet_id)
+                            VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$expiration_date', '$item_price', '$type_name', '$quantity', '$gl', '$pallet_id')";
                 mysqli_query($dbcon, $saveitem);
                 
                 $response['status'] = 'success';
