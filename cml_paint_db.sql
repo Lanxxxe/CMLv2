@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1-4.fc40
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Oct 28, 2024 at 07:14 PM
--- Server version: 8.0.39
--- PHP Version: 8.3.12
+-- Host: 127.0.0.1
+-- Generation Time: Oct 31, 2024 at 08:47 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -221,10 +221,10 @@ DELIMITER ;
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int UNSIGNED NOT NULL,
+  `admin_id` int(10) UNSIGNED NOT NULL,
   `admin_username` varchar(500) NOT NULL DEFAULT '',
   `admin_password` varchar(500) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `admin`
@@ -240,9 +240,9 @@ INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
 --
 
 CREATE TABLE `brands` (
-  `brand_id` int NOT NULL,
-  `brand_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `brand_img` text COLLATE utf8mb4_general_ci
+  `brand_id` int(11) NOT NULL,
+  `brand_name` varchar(255) NOT NULL,
+  `brand_img` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -261,18 +261,11 @@ INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`) VALUES
 --
 
 CREATE TABLE `cartitems` (
-  `itemID` int NOT NULL,
-  `palletName` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `palletCode` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `palletRGB` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `itemID` int(11) NOT NULL,
+  `palletName` varchar(255) NOT NULL,
+  `palletCode` varchar(255) NOT NULL,
+  `palletRGB` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `cartitems`
---
-
-INSERT INTO `cartitems` (`itemID`, `palletName`, `palletCode`, `palletRGB`) VALUES
-(115, 'Raspberry Run', 'BM-0002', 'rgb(188,112,134)');
 
 -- --------------------------------------------------------
 
@@ -281,7 +274,7 @@ INSERT INTO `cartitems` (`itemID`, `palletName`, `palletCode`, `palletRGB`) VALU
 --
 
 CREATE TABLE `items` (
-  `item_id` int UNSIGNED NOT NULL,
+  `item_id` int(10) UNSIGNED NOT NULL,
   `item_name` varchar(5000) NOT NULL DEFAULT '',
   `brand_name` varchar(255) NOT NULL,
   `item_image` varchar(5000) NOT NULL DEFAULT '',
@@ -289,22 +282,20 @@ CREATE TABLE `items` (
   `expiration_date` varchar(255) DEFAULT NULL,
   `item_price` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `quantity` int NOT NULL,
-  `gl` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `quantity` int(11) NOT NULL,
+  `gl` varchar(255) NOT NULL,
+  `pallet_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `items`
 --
 
-INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`) VALUES
-(34, 'Boysen Paint', 'Davies', '706878.jpg', '2024-09-28 00:00:00.000000', '2024-09-10', '200', 'Oil Paint', 133, 'Gallon'),
-(35, 'Boysend', 'Boysen', '712709.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrylic', 22, 'Gallon'),
-(37, 'Sample Paint', 'K92', '158008.png', '2024-10-08 00:00:00.000000', '2024-11-01', '200', 'Acrytex', 17, 'Liter'),
-(41, 'Paint Brush', 'Davies', '396958.jpg', '2024-10-25 00:00:00.000000', NULL, '100', 'Brush', 100, ''),
-(43, 'Davies Paint', 'Davies', '2817.png', '2024-10-25 00:00:00.000000', '2024-11-09', '100', 'Paints', 100, 'Liter'),
-(44, 'Latex Paint', 'Rain or Shine', '770440.png', '2024-10-26 00:00:00.000000', '2024-11-08', '100', 'Paint', 20, 'Liter'),
-(45, 'Latex Paint', 'Rain or Shine', '87327.png', '2024-10-26 00:00:00.000000', '2024-11-09', '200', 'Paint', 20, 'Gallon');
+INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`) VALUES
+(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 20, 'Gallon', 9),
+(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 20, 'Gallon', 3),
+(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 100, 'Gallon', 12),
+(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 100, 'Gallon', 17);
 
 -- --------------------------------------------------------
 
@@ -313,46 +304,20 @@ INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_d
 --
 
 CREATE TABLE `orderdetails` (
-  `order_id` int UNSIGNED NOT NULL,
-  `user_id` int NOT NULL DEFAULT '0',
+  `order_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT 0,
   `order_name` varchar(1000) NOT NULL DEFAULT '',
-  `order_price` double NOT NULL DEFAULT '0',
-  `order_quantity` int UNSIGNED NOT NULL DEFAULT '0',
-  `order_total` double NOT NULL DEFAULT '0',
+  `order_price` double NOT NULL DEFAULT 0,
+  `order_quantity` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `order_total` double NOT NULL DEFAULT 0,
   `order_status` varchar(45) NOT NULL DEFAULT '',
   `order_date` date DEFAULT NULL,
   `order_pick_up` datetime(6) DEFAULT NULL,
   `order_pick_place` enum('Quezon City','Caloocan','Valenzuela','San Jose de Monte') DEFAULT NULL,
   `gl` enum('Gallon','Liter') DEFAULT NULL,
-  `payment_id` int DEFAULT NULL,
-  `product_id` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `orderdetails`
---
-
-INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
-(69, 8, 'Latex Paint', 100, 10, 1000, 'Confirmed', '2024-09-28', '2024-10-04 02:52:00.000000', 'Quezon City', 'Gallon', NULL, 33),
-(70, 8, 'Latex Paint (Ice Cubes)', 100, 2, 200, 'Confirmed', '2024-09-27', '2024-09-27 02:53:00.000000', 'San Jose de Monte', 'Gallon', NULL, 33),
-(71, 8, 'Boysen Paint', 200, 50, 10000, 'Confirmed', '2024-09-28', '2024-09-26 02:55:00.000000', 'Quezon City', 'Gallon', NULL, 34),
-(72, 8, 'Boysen Paint', 200, 5, 1000, 'Confirmed', '2024-09-28', '2024-09-28 03:00:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
-(73, 8, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-09-29', '2024-10-02 02:03:00.000000', 'Valenzuela', 'Gallon', NULL, 34),
-(78, 8, 'Boysen Paint', 200, 2, 400, 'Confirmed', '2024-10-09', '2024-10-10 07:07:00.000000', 'Quezon City', 'Gallon', NULL, 34),
-(82, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-20 20:10:00.000000', 'Caloocan', 'Gallon', 40, 33),
-(83, 17, 'Boysend', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-17 20:39:00.000000', 'Valenzuela', 'Gallon', NULL, 35),
-(84, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-18 20:41:00.000000', 'Caloocan', 'Gallon', 41, 33),
-(85, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-10 21:06:00.000000', 'Caloocan', 'Gallon', NULL, 33),
-(87, 17, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-20', '2024-10-15 21:16:00.000000', 'Caloocan', 'Gallon', 42, 33),
-(88, 8, 'Boysend', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-25 22:15:00.000000', 'Caloocan', 'Gallon', 43, 35),
-(90, 17, 'Boysen Paint', 200, 1, 200, '0', '2024-10-20', '2024-10-23 22:51:00.000000', 'Caloocan', 'Gallon', 44, 34),
-(93, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-15 23:13:00.000000', 'Caloocan', 'Gallon', NULL, 34),
-(94, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-20 23:14:00.000000', 'Caloocan', 'Gallon', NULL, 34),
-(95, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-20', '2024-10-20 23:17:00.000000', 'Caloocan', 'Gallon', 45, 34),
-(97, 8, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-10-24', '2024-10-25 22:40:00.000000', 'Caloocan', 'Gallon', 51, 34),
-(98, 8, 'Latex Paint', 15, 1, 15, 'Confirmed', '2024-10-24', '2024-10-26 22:41:00.000000', 'Caloocan', 'Gallon', 51, 33),
-(100, 17, 'Latex Paint', 15, 4, 60, 'Pending', '2024-10-25', '2024-10-26 00:02:00.000000', 'Caloocan', 'Gallon', NULL, 33),
-(101, 17, 'Paint Brush', 100, 7, 700, 'Pending', '2024-10-25', '2024-10-26 00:06:00.000000', 'Caloocan', '', NULL, 38);
+  `payment_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -361,10 +326,10 @@ INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, 
 --
 
 CREATE TABLE `pallets` (
-  `pallet_id` int NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `rgb` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `pallet_id` int(11) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `rgb` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -623,20 +588,20 @@ INSERT INTO `pallets` (`pallet_id`, `code`, `name`, `rgb`) VALUES
 --
 
 CREATE TABLE `paymentform` (
-  `id` int NOT NULL,
-  `firstname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `lastname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `address` text COLLATE utf8mb4_general_ci,
-  `mobile` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `payment_method` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `payment_type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `id` int(11) NOT NULL,
+  `firstname` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `mobile` varchar(255) NOT NULL,
+  `payment_method` varchar(255) NOT NULL,
+  `payment_type` varchar(255) NOT NULL,
   `amount` decimal(10,2) DEFAULT NULL,
-  `payment_image_path` text COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `order_id` int UNSIGNED DEFAULT NULL,
-  `payment_status` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'verification',
-  `months_paid` int NOT NULL DEFAULT '0'
+  `payment_image_path` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `order_id` int(10) UNSIGNED DEFAULT NULL,
+  `payment_status` varchar(20) DEFAULT 'verification',
+  `months_paid` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -644,17 +609,13 @@ CREATE TABLE `paymentform` (
 --
 
 INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`, `months_paid`) VALUES
-(40, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/Black.jpg', '2024-10-20 12:12:23', NULL, 'verification', 0),
-(41, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-10-20 12:42:16', NULL, 'verification', 0),
-(42, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 15.00, '', '2024-10-20 13:56:29', NULL, 'verification', 0),
-(43, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/Black.jpg', '2024-10-20 14:16:35', NULL, 'verification', 0),
 (44, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:01:19', NULL, 'Confirmed', 0),
 (45, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:26:24', NULL, 'Confirmed', 0),
 (46, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/august.png', '2024-10-24 14:33:54', NULL, 'verification', 0),
 (48, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:41:44', NULL, 'verification', 0),
 (49, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:44:07', NULL, 'verification', 0),
 (50, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:52:56', NULL, 'verification', 0),
-(51, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:53:09', NULL, 'verification', 0);
+(52, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', NULL, '', '2024-10-30 01:11:37', NULL, 'Confirmed', 0);
 
 -- --------------------------------------------------------
 
@@ -663,12 +624,12 @@ INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `m
 --
 
 CREATE TABLE `payment_track` (
-  `track_id` int NOT NULL,
-  `payment_id` int NOT NULL,
+  `track_id` int(11) NOT NULL,
+  `payment_id` int(11) NOT NULL,
   `status` varchar(32) NOT NULL DEFAULT 'Requested',
   `amount` decimal(10,2) NOT NULL,
-  `date_tracked` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -677,18 +638,32 @@ CREATE TABLE `payment_track` (
 --
 
 CREATE TABLE `product_type` (
-  `type_id` int NOT NULL,
-  `type_name` text COLLATE utf8mb4_general_ci NOT NULL,
-  `brand_id` int NOT NULL
+  `type_id` int(11) NOT NULL,
+  `type_name` text NOT NULL,
+  `brand_id` int(11) NOT NULL,
+  `prod_type` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product_type`
 --
 
-INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`) VALUES
-(3, 'Tape', 2),
-(5, 'Paint', 2);
+INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`) VALUES
+(8, 'Latex Paint', 2, 'Paint'),
+(9, 'Gloss', 2, 'Paint'),
+(10, 'Oil Paint', 2, 'Paint'),
+(11, 'Aluminum Paint', 2, 'Paint'),
+(12, 'Semi Gloss Paint', 2, 'Paint'),
+(13, 'Enamel', 2, 'Paint'),
+(14, 'Exterior Paint', 2, 'Paint'),
+(15, 'Interior Paint', 2, 'Paint'),
+(16, 'Emulsion', 2, 'Paint'),
+(17, 'Primer', 2, 'Paint'),
+(18, 'Acrylic', 2, 'Paint'),
+(19, 'Flat Paint', 2, 'Paint'),
+(20, 'Matte Finish', 2, 'Paint'),
+(21, 'Aluminum Paint', 10, 'Paint'),
+(22, 'Gloss', 10, 'Paint');
 
 -- --------------------------------------------------------
 
@@ -697,22 +672,15 @@ INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`) VALUES
 --
 
 CREATE TABLE `returnitems` (
-  `return_id` int NOT NULL,
-  `user_id` int DEFAULT NULL,
-  `reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `quantity` int DEFAULT NULL,
-  `product_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `receipt_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `product_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `return_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `receipt_image` varchar(255) DEFAULT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `returnitems`
---
-
-INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `product_image`, `receipt_image`, `product_name`, `status`) VALUES
-(3, 8, 'Incorrect Item', 5, 'returnItems/BAGUIO GREEN.png', 'returnItems/CLEAR GLOSS EMULSION.PNG', 'Latex Paint', 'Pending');
 
 -- --------------------------------------------------------
 
@@ -721,7 +689,7 @@ INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `produc
 --
 
 CREATE TABLE `users` (
-  `user_id` int NOT NULL,
+  `user_id` int(11) NOT NULL,
   `user_email` varchar(1000) NOT NULL,
   `user_password` varchar(1000) NOT NULL,
   `user_firstname` varchar(1000) NOT NULL,
@@ -729,7 +697,7 @@ CREATE TABLE `users` (
   `user_address` varchar(1000) NOT NULL,
   `user_mobile` varchar(255) NOT NULL,
   `type` enum('Admin','Customer','Cashier') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `users`
@@ -747,10 +715,10 @@ INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`,
 --
 
 CREATE TABLE `wishlist` (
-  `wish_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `item_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `wish_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Indexes for dumped tables
@@ -844,73 +812,73 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 
 --
 -- AUTO_INCREMENT for table `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `pallet_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
+  MODIFY `pallet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=245;
 
 --
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
 --
 ALTER TABLE `payment_track`
-  MODIFY `track_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `track_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `product_type`
 --
 ALTER TABLE `product_type`
-  MODIFY `type_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `returnitems`
 --
 ALTER TABLE `returnitems`
-  MODIFY `return_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wish_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
