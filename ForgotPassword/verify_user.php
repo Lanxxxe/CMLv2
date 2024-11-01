@@ -130,6 +130,7 @@ if (!empty($email)) {
                   <input type="text" minlength="6" maxlength="6" class="form-control" id="verificationCode" name="verification_code" placeholder="Verification Code" required="">
                 </div>
                 <button type="submit" class="btn btn-primary" name="submit" value="Submit">Submit</button>
+                <button style="margin-top: 10px;" class="btn btn-danger" onclick="window.location.href='../index.php'">Cancel</button>
             </form>
         </div>
 

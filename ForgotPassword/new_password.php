@@ -104,6 +104,7 @@ try {
                       <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required placeholder="Confirm New Password">
                     </div>
                     <button type="submit" class="btn btn-primary">Update Password</button>
+                    <button style="margin-top: 10px;" class="btn btn-danger" onclick="window.location.href='../index.php'">Cancel</button>
             </form>
         </div>
 

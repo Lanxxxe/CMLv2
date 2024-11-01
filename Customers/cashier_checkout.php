@@ -29,8 +29,18 @@ $email = $_SESSION['user_email'] ?? '';
 $address = $_SESSION['user_address'] ?? '';
 $paymentType = 'Full Payment';
 $pay = 'Walk In';
-$item_ids = $_POST['item_ids'] ?? []; // Expecting item_ids as an array
-$qtys = $_POST['qtys'] ?? [];
+$token = $_POST['_token'] ?? null;
+
+$item_ids = null;
+$qtys = null;
+
+if (isset($token)) {
+    $item_ids = $_SESSION['item_ids'] ?? [];
+    $qtys = $_SESSION['qtys'] ?? [];
+} else {
+    $item_ids = $_POST['item_ids'] ?? [];
+    $qtys = $_POST['qtys'] ?? [];
+}
 
 // Process only if user type is Cashier and payment type is fullpayment
 if ($_SESSION['user_type'] !== 'Cashier' || empty($item_ids)) {
@@ -45,7 +55,7 @@ if (!is_array($item_ids) || empty($item_ids)) {
 }
 
 // Start transaction
-$conn->begin_transaction();
+$conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 try {
     // Insert payment information
     $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, payment_image_path, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -82,7 +92,7 @@ try {
 
     foreach ($items as $index => $item) {
         // Calculate total price for the order
-        $itemQuantity = $qtys[$index]; // Get quantity from the submitted data
+        $itemQuantity = $qtys[$index]; // Get qua 'payment_id' => $payment_idntity from the submitted data
         $itemTotalPrice = $item['item_price'] * $itemQuantity;
         $totalPrice += $itemTotalPrice;
 
@@ -102,53 +112,94 @@ try {
         ];
     }
 
- // Prepare and execute insertion for each order detail
-$insertOrderDetailsSQL = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-$stmt_insert_item = $conn->prepare($insertOrderDetailsSQL);
+     // Prepare and execute insertion for each order detail
+    $stmt_last_order_result= $conn->query("SELECT max(order_id) as last_order_id FROM orderdetails");
+    $last_order_id = $stmt_last_order_result->fetch_array()[0];
 
-foreach ($params as $param) {
-    // Create temporary variables for binding
-    $userId = $param['user_id'];
-    $orderName = $param['order_name'];
-    $orderPrice = $param['order_price'];
-    $orderQuantity = $param['order_quantity'];
-    $orderTotal = $param['order_total'];
-    $orderStatus = $param['order_status'] ?? '';
-    $orderDate = $param['order_date'] ?? '';
-    $orderPickUp = $param['order_pick_up'] ?? '';
-    $orderPickPlace = $param['order_pick_place'] ?? '';
-    $gl = $param['gl'] ?? '';
-    $productId = $param['product_id'] ?? '';
+    $insertOrderDetailsSQL = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt_insert_item = $conn->prepare($insertOrderDetailsSQL);
 
-    // Now bind the parameters
-    if (!$stmt_insert_item->bind_param(
-        'issdissssss',
-        $userId,
-        $orderName,
-        $orderPrice,
-        $orderQuantity,
-        $orderTotal,
-        $orderStatus,
-        $orderDate,
-        $orderPickUp,
-        $orderPickPlace,
-        $gl,
-        $productId
-    )) {
-        throw new Exception('Error binding parameters: ' . $stmt_insert_item->error);
+    foreach ($params as $param) {
+        // Create temporary variables for binding
+        $userId = $param['user_id'];
+        $orderName = $param['order_name'];
+        $orderPrice = $param['order_price'];
+        $orderQuantity = $param['order_quantity'];
+        $orderTotal = $param['order_total'];
+        $orderStatus = $param['order_status'] ?? '';
+        $orderDate = $param['order_date'] ?? '';
+        $orderPickUp = $param['order_pick_up'] ?? '';
+        $orderPickPlace = $param['order_pick_place'] ?? '';
+        $gl = $param['gl'] ?? '';
+        $productId = $param['product_id'] ?? '';
+
+        // Now bind the parameters
+        if (!$stmt_insert_item->bind_param(
+            'issdissssss',
+            $userId,
+            $orderName,
+            $orderPrice,
+            $orderQuantity,
+            $orderTotal,
+            $orderStatus,
+            $orderDate,
+            $orderPickUp,
+            $orderPickPlace,
+            $gl,
+            $productId
+        )) {
+            throw new Exception('Error binding parameters: ' . $stmt_insert_item->error);
+        }
+
+        if (!$stmt_insert_item->execute()) {
+            throw new Exception('Error inserting order details: ' . $stmt_insert_item->error);
+        }
     }
 
-    if (!$stmt_insert_item->execute()) {
-        throw new Exception('Error inserting order details: ' . $stmt_insert_item->error);
-    }
-}
+    $stmt_insert_item->close();
 
-$stmt_insert_item->close();
+    if (isset($token)) {
+        if ($token !== $_SESSION['_token']) {
+            $conn->rollback();
+            if ($last_order_id) {
+                $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $last_order_id");
+            }
+            if ($payment_id) {
+                $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $payment_id");
+            }
+            echo json_encode(['success' => false, 'message' => 'Invalid token']);
+            exit;
+        }
+        $conn->commit();
+        echo json_encode(['success' => true, 'message' => 'Payment successfully processed.']);
+        unset($_SESSION['item_ids']);
+        unset($_SESSION['qtys']);
+        exit;
+    } else {
+        $conn->rollback();
+        if ($last_order_id) {
+            $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $last_order_id");
+        }
+        if ($payment_id) {
+            $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $payment_id");
+        }
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_token'] = $token;
+        include './cashier_preview.php';
+        $_SESSION['item_ids'] = $item_ids;
+        $_SESSION['qtys'] = $qtys;
+        echo json_encode(['success' => true, 'message' => $preview, 'payment_id']);
+        exit;
+    }
    
 
-    $conn->commit();
-    echo json_encode(['success' => true, 'message' => 'Payment successfully processed.', 'payment_id' => $payment_id]);
 } catch (Exception $e) {
     $conn->rollback();
+    if ($last_order_id) {
+        $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $last_order_id");
+    }
+    if ($payment_id) {
+        $conn->query("ALTER TABLE paymentform AUTO_INCREMENT = $payment_id");
+    }
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

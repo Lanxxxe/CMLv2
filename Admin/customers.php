@@ -503,7 +503,7 @@ if (isset($_GET['delete_return_id'])) {
                         INNER JOIN orderdetails od ON u.user_id = od.user_id
                         INNER JOIN paymentform pf ON od.payment_id = pf.id
                     WHERE 
-                        (pf.payment_status NOT IN ('Confirmed', 'Returned'))
+                        (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed'))
                     GROUP BY 
                         u.user_email,
                         u.user_firstname,
@@ -557,7 +557,6 @@ if (isset($_GET['delete_return_id'])) {
                                 <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
                                 <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
                                 <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
-                                <a class="btn btn-danger" href="javascript:deleteUser('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for delete"><span class='glyphicon glyphicon-trash'></span> Remove Order</a>
                             </td>
                         </tr>
                         <?php

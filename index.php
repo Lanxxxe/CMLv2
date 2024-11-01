@@ -385,7 +385,7 @@ session_start();
                                         required>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Mobile Number" name="ruser_mobile" type="number"
+                                    <input class="form-control mobile-number-input" placeholder="Mobile Number" name="ruser_mobile" type="text" minlength="11" maxlength="11" pattern="09[0-9]{9}"
                                         required>
                                 </div>
                             </fieldset>
@@ -528,6 +528,18 @@ session_start();
 
 
     <script>
+        document.querySelectorAll('.mobile-number-input').forEach(element => {
+            element.addEventListener('input', event => {
+                let txt = "";
+                for (const c of element.value) {
+                    if ("0123456789".includes(c)) {
+                        txt += c;
+                    }
+                }
+                element.value = txt;
+            });
+        });
+
     document.addEventListener('DOMContentLoaded', function () {
         const setVisible = (elementOrSelector, visible) => {
           const element = document.querySelector(elementOrSelector);

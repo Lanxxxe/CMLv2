@@ -92,7 +92,7 @@ try {
     $pdf->SetFont('helvetica', '', 8);
     $pdf->Cell(0, 3, 'Receipt No: ' . str_pad($payment_id, 8, '0', STR_PAD_LEFT), 0, 1);
     $pdf->Cell(0, 3, 'Date: ' . date('Y-m-d H:i:s'), 0, 1);
-    $pdf->Cell(0, 3, 'Cashier: ' . $_SESSION['user_lastname'] . ', '.  $_SESSION['user_firstname'], 0, 1);
+    // $pdf->Cell(0, 3, 'Cashier: ' . $_SESSION['user_lastname'] . ', '.  $_SESSION['user_firstname'], 0, 1);
 
     // Add separator line
     $pdf->Cell(0, 2, '', 0, 1);
@@ -100,18 +100,18 @@ try {
     $pdf->Cell(0, 2, '', 0, 1);
 
     // Column Headers
-    $pdf->SetFont('helvetica', 'B', 8);
-    $pdf->Cell(35, 3, 'Item', 0, 0);
-    $pdf->Cell(10, 3, 'Qty', 0, 0, 'R');
-    $pdf->Cell(15, 3, 'Price', 0, 0, 'R');
-    $pdf->Cell(15, 3, 'Total', 0, 1, 'R');
+    $pdf->SetFont('DejaVuSans', 'B', 8);
+    $pdf->Cell(30, 3, 'Item', 0, 0);
+    $pdf->Cell(5, 3, 'Qty', 0, 0, 'R');
+    $pdf->Cell(17, 3, 'Price', 0, 0, 'R');
+    $pdf->Cell(18, 3, 'Total', 0, 1, 'R');
 
     // Add separator line
     $pdf->Cell(0, 0, '', 'T', 1);
     $pdf->Cell(0, 2, '', 0, 1);
 
     // Order details
-    $pdf->SetFont('helvetica', '', 8);
+    $pdf->SetFont('DejaVuSans', '', 8);
     $totalPrice = 0;
 
     foreach ($items as $index => $item) {
@@ -120,10 +120,10 @@ try {
         $totalPrice += $itemTotalPrice;
 
         // Item name - wrapped if too long
-        $pdf->MultiCell(35, 3, htmlspecialchars($item['item_name']), 0, 'L', false, 0);
-        $pdf->Cell(10, 3, $itemQuantity, 0, 0, 'R');
-        $pdf->Cell(15, 3, number_format($item['item_price'], 2), 0, 0, 'R');
-        $pdf->Cell(15, 3, number_format($itemTotalPrice, 2), 0, 1, 'R');
+        $pdf->MultiCell(30, 3, htmlspecialchars($item['item_name']), 0, 'L', false, 0);
+        $pdf->Cell(5, 3, $itemQuantity, 0, 0, 'R');
+        $pdf->Cell(17, 3, '₱' . number_format($item['item_price'], 2), 0, 0, 'R');
+        $pdf->Cell(18, 3, '₱' . number_format($itemTotalPrice, 2), 0, 1, 'R');
     }
 
     // Add separator line
@@ -132,9 +132,10 @@ try {
     $pdf->Cell(0, 2, '', 0, 1);
 
     // Totals
-    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetFont('DejaVuSans', 'B', 8);
     $pdf->Cell(45, 3, 'TOTAL:', 0, 0);
-    $pdf->Cell(25, 3, number_format($totalPrice, 2), 0, 1, 'R');
+    $pdf->Cell(25, 3, '₱' . number_format($totalPrice, 2), 0, 1, 'R');
+    $pdf->SetFont('helvetica', 'B', 8);
     
     // $vat = $totalPrice * 0.12; // 12% VAT
     // $pdf->Cell(45, 3, 'VAT (12%):', 0, 0);
@@ -158,28 +159,26 @@ try {
     // Footer
     $pdf->Cell(0, 5, '', 0, 1);
     $pdf->SetFont('helvetica', '', 8);
-    $pdf->Cell(0, 3, 'Thank you for shopping!', 0, 1, 'C');
+    $pdf->Cell(0, 3, 'Thank you for choosing CML Paint Trading!', 0, 1, 'C');
     $pdf->Cell(0, 3, 'Please keep this receipt for your records.', 0, 1, 'C');
-    $pdf->SetFont('helvetica', '', 7);
-    $pdf->Cell(0, 3, 'This serves as your official receipt', 0, 1, 'C');
-    $pdf->Cell(0, 3, 'Powered by CML Paint Trading System', 0, 1, 'C');
+    // $pdf->SetFont('helvetica', '', 7);
 
     // Add QR Code at the bottom
-    $pdf->Cell(0, 5, '', 0, 1);
-    $style = array(
-        'border' => false,
-        'vpadding' => 'auto',
-        'hpadding' => 'auto',
-        'fgcolor' => array(0, 0, 0),
-        'bgcolor' => false,
-        'module_width' => 1,
-        'module_height' => 1
-    );
-    $qrContent = "RN:{$payment_id}|DT:" . date('YmdHis') . "|TL:" . number_format($grandTotal, 2);
-    $pdf->write2DBarcode($qrContent, 'QRCODE,L', 25, $pdf->GetY(), 30, 30, $style);
-
+    // $pdf->Cell(0, 5, '', 0, 1);
+    // $style = array(
+    //     'border' => false,
+    //     'vpadding' => 'auto',
+    //     'hpadding' => 'auto',
+    //     'fgcolor' => array(0, 0, 0),
+    //     'bgcolor' => false,
+    //     'module_width' => 1,
+    //     'module_height' => 1
+    // );
+    // $qrContent = "RN:{$payment_id}|DT:" . date('YmdHis') . "|TL:" . number_format($grandTotal, 2);
+    // $pdf->write2DBarcode($qrContent, 'QRCODE,L', 25, $pdf->GetY(), 30, 30, $style);
+    
     // Output PDF
-    $pdf->Output('receipt.pdf', 'D');
+    $pdf->Output('receipt.pdf', 'I');
 
 } catch (Exception $e) {
     echo 'Error: ' . htmlspecialchars($e->getMessage());

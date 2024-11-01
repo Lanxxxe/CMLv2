@@ -95,6 +95,7 @@ try {
                   <input type="email" class="form-control" id="userEmail" name="email" required="">
                 </div>
                 <button type="submit" class="btn btn-primary" name="verify_email">Verify Email</button>
+                <button style="margin-top: 10px;" class="btn btn-danger" onclick="window.location.href='../index.php'">Cancel</button>
             </form>
         </div>
 

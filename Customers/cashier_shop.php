@@ -35,121 +35,8 @@ extract($edit_row);
     <link rel="stylesheet" type="text/css" href="jquery.fancybox-thumbs.css?v=1.0.7" />
     <script type="text/javascript" src="jquery.fancybox-thumbs.js?v=1.0.7"></script>
     <script type="text/javascript" src="jquery.fancybox-media.js?v=1.0.6"></script>
+    <link rel="stylesheet" type="text/css" href="./css/cashier_shop.css"/>
 
-<style>
-.cart-sidebar {
-    position: fixed;
-    right: 0;
-    top: 50px;
-    width: 370px;
-    height: calc(100vh - 50px);
-    background-color: white;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-}
-
-#page-wrapper {
-    width: calc(100% - 370px);
-    margin-right: 370px !important;
-}
-
-.cart-header {
-    padding: 15px;
-    background-color: #033c73;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2em;
-}
-
-.cart-items {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 15px;
-}
-
-.cart-item {
-    display: flex;
-    align-items: center;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-}
-
-.cart-item:hover {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.cart-item img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    margin-right: 10px;
-}
-
-.cart-item-details {
-    flex: 1;
-}
-
-.cart-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.cart-item-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.quantity-input {
-    width: 60px;
-    text-align: center;
-    padding: 5px;
-}
-
-.remove-item {
-    color: red;
-    cursor: pointer;
-}
-
-.cart-footer {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #ddd;
-}
-
-.payment-section {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-}
-
-.payment-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-.change-amount {
-    font-size: 1.2em;
-    color: #033c73;
-    font-weight: bold;
-}
-
-.cart-total {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-}
-</style>
     <script type="text/javascript">
         $(document).ready(function() {
             $('.fancybox').fancybox();
@@ -427,6 +314,7 @@ extract($edit_row);
                 <span id="cart-total-amount">0.00</span>
             </div>
             <button class="btn btn-success btn-block" onclick="checkout()">Checkout</button>
+            <button class="btn btn-danger btn-block" onclick="clearItems()">Clear</button>
         </div>
     </div>
 
@@ -609,11 +497,16 @@ function addToCart(itemId, name, price, maxQuantity, itemImage) {
 }
 
 function removeItem(itemId) {
-    showConfirmation('Remove Item', 'Are you sure you want to remove this item?', () => {
+    // showConfirmation('Remove Item', 'Are you sure you want to remove this item?', () => {
         cart.delete(itemId);
         updateCartDisplay();
-        showAlert('success', 'Removed!', 'The item has been removed from your cart.');
-    });
+        // showAlert('success', 'Removed!', 'The item has been removed from your cart.');
+    // });
+}
+
+function clearItems() {
+    cart = new FormData();
+    updateCartDisplay();
 }
 
 function updateQuantity(itemId, quantity) {
@@ -826,16 +719,10 @@ function checkout() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: data.message,
-                confirmButtonText: 'OK'
-            }).then(() => {
-                // Optionally redirect or update the UI
-                printReceipt(data.payment_id);
-                location.reload();
-            });
+            const modal = document.createElement('div');
+            modal.id = 'checkingOut';
+            modal.innerHTML = data.message;
+            document.body.appendChild(modal);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -879,7 +766,10 @@ function printReceipt(payment_id) {
         qtyInput.value = qty;
         form.appendChild(qtyInput);
     }
-    form.append('payment_id', payment_id);
+    const paymentIdInput = document.createElement('input');
+    paymentIdInput.setAttribute('type', 'hidden');
+    paymentIdInput.setAttribute('payment_id', payment_id);
+    form.appendChild(paymentIdInput);
 
     // Append the form to the body
     document.body.appendChild(form);
@@ -890,6 +780,55 @@ function printReceipt(payment_id) {
     // Remove the form after submission
     form.remove();
 }
+
+document.addEventListener('click', (event) => {
+    const printRecieptTrigger = event.target.closest('#printRecieptTrigger');
+    if (printRecieptTrigger) {
+        const pid = printRecieptTrigger.getAttribute('data-pid');
+        printReceipt(pid);
+    }
+
+    const confirmPayment = event.target.closest('#confirmPayment');
+    if (confirmPayment) {
+        const token = confirmPayment.getAttribute('data-token');
+        const formData = new FormData();
+        formData.append('_token', token);
+        fetch('./cashier_checkout.php', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('checkingOut').remove();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Confirmed!',
+                    text: data.message,
+                    confirmButtonText: 'Ok'
+                    }).then(arg => {
+                        location.reload();
+                    });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: data.message,
+                    confirmButtonText: 'Try Again'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'An unexpected error occurred. Please try again.',
+                confirmButtonText: 'Close'
+            });
+        });
+    }
+});
 </script>
 </body>
 

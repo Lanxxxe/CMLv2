@@ -19,10 +19,10 @@
                     <li><a href="paint-match.php"> &nbsp; <span class='glyphicon glyphicon-tint'></span> Paint Match</a></li>
                     <li><a href="color-change.php"> &nbsp; <span class='glyphicon glyphicon-glass'></span> Color Change</a></li>
                     <li><a href="calculator.php"> &nbsp; <span class='glyphicon glyphicon-edit'></span> Paint Calculator</a></li>
+                    <li><a href="cart_items.php"> &nbsp; <span class='fa fa-cart-plus'></span> Shopping Cart Lists</a></li>
                 <?php
                 }
             ?>
-            <li><a href="cart_items.php"> &nbsp; <span class='fa fa-cart-plus'></span> Shopping Cart Lists</a></li>
             <?php 
                 if ($_SESSION['user_type'] == 'Cashier'){
                     ?>
