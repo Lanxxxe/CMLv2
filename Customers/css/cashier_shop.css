@@ -1,0 +1,241 @@
+.cart-sidebar {
+    position: fixed;
+    right: 0;
+    top: 50px;
+    width: 370px;
+    height: calc(100vh - 50px);
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+#page-wrapper {
+    width: calc(100% - 370px);
+    margin-right: 370px !important;
+}
+
+.cart-header {
+    padding: 15px;
+    background-color: #033c73;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2em;
+}
+
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+}
+
+.remove-item {
+    color: red;
+    cursor: pointer;
+}
+
+.cart-footer {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
+
+.payment-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.payment-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.change-amount {
+    font-size: 1.2em;
+    color: #033c73;
+    font-weight: bold;
+}
+
+.cart-total {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+    -webkit-appearance: auto !important;
+    margin: 0;
+    opacity: 1;
+}
+
+.receipt-preview {
+    background: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.receipt-preview .receipt-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.receipt-preview .receipt-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #033c73;
+    font-weight: bold;
+}
+
+.receipt-preview .separator {
+    border-top: 2px solid #033c73;
+    margin: 15px 0;
+    opacity: 0.5;
+}
+
+.receipt-preview .receipt-details {
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+}
+
+.receipt-preview .item-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.receipt-preview .item-table th, 
+.receipt-preview .item-table td {
+    font-size: 14px;
+    padding: 10px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+}
+
+.receipt-preview .item-table th {
+    background-color: #f8f9fa;
+    color: #033c73;
+    text-transform: uppercase;
+}
+
+.receipt-preview .item-table th:first-child, 
+.receipt-preview .item-table td:first-child {
+    text-align: left;
+}
+
+.receipt-preview .total {
+    font-weight: bold;
+    text-align: right;
+    font-size: 18px;
+    color: #033c73;
+    margin-top: 20px;
+    padding: 10px 0;
+    border-top: 2px solid #033c73;
+}
+
+.receipt-preview div:last-child {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.receipt-preview button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.receipt-preview button#confirmPayment {
+    background-color: #28a745;
+    color: white;
+}
+
+.receipt-preview button#printRecieptTrigger {
+    background-color: #007bff;
+    color: white;
+}
+
+.receipt-preview button:last-child {
+    background-color: #dc3545;
+    color: white;
+}
+
+.receipt-preview button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#checkingOut {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: #333333e4;
+    z-index: 100000;
+}
