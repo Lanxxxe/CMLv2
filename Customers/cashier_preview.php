@@ -22,6 +22,7 @@ $preview = '<div class="receipt-preview">
         <thead>
             <tr>
                 <th>Item</th>
+                <th>Size</th>
                 <th>Qty</th>
                 <th>Price</th>
                 <th>Total</th>
@@ -33,6 +34,7 @@ foreach ($items as $i => $item) {
     $preview .= '
         <tr>
             <td>' . $item['item_name'] . '</td>
+            <td>' . $qtys[''] . '</td>
             <td>' . $qtys[$i] . '</td>
             <td>₱' . $item['item_price'] . '</td>
             <td>₱' . ($item['item_price'] * $qtys[$i]) . '</td>

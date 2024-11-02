@@ -99,48 +99,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
 
 <body>
     <div id="wrapper">
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="logo-custom" src="../assets/img/logo.png" alt="" style="height: 40px; margin-left: 15px;" />
-            </div>
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
-                    <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
-                    <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
-                    <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Stock</a></li>
-                    <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Tools Products</a></li>
-                    <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
-                    <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
-                    <li><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Manage Return Items</a></li>
-                    <li class="active"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
-                    <li><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
-                    <li><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right navbar-user">
-                    <li class="dropdown messages-dropdown">
-                        <a href="#"><i class="fa fa-calendar"></i> <?php
-                                                                    $Today = date('y:m:d');
-                                                                    $new = date('l, F d, Y', strtotime($Today));
-                                                                    echo $new; ?></a>
-
-                    </li>
-                    <li class="dropdown user-dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?php extract($_SESSION);
-                                                                                                                echo $admin_username; ?><b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-
-                            <li><a href="logout.php"><i class="fa fa-power-off"></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <?php include("navigation.php"); ?>
 
         <nav id="filterTab" class="navbar navbar-inverse">
             <a class="btn mnav <?php echo ($order_type !== 'walk_in' && $order_type !== 'gcash')? 'activeFilterTab' : '' ?>" href="./salesreport.php">All</a>
@@ -288,14 +247,14 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                 </div>
             </div>
 
+            <div class="alert alert-default" style="background-color:#033c73;">
+                <p style="color:white;text-align:center;">
+                    &copy 2024 CML Paint Trading Shop | All Rights Reserved
+                </p>
+            </div>
         </div>
 
-        <br />
-        <br />
-
     </div>
-    <!-- /#wrapper -->
-
 
     <!-- Mediul Modal -->
     <?php require_once "uploadItems.php"; ?>
@@ -303,6 +262,8 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <?php require_once "salesReportModal.php"; ?>
 
     <script type="text/javascript" charset="utf-8">
+        document.querySelector("#nav_sales_report").className = "active";
+
         function confirmEdit(itemName) {
             Swal.fire({
                 title: 'Edit Item',

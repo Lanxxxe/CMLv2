@@ -2,6 +2,7 @@
 include_once 'config.php';
 ?>
 
+<!-- Paint Products -->
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md">
         <div style="color:white;background-color:#008CBA" class="modal-content">
@@ -81,8 +82,7 @@ include_once 'config.php';
                         
                         <p>Price:</p>
                         <div class="form-group">
-                            <input id="priceinput" class="form-control" placeholder="Price" name="item_price"
-                                type="text">
+                            <input id="priceinput" class="form-control" placeholder="Price" name="item_price" min="1" type="number">
                         </div>
                         <p>Quantity:</p>
                         <div class="form-group">
@@ -109,6 +109,7 @@ include_once 'config.php';
     </div>
 </div>
 
+<!-- Tools Products -->
 <div class="modal fade" id="uploadItems" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md">
         <div style="color:white;background-color:#008CBA" class="modal-content">
