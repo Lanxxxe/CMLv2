@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             // Add the "Shop" button after the receipt
                             $receipt .= "<div class=\"input_group\">";
                             $receipt .= "<div class=\"input_box\">";
-                            $receipt .= "<button style=\"margin: 10px auto;\" onclick=\"saveAsPDF()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Save as PDF</button>";
+                            $receipt .= "<button style=\"margin: 10px auto;\" onclick=\"window.print()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Print</button>";
                             $receipt .= "<a href=\"shop.php\" class=\"w-100 btn btn-primary\">Shop</a>";
                             $receipt .= "</div>";
                             $receipt .= "</div>";
@@ -289,18 +289,111 @@ $conn->close();
 
         .receipt {
             border: 1px solid #ccc;
-            padding: 20px;
-            margin-top: 20px;
+            padding: 1.25rem;
+            margin-top: 1.25rem;
         }
 
         .receipt h2 {
-            margin-bottom: 10px;
+            margin-bottom: 0.625rem;
+            font-size: 1.5rem;
         }
 
         .receipt p {
-            margin-bottom: 5px;
+            margin-bottom: 0.3125rem;
+            font-size: 1rem;
+        }
+
+        @media print {
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            #cmlReciept {
+                border: none;
+            }
+
+            #receipt, #receipt * {
+                visibility: visible !important;
+            }
+
+            #receipt {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                padding: 0.75rem !important;
+                margin: 0 !important;
+            }
+
+            /* Typography for receipt printing - 2.5x bigger */
+            #receipt h2 {
+                font-size: 3rem !important;  /* Increased from 1.2rem */
+                margin-bottom: 1.25rem !important;
+                line-height: 1.2 !important;
+            }
+
+            #receipt p {
+                font-size: 2.2rem !important;  /* Increased from 0.875rem */
+                margin-bottom: 0.75rem !important;
+                line-height: 1.4 !important;
+            }
+
+            #receipt table {
+                font-size: 2.2rem !important;  /* Increased from 0.875rem */
+                width: 100% !important;
+                margin: 1.25rem 0 !important;
+            }
+
+            #receipt th, 
+            #receipt td {
+                padding: 0.625rem !important;
+                font-size: 2.2rem !important;  /* Increased from 0.875rem */
+            }
+
+            /* Company name styling */
+            #receipt h2:first-child {
+                font-size: 3.5rem !important;  /* Increased from 1.4rem */
+                font-weight: 900 !important;
+                color: #044C92 !important;
+                padding: 0.3125rem !important;
+                margin-bottom: 1.875rem !important;
+            }
+
+            /* Increase spacing between sections */
+            #receipt > * {
+                margin-bottom: 1.25rem !important;
+            }
+
+            /* Hide print and shop buttons when printing */
+            #receipt .input_group,
+            #receipt .btn {
+                display: none !important;
+            }
+
+            /* Make strong tags (labels) stand out more */
+            #receipt strong {
+                font-size: 2.2rem !important;
+                font-weight: 700 !important;
+            }
+
+            /* Add more spacing between table rows */
+            #receipt tr {
+                margin-bottom: 0.625rem !important;
+            }
+
+            /* Ensure the payment image scales appropriately */
+            #receipt img {
+                width: 125px !important;  /* Increased from 50px */
+                height: 125px !important;  /* Increased from 50px */
+            }
         }
     </style>
+
 </head>
 <body>
     <div class="wrapper">
