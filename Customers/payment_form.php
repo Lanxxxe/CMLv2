@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $message .= ' Payment Document Successfully Submitted for all selected orders.';
                             // Generate receipt HTML
                             $receipt .= "<div id=\"cmlReciept\" class=\"receipt\">";
-                            $receipt .= "<h2 style='font-size: 26; font-weight: 900; border: none; color: #044C92; padding: 2px;'>CML Pain Trading</h2>";
+                            $receipt .= "<h2 style='font-size: 26; font-weight: 900; border: none; color: #044C92; padding: 2px;'>CML Paint Trading</h2>";
                             $receipt .= "<h2>Payment Receipt</h2>";
                             $receipt .= "<p><strong>Date Ordered:</strong> $formattedDateTime</p>";
                             $receipt .= "<p><strong>Order ID/s:</strong> " . implode(', ', $order_ids) . "</p>";
@@ -159,21 +159,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 $receipt .= "</tr>";
                             $receipt .= "</thead>";
                             $receipt .= "<tbody>";
+                            $_total_amount = 0;
                             foreach ($order_list as $order_data) {
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
-                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['name']} </td>";
-                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['qty']} </td>";
-                                    $receipt .= "<td style=\"padding: 4px 0;\"> {$order_data['price']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['name']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['qty']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\">₱{$order_data['price']} </td>";
                                 $receipt .= "</tr>";
+                                $_total_amount += $order_data['price'] * $order_data['qty'];
                             }
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
                                     $receipt .= "<th colspan=\"2\" style=\"padding: 4px 0;\"> Total Amount </th>";
-                                    $receipt .= "<th style=\"padding: 4px 0;\"> $amount </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\">₱$_total_amount </th>";
                                 $receipt .= "</tr>";
                             $receipt .= "</tbody>";
                             $receipt .= "</table>";
                             // $receipt .= "<p><strong>Amount:</strong> $amount</p>";
                             // $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
+                            if (strcasecmp($paymentType, "") !== 0) {
+                                $receipt .= "<p><strong>Amount Paid:</strong> ₱" . number_format($amount) . "</p>";
+                                $receipt .= "<p><strong>Remaining Balance:</strong> ₱" .   number_format($_total_amount - $amount) . "</p>";
+                            }
+
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
                             if ($_SESSION['user_type'] != 'Cashier'){
                                 $receipt .= "<p><strong>Payment Image:</strong> <img src=\"$dest_path\" style=\"width: 50px; height: 50px; object-fit: cover;\" alt=\"Proof of Payment\"></p>";
@@ -356,7 +363,7 @@ $conn->close();
                 </div>
             </div>
             <div class="input_box" id="amountInput">
-                <input type="number" name="amount" value="<?php echo $total_amount; ?>" readonly class="name">
+                <input type="number" name="amount" value="<?php echo $total_amount; ?>" readonly class="name" min="1" max="<?php echo $total_amount; ?>">
                 <i class="fa fa-money icon" aria-hidden="true"></i>
             </div>
 
@@ -424,6 +431,22 @@ $conn->close();
                 amountField.value = '';
             }
             amountInput.style.display = 'block';
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', event => {
+                    const min = +input.getAttribute('min');
+                    const max = +input.getAttribute('max') * 0.30;
+                    if(+input.value < min) {
+                        input.value = min;
+                    }
+                    if(+input.value > max) {
+                        input.value = max;
+                    }
+                });
+            });
         });
     </script>
 </body>

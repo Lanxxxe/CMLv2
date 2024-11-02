@@ -441,7 +441,7 @@ if (isset($_GET['delete_return_id'])) {
             <ul class="nav navbar-nav side-nav">
                 <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
                 <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
-                <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
+                <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Stock</a></li>
                 <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Tools Products</a></li>                
                 <li><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                 <li class="active"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
@@ -478,6 +478,7 @@ if (isset($_GET['delete_return_id'])) {
                 <tr>
                     <th>Order ID</th>
                     <th>Customer Email</th>
+                    <th>Payment Type</th>
                     <th>Order Status</th>
                     <th>Order Total</th>
                     <th>Actions</th>
@@ -551,6 +552,7 @@ if (isset($_GET['delete_return_id'])) {
                         <tr>
                             <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
                             <td><?php echo htmlspecialchars($row['user_email']); ?></td>
+                            <td><?php echo htmlspecialchars($row['payment_type']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_status']); ?></td>
                             <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
                             <td>

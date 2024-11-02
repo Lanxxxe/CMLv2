@@ -1,4 +1,6 @@
 <?php
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 session_start();
 
 $response = array('status' => '', 'message' => '');
@@ -48,8 +50,8 @@ if(mysqli_num_rows($run_query) > 0) {
             $type_name = $type_row['type_name'];
 
             // Insert the item into the database
-            $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, item_price, type, quantity)
-                        VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$item_price', '$type_name', '$quantity')";
+            $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, item_price, type, quantity, gl)
+                        VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$item_price', '$type_name', '$quantity', '')";
             mysqli_query($dbcon, $saveitem);
             
             $response['status'] = 'success';

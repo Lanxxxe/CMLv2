@@ -90,7 +90,7 @@ include_once 'config.php';
                         </div>
                         <p>Expiration Date:</p>
                         <div class="form-group">
-                            <input class="form-control" name="expiration_date"
+                            <input class="form-control" name="expiration_date" 
                                 type="date" required>
                         </div>
                         
@@ -310,5 +310,20 @@ include_once 'config.php';
                 typeSelect.append('<option value="">Select Brand First</option>');
             }
         }
+
+        document.querySelectorAll('input[name="expiration_date"]').forEach(input => {
+            const currentDate = new Date();
+            const minDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 2));
+            
+            // Format the minDate to YYYY-MM-DD
+            const formattedMinDate = minDate.toISOString().split('T')[0];
+            input.setAttribute('min', formattedMinDate); // Set the min attribute for the input
+
+            input.addEventListener('input', event => {
+                if (input.value < formattedMinDate) {
+                    input.value = formattedMinDate;
+                }
+            })
+        });
     });
 </script>

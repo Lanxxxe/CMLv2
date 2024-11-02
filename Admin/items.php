@@ -70,7 +70,7 @@ if (isset($_GET['delete_id'])) {
                 <ul class="nav navbar-nav side-nav">
                     <li><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
                     <li><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Admin Order Dashboard</a></li>
-                    <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
+                    <li><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Stock</a></li>
                     <li><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Tools Products</a></li>
                     <li class="active"><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
                     <li><a href="customers.php"> &nbsp; &nbsp; &nbsp; Customer Management</a></li>
@@ -162,7 +162,7 @@ if (isset($_GET['delete_id'])) {
                                     <td>
                                         <center> <img src="item_images/<?php echo $item_image; ?>" class="img img-rounded" width="50" height="50" /></center>
                                     </td>
-                                    <td><?php echo $item_name . " (" . $gl . ")" ?></td>
+                                    <td><?php echo $item_name . (($gl)? " (" . $gl . ")" : "") ?></td>
                                     <td><?php echo $brand_name ?></td>
                                     <td>&#8369; <?php echo $item_price; ?></td>
                                     <td><?php echo $quantity . " " . $gl ?></td>
