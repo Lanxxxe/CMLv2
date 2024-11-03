@@ -258,10 +258,14 @@ function isActivated($s) {
 
     $(document).ready(function () {
         $('#example').DataTable({
-            "ordering": false, // Disable all sorting
+            "ordering": true, // Enable global ordering
             "paging": true,
             "info": true,
             "searching": true,
+            "columnDefs": [
+                { "orderable": true, "targets": [0, 1, 2] }, // Enable ordering for columns 1 to 3
+                { "orderable": false, "targets": '_all' } // Disable ordering for all other columns
+            ]
         });
     });
 

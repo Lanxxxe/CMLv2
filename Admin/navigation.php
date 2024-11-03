@@ -20,7 +20,7 @@
             <li id="nav_sales_report"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
             <li id="nav_maintenance"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
             <li id="nav_user_management"><a href="userManagement.php"> &nbsp; &nbsp; &nbsp; User Management</a></li>
-            <li id="nav_logout"><a href="logout.php"> &nbsp; &nbsp; &nbsp; Logout</a></li>
+            <li id="nav_logout"><a href="javascript:confirmLogout()"> &nbsp; &nbsp; &nbsp; Logout</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-user">
             <li class="dropdown messages-dropdown">
@@ -33,10 +33,29 @@
             <li class="dropdown user-dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?php   extract($_SESSION); echo $admin_username; ?><b class="caret"></b></a>
                 <ul class="dropdown-menu">
-
-                    <li><a href="logout.php"><i class="fa fa-power-off"></i> Log Out</a></li>
+                    <li><a href="javascript:confirmLogout()"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
             </li>
         </ul>
     </div>
 </nav>
+
+<script>
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to log out?',
+        icon: 'warning',
+        showCancelButton: true,  // Displays the "Cancel" button
+        confirmButtonText: 'Yes, log out',
+        cancelButtonText: 'No, stay logged in',
+        confirmButtonColor: '#d33',  // Custom color for the "Yes" button
+        cancelButtonColor: '#3085d6', // Custom color for the "No" button
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Proceed with the logout action
+          window.location.href = 'logout.php';  // Redirect to the logout route
+        }
+      });
+    }
+</script>

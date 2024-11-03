@@ -101,9 +101,9 @@ try {
 
     // Column Headers
     $pdf->SetFont('DejaVuSans', 'B', 8);
-    $pdf->Cell(30, 3, 'Item', 0, 0);
-    $pdf->Cell(5, 3, 'Qty', 0, 0, 'R');
-    $pdf->Cell(17, 3, 'Price', 0, 0, 'R');
+    $pdf->Cell(25, 3, 'Item', 0, 0);
+    $pdf->Cell(12, 3, 'Qty', 0, 0, 'R');
+    $pdf->Cell(15, 3, 'Price', 0, 0, 'R');
     $pdf->Cell(18, 3, 'Total', 0, 1, 'R');
 
     // Add separator line
@@ -118,11 +118,12 @@ try {
         $itemQuantity = $qtys[$index];
         $itemTotalPrice = $item['item_price'] * $itemQuantity;
         $totalPrice += $itemTotalPrice;
+        $gl = $item['gl']? ' ' . $item['gl'] : ' pc';
 
         // Item name - wrapped if too long
-        $pdf->MultiCell(30, 3, htmlspecialchars($item['item_name']), 0, 'L', false, 0);
-        $pdf->Cell(5, 3, $itemQuantity, 0, 0, 'R');
-        $pdf->Cell(17, 3, '₱' . number_format($item['item_price'], 2), 0, 0, 'R');
+        $pdf->MultiCell(25, 3, htmlspecialchars($item['item_name']), 0, 'L', false, 0);
+        $pdf->Cell(12, 3, $itemQuantity . $gl, 0, 0, 'R');
+        $pdf->Cell(15, 3, '₱' . number_format($item['item_price'], 2), 0, 0, 'R');
         $pdf->Cell(18, 3, '₱' . number_format($itemTotalPrice, 2), 0, 1, 'R');
     }
 

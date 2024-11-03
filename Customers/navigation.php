@@ -48,7 +48,7 @@
             <?php 
                 }
             ?>
-            <li><a href="logout.php"> &nbsp; <span class='glyphicon glyphicon-off'></span> Logout</a></li>
+            <li><a href="javascript:confirmLogout()"> &nbsp; <span class='glyphicon glyphicon-off'></span> Logout</a></li>
 
 
         </ul>
@@ -71,9 +71,29 @@
                 <ul class="dropdown-menu">
                     <li><a data-toggle="modal" data-target="#setAccount"><i class="fa fa-gear"></i> Settings</a></li>
                     <li class="divider"></li>
-                    <li><a href="logout.php"><i class="fa fa-power-off"></i> Log Out</a></li>
+                    <li><a href="javascript:confirmLogout()"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
             </li>
         </ul>
     </div>
 </nav>
+
+<script>
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to log out?',
+        icon: 'warning',
+        showCancelButton: true,  // Displays the "Cancel" button
+        confirmButtonText: 'Yes, log out',
+        cancelButtonText: 'No, stay logged in',
+        confirmButtonColor: '#d33',  // Custom color for the "Yes" button
+        cancelButtonColor: '#3085d6', // Custom color for the "No" button
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Proceed with the logout action
+          window.location.href = 'logout.php';  // Redirect to the logout route
+        }
+      });
+    }
+</script>
