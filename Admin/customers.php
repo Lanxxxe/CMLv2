@@ -460,6 +460,7 @@ if (isset($_GET['delete_return_id'])) {
                             pf.id AS payment_id,
                             pf.payment_status AS order_status,
                             pf.payment_type,
+                            pf.payment_image_path,
                             SUM(od.order_total) AS order_total
                         FROM 
                             users u
@@ -487,6 +488,7 @@ if (isset($_GET['delete_return_id'])) {
                             pt.track_id AS order_id,
                             pt.status AS order_status,
                             pf.payment_type,
+                            pf.payment_image_path,
                             pf.id as payment_id,
                             pt.amount AS order_total
                         FROM 
@@ -518,7 +520,7 @@ if (isset($_GET['delete_return_id'])) {
                                 <td><?php echo htmlspecialchars($row['order_status']); ?></td>
                                 <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
                                 <td>
-                                    <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>');">
+                                    <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>', '<?php echo htmlspecialchars($row['payment_image_path']); ?>');">
                                         <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order
                                     </a>                                
                                     <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
@@ -549,7 +551,7 @@ if (isset($_GET['delete_return_id'])) {
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="receiptModalLabel">Order Receipt</h5>
+                    <h2 class="modal-title" id="receiptModalLabel">Order Receipt</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -560,6 +562,12 @@ if (isset($_GET['delete_return_id'])) {
                     <p><strong>Payment Type:</strong> <span id="receiptPaymentType"></span></p>
                     <p><strong>Order Status:</strong> <span id="receiptStatus"></span></p>
                     <p><strong>Order Total:</strong> ₱<span id="receiptTotal"></span></p>
+
+                    <!-- Payment Proof Image -->
+                    <div class="payment-proof mt-3">
+                        <p><strong>Proof of Payment</strong></p>
+                        <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 30%; height: auto; border: 1px solid #ddd;">
+                    </div>
 
                     <!-- Order Items Table -->
                     <h5>Order Items</h5>
@@ -592,14 +600,15 @@ if (isset($_GET['delete_return_id'])) {
     document.querySelector("#nav_order_request").className = "active";
 
 
-    function confirmOrder(orderId, paymentType, email, status, total) {
+    function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment) {
         // Populate the receipt modal with basic order details
         document.getElementById("receiptOrderId").textContent = orderId;
         document.getElementById("receiptEmail").textContent = email;
         document.getElementById("receiptPaymentType").textContent = paymentType;
         document.getElementById("receiptStatus").textContent = status;
         document.getElementById("receiptTotal").textContent = total;
-
+        
+        document.getElementById("paymentProofImage").src = `../Customers/${proofOfPayment}`;
         // Clear any previous items in the orderItems table body
         const orderItemsBody = document.getElementById("orderItems");
         orderItemsBody.innerHTML = "";
@@ -609,6 +618,7 @@ if (isset($_GET['delete_return_id'])) {
             .then(response => response.json())
             .then(items => {
                 // Populate the items in the table
+                console.log(items);
                 items.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
