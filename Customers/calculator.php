@@ -79,7 +79,11 @@ try {
                                 <option value="">Select Brand</option>
                                 <?php
                                 // Fetch all brands from database
-                                $stmt = $DB_con->prepare("SELECT brand_id, brand_name FROM brands ORDER BY brand_name");
+                                $stmt = $DB_con->prepare("SELECT DISTINCT b.brand_id, b.brand_name 
+                                    FROM brands b
+                                    JOIN product_type pt ON b.brand_id = pt.brand_id
+                                    WHERE pt.prod_type = 'Paint'
+                                    ORDER BY b.brand_name");
                                 $stmt->execute();
                                 $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 
@@ -133,6 +137,22 @@ try {
                             <input class="form-control" id="totalPrice" value="0" type="text">
                         </div>
                     </div>
+
+                    <div class="item-preview-container" style="display: none;">
+                        <h3>Item Preview</h3>
+
+                        <div style="font-size: 20px; font-weight: bold;">
+                            <img id="paint_item_image" src="" width="300px" height="250px" style="display: block; margin: 0 auto;" alt="">
+                            <p>Brand: <span id="paint_brand_name"></span></p>
+                            <p>Item: <span id="paint_item_name"></span></p>
+                            <p>Price: <span id="paint_item_price"></span></p>
+
+                            <div id="item-preview-pallet" style="display: flex; gap: 7px">
+                                <p style="display: block;">Pallet Color: <span id="pallet_item_code"></span></p>
+                                <div id="pallet-container" style="width: 500px; height: 20px; margin-top: 6px; border-radius: 7px"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -152,51 +172,27 @@ try {
                 </div>
                 <form enctype="multipart/form-data" method="post" action="settings.php">
                     <div class="modal-body">
-                        <fieldset>
-                            
-                                
-                                    <p>Firstname:</p>
-                                    <div class="form-group">
-                                    
-                                        <input class="form-control" placeholder="Firstname" name="user_firstname" type="text" value="<?php  echo $user_firstname; ?>" required>
-                                
-                                    
-                                    </div>
-                                    
-                                    
-                                    <p>Lastname:</p>
-                                    <div class="form-group">
-                                    
-                                        <input class="form-control" placeholder="Lastname" name="user_lastname" type="text" value="<?php  echo $user_lastname; ?>" required>
-                                
-                                    
-                                    </div>
-                                    
-                                    <p>Address:</p>
-                                    <div class="form-group">
-                                    
-                                        <input class="form-control" placeholder="Address" name="user_address" type="text" value="<?php  echo $user_address; ?>" required>
-                                
-                                    
-                                    </div>
-                                    
-                                    <p>Password:</p>
-                                    <div class="form-group">
-                                    
-                                        <input class="form-control" placeholder="Password" name="user_password" type="password" value="<?php  echo $user_password; ?>" required>
-                                
-                                    
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                    
-                                        <input class="form-control hide" name="user_id" type="text" value="<?php  echo $user_id; ?>" required>
-                                
-                                    
-                                    </div>
-
-                            </fieldset>
-                        
+                        <fieldset>                        
+                            <p>Firstname:</p>
+                            <div class="form-group">          
+                                <input class="form-control" placeholder="Firstname" name="user_firstname" type="text" value="<?php  echo $user_firstname; ?>" required>
+                            </div> 
+                            <p>Lastname:</p>
+                            <div class="form-group"> 
+                                <input class="form-control" placeholder="Lastname" name="user_lastname" type="text" value="<?php  echo $user_lastname; ?>" required>          
+                            </div>         
+                            <p>Address:</p>
+                            <div class="form-group">      
+                                <input class="form-control" placeholder="Address" name="user_address" type="text" value="<?php  echo $user_address; ?>" required>
+                            </div>
+                            <p>Password:</p>
+                            <div class="form-group">          
+                                <input class="form-control" placeholder="Password" name="user_password" type="password" value="<?php  echo $user_password; ?>" required>
+                            </div>         
+                            <div class="form-group">         
+                                <input class="form-control hide" name="user_id" type="text" value="<?php  echo $user_id; ?>" required>
+                            </div>
+                        </fieldset>
                     </div>
 
                     <div class="modal-footer">
@@ -228,19 +224,21 @@ try {
         document.getElementById("surfaceArea").value = surfaceArea.toFixed(2);
     }
 
-    // Function to calculate total gallons and price
     function updateTotalPrice() {
         const surfaceArea = parseFloat(document.getElementById("surfaceArea").value) || 0;
-        const coatsNumber = parseFloat(document.getElementById("coatsNumber").value) || 1;
-        const priceText = document.getElementById("typeSelect").selectedOptions[0]?.text || "";
-        const pricePerGallon = parseFloat(priceText.split("-")[1]) || 0;
+        const coatsNumber = parseFloat(document.getElementById("coatsNumber").value) || 0;
+        
+        // Retrieve the price per gallon from the selected option's data attribute
+        const selectedOption = document.getElementById("typeSelect").selectedOptions[0];
+        const pricePerGallon = selectedOption ? parseFloat(selectedOption.getAttribute("data-item-price")) : 0;
 
         // Calculate total gallons and total price
-        const totalGallons = (surfaceArea * coatsNumber) / 10; // Example calculation
+        const totalGallons = (surfaceArea * coatsNumber) / 10; // Example calculation, adjust if needed
         const totalPrice = totalGallons * pricePerGallon;
 
+        // Update the display fields
         document.getElementById("totalGallons").value = totalGallons.toFixed(2);
-        document.getElementById("totalPrice").value = totalPrice.toFixed(2);
+        document.getElementById("totalPrice").value = `P${totalPrice.toFixed(2)}`;
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -269,7 +267,14 @@ try {
                         typeSelect.innerHTML = '<option value="">Select Type</option>';
                         types.forEach(type => {
                             if (type.gl === "Gallon") {
-                                typeSelect.innerHTML += `<option value="${type.type}">${type.type} - ${type.item_price} per gallon</option>`;
+                                typeSelect.innerHTML += `<option value="${type.type}" 
+                                    data-brand-name="${type.brand_name}" 
+                                    data-item-name="${type.item_name}" 
+                                    data-item-price="${type.item_price}"
+                                    data-item-image="${type.item_image}"
+                                    data-item-color="${type.rgb}">
+                                    ${type.type} - ${type.item_price} per ${type.gl} - ${type.name}
+                                </option>`;
                             }
                         });
                         typeSelect.disabled = false;
@@ -283,12 +288,41 @@ try {
                 typeSelect.disabled = true;
             }
         });
+        
+        // Update the preview when a type is selected
+        document.getElementById("typeSelect").addEventListener("change", function() {
+            const selectedOption = this.options[this.selectedIndex];
 
-            // Other event listeners for updates
-            document.getElementById("typeSelect").addEventListener("change", updateTotalPrice);
-            document.getElementById("width").addEventListener("input", calculateSurfaceArea);
-            document.getElementById("height").addEventListener("input", calculateSurfaceArea);
-            document.getElementById("coatsNumber").addEventListener("input", updateTotalPrice);
+            if (selectedOption.value) {
+                document.querySelector('.item-preview-container').style.display = 'block';
+                // Get details from the selected option's data attributes
+                const brandName = selectedOption.getAttribute("data-brand-name");
+                const itemName = selectedOption.getAttribute("data-item-name");
+                const itemPrice = selectedOption.getAttribute("data-item-price");
+                const itemImage = selectedOption.getAttribute("data-item-image");
+                const itemColor = selectedOption.getAttribute("data-item-color");
+                
+                // Update the preview container
+                document.querySelector("#paint_brand_name").textContent = brandName;
+                document.querySelector("#paint_item_name").textContent = itemName;
+                document.querySelector("#paint_item_price").textContent = itemPrice;
+                document.querySelector("#paint_item_image").src = `../Admin/item_images/${itemImage}`;
+                document.querySelector("#paint_item_image").alt = `${itemName}`;
+                document.querySelector("#pallet-container").style.backgroundColor = `${itemColor}`;
+            } else {
+                document.querySelector('.item-preview-container').style.display = 'none';
+                // Clear the preview if no type is selected
+                document.querySelector("#paint_brand_name").textContent = "";
+                document.querySelector("#paint_item_name").textContent = "";
+                document.querySelector("#paint_item_price").textContent = "";
+            }
+        });
+
+        // Other event listeners for updates
+        document.getElementById("typeSelect").addEventListener("change", updateTotalPrice);
+        document.getElementById("width").addEventListener("input", calculateSurfaceArea);
+        document.getElementById("height").addEventListener("input", calculateSurfaceArea);
+        document.getElementById("coatsNumber").addEventListener("input", updateTotalPrice);
     });
 
 </script>

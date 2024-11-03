@@ -232,9 +232,10 @@ if (isset($_GET['update_id'])) {
                         include_once("./paint-mixer-files/step2-search.php");
                     } else if ($step === "3") {
                         include_once("./paint-mixer-files/step3.php");
-                    } else if ($step === "4") {
-                        include_once("./paint-mixer-files/step4.php");
-                    }
+                    } 
+                    // else if ($step === "4") {
+                    //     include_once("./paint-mixer-files/step4.php");
+                    // }
                 ?>
             </div>
         </div>

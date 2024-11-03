@@ -185,3 +185,78 @@
 (2024-11-02 22:52:31) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
 (2024-11-02 22:52:31) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
 (2024-11-02 22:52:31) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-03 18:23:16) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 18:23:16) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 18:23:17) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 18:23:17) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 18:23:20) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 18:23:20) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 20:04:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:04:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:04:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:04:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:04:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:06:22) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:06:22) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:06:22) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:06:22) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:06:22) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:12:50) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:12:50) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:12:50) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:12:50) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:12:50) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:16:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:16:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:16:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:16:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:16:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:35) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:43) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:43) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:43) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:43) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:22:43) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:29) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 20:28:29) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-03 20:28:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:33) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:39) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:39) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:39) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:39) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:39) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:28:48) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:29:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:29:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:29:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:29:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:29:27) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:32:12) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:32:12) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:32:12) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:32:12) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:32:12) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-03 20:47:50) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:47:50) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-03 20:48:20) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:48:20) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-03 20:48:22) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:48:22) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-03 20:48:22) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:48:22) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-03 20:48:24) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:48:24) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-03 20:48:27) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-03 20:48:27) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
