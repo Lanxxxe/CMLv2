@@ -34,7 +34,7 @@ foreach ($items as $i => $item) {
     $preview .= '
         <tr>
             <td>' . $item['item_name'] . '</td>
-            <td>' . $qtys[''] . '</td>
+            <td>' . $item['gl'] . '</td>
             <td>' . $qtys[$i] . '</td>
             <td>₱' . $item['item_price'] . '</td>
             <td>₱' . ($item['item_price'] * $qtys[$i]) . '</td>

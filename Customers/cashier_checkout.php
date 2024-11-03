@@ -103,11 +103,11 @@ try {
             'order_price' => $item['item_price'],
             'order_quantity' => $itemQuantity,
             'order_total' => $itemQuantity * $item['item_price'],
-            'order_status' => 'Pending', // Or whatever status you prefer
+            'order_status' => 'Confirmed', // Or whatever status you prefer
             'order_date' => date('Y-m-d H:i:s'),
             'order_pick_up' =>  date('Y-m-d H:i:s'), // Add appropriate values if needed
             'order_pick_place' =>  'Caloocan', // Add appropriate values if needed
-            'gl' => $item['gl'],
+            'gl' => empty($item['gl'])? $item['gl'] : null,
             'product_id' => $item['item_id'] // Assuming you have this in your fetched data
         ];
     }
@@ -130,8 +130,11 @@ try {
         $orderDate = $param['order_date'] ?? '';
         $orderPickUp = $param['order_pick_up'] ?? '';
         $orderPickPlace = $param['order_pick_place'] ?? '';
-        $gl = $param['gl'] ?? '';
+        $gl = $param['gl'];
         $productId = $param['product_id'] ?? '';
+        if (empty($gl)) {
+            $gl = null;
+        }
 
         // Now bind the parameters
         if (!$stmt_insert_item->bind_param(
