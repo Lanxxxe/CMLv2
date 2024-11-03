@@ -1,10 +1,10 @@
 
 <!-- Daily Sales -->
 <div class="modal fade" id="dailySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md" id="dailySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                <button type="button" class="close hide-in-print" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h2 style="color:white" class="modal-title" id="myModalLabel">Daily Sales</h2>
             </div>
@@ -38,8 +38,9 @@
                     </tbody>
                 </table>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer hide-in-print">
                     <a class="btn btn-primary" href="../Admin/reports/daily.php">Save as PDF</a>
+                    <button type="button" class="btn btn-primary" onclick="printContent('dailySalesContent')">Print</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -49,10 +50,10 @@
 
 <!-- Weekly Sales -->
 <div class="modal fade" id="weeklySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md" id="weeklySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                <button type="button" class="close hide-in-print" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h2 style="color:white" class="modal-title" id="myModalLabel">Weekly Sales</h2>
             </div>
@@ -86,8 +87,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer hide-in-print">
                 <a class="btn btn-primary" href="../Admin/reports/weekly.php">Save as PDF</a>
+                <button type="button" class="btn btn-primary" onclick="printContent('weeklySalesContent')">Print</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -96,10 +98,10 @@
 
 <!-- Monthly Sales -->
 <div class="modal fade" id="monthlySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md" id="monthlySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                <button type="button" class="close hide-in-print" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h2 style="color:white" class="modal-title" id="myModalLabel">Monthly Sales</h2>
             </div>
@@ -136,8 +138,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer hide-in-print">
                 <a class="btn btn-primary" href="../Admin/reports/monthly.php">Save as PDF</a>
+                <button type="button" class="btn btn-primary" onclick="printContent('monthlySalesContent')">Print</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>

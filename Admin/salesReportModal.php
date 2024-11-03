@@ -1,7 +1,7 @@
 
 <!-- Daily Sales -->
 <div class="modal fade" id="dailySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md"  id="dailySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -39,8 +39,9 @@
                     </tbody>
                 </table>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer hide-in-print">
                     <a class="btn btn-primary" href="./reports/daily.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
+                    <button type="button" class="btn btn-primary" onclick="printContent('dailySalesContent')">Print</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -50,7 +51,7 @@
 
 <!-- Weekly Sales -->
 <div class="modal fade" id="weeklySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md" id="weeklySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -93,8 +94,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer hide-in-print">
                 <a class="btn btn-primary" href="./reports/weekly.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
+                <button type="button" class="btn btn-primary" onclick="printContent('weeklySalesContent')">Print</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -103,7 +105,7 @@
 
 <!-- Monthly Sales -->
 <div class="modal fade" id="monthlySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-md" id="monthlySalesContent">
         <div style="color:white;background-color:#008CBA" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -146,8 +148,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer hide-in-print">
                 <a class="btn btn-primary" href="./reports/monthly.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
+                <button type="button" class="btn btn-primary" onclick="printContent('monthlySalesContent')">Print</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>

@@ -81,6 +81,10 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
         }
         #saveAsPDFBtn {
             margin-left: auto;
+            margin-right: 10px;
+        }
+        .printBtn {
+            margin-right: 10px;
         }
         .sales-report-container {
             margin-top: 50px;
@@ -93,6 +97,88 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             color: gray;
             transition: all 300ms;
         }
+        .sales-report-container {
+            height: auto;
+        }
+    @media print {
+        @page {
+            size: 800px auto;
+            margin: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        .printable, .printable * {
+            visibility: visible !important;
+        }
+
+        .printable {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            padding: 0.75rem !important;
+            margin: 0 !important;
+        }
+
+        #page-wrapper:not(.printable) {
+            display: none !important;
+        }
+
+        /* Force background colors to print */
+        .sales-report-item {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Apply specific background colors */
+        .sales-report-item:nth-child(1) {
+            background-color: #bfea91 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .sales-report-item:nth-child(2) {
+            background-color: #91d4ea !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .sales-report-item:nth-child(3) {
+            background-color: #cb91ea !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Ensure text remains visible */
+        .sales-report-item h2,
+        .sales-report-item p {
+            color: black !important;
+        }
+        
+        .hide-in-print {
+            display: none !important;
+        }
+        .modal {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .modal-dialog {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .close {
+            display: none !important;
+        }
+    }
     </style>
 
 </head>
@@ -147,8 +233,9 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             <a class="btn mnav <?php echo ($order_type === 'walk_in')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=walk_in">Walk In</a>
             <a class="btn mnav <?php echo ($order_type === 'gcash')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=gcash">Gcash</a>
             <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
+            <button type="button" class="printBtn btn btn-primary" onclick="printContent('page-wrapper')">Print Sales Report</button> 
         </nav>
-        <div id="page-wrapper">
+        <div id="page-wrapper" class="printable">
             <div class="sales-report-container">
                 <h1>Sales Report</h1>
 
@@ -356,6 +443,15 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                 return false;
 
             return true;
+        }
+        function printContent(id) {
+            document.querySelectorAll('.printable').forEach(e => {
+                e.classList.remove('printable');
+            });
+            const ne = document.getElementById(id);
+            ne.classList.add('printable');
+            window.print();
+            ne.classList.remove('printable');
         }
     </script>
 </body>
