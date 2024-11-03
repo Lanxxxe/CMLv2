@@ -41,7 +41,13 @@
                 }   
             ?>
             <!-- <li><a href="./view_purchased.php"> &nbsp; <span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a></li> -->
+            <?php 
+                if ($_SESSION['user_type'] != 'Cashier'){
+            ?>
             <li><a data-toggle="modal" data-target="#setAccount"> &nbsp; <span class='fa fa-gear'></span> Account Settings</a></li>
+            <?php 
+                }
+            ?>
             <li><a href="logout.php"> &nbsp; <span class='glyphicon glyphicon-off'></span> Logout</a></li>
 
 

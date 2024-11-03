@@ -65,7 +65,6 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
               <label for="reason">Reason for Return:</label>
               <select class="form-control" id="reason" name="reason" required>
                 <option value="" selected>Select a reason</option>
-                <option value="Product damaged">Product damaged</option>
                 <option value="Product not as described">Product not as described</option>
                 <option value="Incorrect Item">Incorrect Item</option>
                 <option value="Expired Product">Expired Product</option>
