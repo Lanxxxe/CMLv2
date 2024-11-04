@@ -743,7 +743,7 @@ function checkout() {
     });
 }
 
-function printReceipt(payment_id) {
+function printReceipt() {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = './cashier_reciept.php'; // Your receipt generation script
@@ -766,10 +766,6 @@ function printReceipt(payment_id) {
         qtyInput.value = qty;
         form.appendChild(qtyInput);
     }
-    const paymentIdInput = document.createElement('input');
-    paymentIdInput.setAttribute('type', 'hidden');
-    paymentIdInput.setAttribute('payment_id', payment_id);
-    form.appendChild(paymentIdInput);
 
     // Append the form to the body
     document.body.appendChild(form);
@@ -784,8 +780,7 @@ function printReceipt(payment_id) {
 document.addEventListener('click', (event) => {
     const printRecieptTrigger = event.target.closest('#printRecieptTrigger');
     if (printRecieptTrigger) {
-        const pid = printRecieptTrigger.getAttribute('data-pid');
-        printReceipt(pid);
+        printReceipt();
     }
 
     const confirmPayment = event.target.closest('#confirmPayment');

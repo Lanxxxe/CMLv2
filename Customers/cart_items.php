@@ -79,6 +79,13 @@ if (isset($_GET['update_id'])) {
     <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <style>
+        .checkOrdered {
+            width: 1.4rem;
+            height: 1.4rem; 
+            position: relative;
+            top: 1px;
+            margin-right: 4px !important;
+        }
         .last-column {
             display: flex;
             justify-content: space-between;
@@ -89,13 +96,20 @@ if (isset($_GET['update_id'])) {
             align-items: center;
         }
         .all-checkbtn #checkAllBtn {
-            align-self: end;
-            width: 20px;
-            height: 20px;
-            margin-inline: 10px;
+            width: 1.4rem;
+            height: 1.4rem;
+            margin-right: 4px;
             position: relative;
-            top: 4px;
+            top: 1px;
         }
+        #unselectAllBtn {
+            background: none;
+            border: none;
+        }
+        #unselectAllBtn:hover {
+            opacity: 0.8;
+        }
+
     </style>
 </head>
 
@@ -109,6 +123,11 @@ if (isset($_GET['update_id'])) {
                 </center>
             </div><br />
             <div class="table-responsive">
+                <span class="all-checkbtn">
+                    <input id="checkAllBtn" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
+                    All
+                </span>
+                <button id='unselectAllBtn' ><span class='glyphicon glyphicon-remove'></span> Unselect</button>
                 <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
                     <thead>
                         <tr>
@@ -121,10 +140,6 @@ if (isset($_GET['update_id'])) {
                             <th>
                                 <div class="last-column">
                                     <span>Actions</span>
-                                    <span class="all-checkbtn">
-                                        All
-                                        <input id="checkAllBtn" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
-                                    </span>
                                 </div>
                             </th>
                         </tr>
@@ -142,7 +157,10 @@ if (isset($_GET['update_id'])) {
                                 $formattedDate = $date->format('F j, Y');
                                 ?>
                                 <tr>
-                                    <td><?php echo $order_name . " (" . $gl . ")"; ?></td>
+                                    <td>
+                                        <input class="checkOrdered" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
+                                        <?php echo $order_name ?>
+                                    </td>
                                     <td>&#8369; <?php echo $order_price; ?> </td>
                                     <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
                                     <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
@@ -155,7 +173,6 @@ if (isset($_GET['update_id'])) {
                                                 onclick="confirmDelete(event, <?php echo $row['order_id']; ?>)">
                                                 <span class='glyphicon glyphicon-trash'></span> Remove Item
                                             </a>
-                                        <input class="checkOrdered" style="width: 20px; height: 20px; margin-inline: 10px; margin-top: 0;" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
                                         </div>
                                     </td>
                                 </tr>
@@ -181,7 +198,6 @@ if (isset($_GET['update_id'])) {
                                     echo "<button style='flex: 1;' class='btn btn-success flex' id='checkOutBtn'><span class='glyphicon glyphicon-'></span> CheckOut</button>";
                                 }
                                 echo "<button id='removeSelectedBtn' style='margin-inline: 7px;' class='btn btn-danger'><span class='glyphicon glyphicon-trash'></span></button>";
-                                echo "<button id='unselectAllBtn' class='btn' style='background-color: transparent; visibility: hidden; color: gray;'><span class='glyphicon glyphicon-remove'></span></button>";
                                 echo "</td>";
                                 echo "</tr>";
                             }
