@@ -33,7 +33,7 @@ if (isset($_POST['order_save'])) {
     $save_order_details = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) 
                            VALUES (?, ?, ?, ?, ?, ?, CURDATE(), ?, ?, ?, ?)";
     $stmt = mysqli_prepare($dbcon, $save_order_details);
-    mysqli_stmt_bind_param($stmt, "isdidssssi", $user_id, $order_name, $order_price, $order_price, $order_total, $order_status, $order_pick_up, $order_pick_place, $gl, $product_id); 
+    mysqli_stmt_bind_param($stmt, "isdidssssi", $user_id, $order_name, $order_price, $order_quantity, $order_total, $order_status, $order_pick_up, $order_pick_place, $gl, $product_id); 
     mysqli_stmt_execute($stmt);
 
     $subtract = "UPDATE items SET quantity = quantity - ? WHERE item_id = ?";

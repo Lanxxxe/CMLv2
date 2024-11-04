@@ -40,23 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
             case 'get_payment_details':
                 $stmt = $DB_con->prepare("
-                    SELECT p.*,
-                           SUM(o.order_total) as total_amount,
-                           GROUP_CONCAT(
-                               CONCAT(o.order_name, ' (', o.order_quantity, ' ', o.gl, ')')
-                               SEPARATOR ', '
-                           ) as items,
-                           pt.track_id,
-                           pt.status as track_status,
-                           pt.amount as track_amount,
-                           pt.date_tracked
-                    FROM paymentform p
-                    LEFT JOIN orderdetails o ON p.id = o.payment_id
-                    LEFT JOIN payment_track pt ON p.id = pt.payment_id
-                    WHERE p.id = :id
-                    GROUP BY p.id
-                    ORDER BY pt.track_id DESC
-                    LIMIT 1
+                SELECT p.*,
+                       SUM(o.order_total) AS total_amount,
+                       GROUP_CONCAT(CONCAT(o.order_name, ' (', o.order_quantity, ' ', o.gl, ')') SEPARATOR ', ') AS items,
+                       pt.track_id,
+                       pt.status AS track_status,
+                       pt.amount AS track_amount,
+                       pt.date_tracked
+                FROM paymentform p
+                LEFT JOIN orderdetails o ON p.id = o.payment_id
+                LEFT JOIN payment_track pt ON p.id = pt.payment_id AND pt.date_tracked = (
+                    SELECT MAX(pt2.date_tracked)
+                    FROM payment_track pt2
+                    WHERE pt2.payment_id = p.id
+                )
+                WHERE p.id = :id
+                GROUP BY p.id, pt.track_id, pt.status, pt.amount, pt.date_tracked
+                LIMIT 1;
                 ");
                 $stmt->execute([':id' => $payment_id]);
                 $payment = $stmt->fetch(PDO::FETCH_ASSOC);

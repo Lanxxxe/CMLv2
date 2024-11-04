@@ -31,7 +31,8 @@ $stmt_installment = $DB_con->prepare("
         SELECT paymentform.*, 
                (SELECT SUM(orderdetails.order_total) 
                 FROM orderdetails 
-                WHERE orderdetails.payment_id = paymentform.id) AS total_amount 
+                WHERE orderdetails.payment_id = paymentform.id) AS total_amount,
+               (SELECT pt.status FROM payment_track pt WHERE pt.payment_id = paymentform.id ORDER BY pt.date_tracked DESC LIMIT 1) AS pt_status
         FROM paymentform 
         WHERE email = :email AND payment_type = 'Installment'");
 $stmt_installment->execute(array(':email' => $_SESSION['user_email']));
@@ -41,7 +42,8 @@ $stmt_downpayment = $DB_con->prepare("
         SELECT paymentform.*, 
                (SELECT SUM(orderdetails.order_total) 
                 FROM orderdetails 
-                WHERE orderdetails.payment_id = paymentform.id) AS total_amount 
+                WHERE orderdetails.payment_id = paymentform.id) AS total_amount,
+               (SELECT pt.status FROM payment_track pt WHERE pt.payment_id = paymentform.id ORDER BY pt.date_tracked DESC LIMIT 1) AS pt_status
         FROM paymentform 
         WHERE email = :email AND payment_type = 'Down payment'");
 $stmt_downpayment->execute(array(':email' => $_SESSION['user_email']));
@@ -119,7 +121,8 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                 <tbody>
                                                     <?php foreach ($downpayment_row as $row): 
                                                         $stat = $row['payment_status'];
-                                                        $paid = $stat === 'Confirm' && $row['total_amount'] <= $row['amount'];
+                                                        $paid = $row['total_amount'] <= $row['amount'];
+                                                        $reqeusted = $row['pt_status'] === 'Requested' || $stat !== 'Confirmed';
                                                         ?>
                                                         <tr>
                                                             <td><?= $row['id'] ?></td>
@@ -131,9 +134,11 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                                                 if ($row['payment_status'] === 'failed') {?>
                                                                    <span>Rejected</span>
                                                                 <?php } elseif ($paid) {?>
-                                                                   <span>Paid</span>
+                                                                   <span>Fully Paid</span>
+                                                                <?php } elseif ($reqeusted) {?>
+                                                                   <span>Payment Requested</span>
                                                                 <?php } else {?>
-                                                                   <span>Payment Pending</span>
+                                                                   <span>Partially Paid</span>
                                                                 <?php } ?>
                                                             </td>
                                                             <td>
@@ -397,7 +402,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Pending Payment',
-                                    text: 'There is already a pending payment request for this order.'
+                                    text: 'There is already a pending payment request for this order. Please wait, your payment is being confirmed.'
                                 });
                                 return;
                             }

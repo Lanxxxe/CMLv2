@@ -571,7 +571,7 @@ if (isset($_GET['delete_return_id'])) {
                             u.user_address,
                             pf.id AS order_id,
                             pf.id AS payment_id,
-                            pf.payment_status AS order_status,
+                            if(pf.payment_type IN ('Down Payment', 'Installment') AND pf.payment_status = 'verification', 'Requested', pf.payment_status) AS order_status,
                             pf.payment_type,
                             pf.payment_image_path,
                             SUM(od.order_total) AS order_total
@@ -580,7 +580,7 @@ if (isset($_GET['delete_return_id'])) {
                             INNER JOIN orderdetails od ON u.user_id = od.user_id
                             INNER JOIN paymentform pf ON od.payment_id = pf.id
                         WHERE 
-                            (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed'))
+                            (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed')) AND (pf.payment_type NOT IN ('Down Payment', 'Installment') OR pf.payment_status = 'verification')
                         GROUP BY 
                             u.user_email,
                             u.user_firstname,
