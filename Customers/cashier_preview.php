@@ -1,4 +1,5 @@
 <?php
+$_SESSION['payment_id'] = $payment_id;
 
 $preview = '<div class="receipt-preview">
     <div class="receipt-header">

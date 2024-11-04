@@ -31,7 +31,7 @@ try {
     // Get item IDs and quantities from POST data
     $item_ids = $_POST['item_ids'] ?? [];
     $qtys = $_POST['qtys'] ?? [];
-    $payment_id = $_POST['payment_id'] ?? '';
+    $payment_id = $_SESSION['payment_id'] ?? '';
 
     // Validate input
     if (!is_array($item_ids) || !is_array($qtys) || empty($item_ids) || count($item_ids) !== count($qtys)) {
