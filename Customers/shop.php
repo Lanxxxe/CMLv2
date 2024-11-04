@@ -1,7 +1,7 @@
 <?php
 session_start();
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 function customErrorHandler($errno, $errstr, $errfile, $errline) {
     $date = date('Y-m-d H:i:s');
     $message = "($date) Error: [$errno] $errstr - $errfile:$errline" . PHP_EOL;
@@ -277,7 +277,7 @@ extract($edit_row);
             }
 
 
-            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price FROM items LIMIT $start, $limit");
+            $query = mysqli_query($conn, "SELECT DISTINCT * FROM items LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 $exist = inWishlist($query2['item_id']);
@@ -286,14 +286,14 @@ extract($edit_row);
                     <div class='panel panel-default' style='border-color:#008CBA;'>
                         <div class='panel-heading' style='color:white;background-color: #033c73;'>
                             <center> 
-                                <div style='text-align:center;background-color: white;' class='form-control'><?php echo $query2['brand_name'] ?></div>
+                                <div class="brandNameClass form-control"><?php echo $query2['brand_name'] ?></div>
                             </center>
                         </div>
                         <div class='panel-body'>
                             <a class='fancybox-buttons' href='../Admin/item_images/<?php echo $query2['item_image'] ?>'data-fancybox-group='button' title='Page <?php $id . "- " . $query2['item_name'] ?>'>
                                 <img src='../Admin/item_images/<?php echo $query2['item_image'] ?>' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
                             </a>
-                            <center><h4><?php echo $query2['item_name'] ?></h4></center>
+                            <center><h4 class="itemKey"><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
                                 <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
@@ -432,7 +432,7 @@ extract($edit_row);
             const panels = document.querySelectorAll('.panel-item');
 
             panels.forEach(panel => {
-                const itemName = panel.querySelector('textarea').value.toLowerCase();
+                const itemName = panel.querySelector('.brandNameClass').textContent.toLowerCase();
                 if (itemName.includes(searchValue)) {
                     panel.style.display = '';
                 } else {
