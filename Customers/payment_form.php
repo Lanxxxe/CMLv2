@@ -446,8 +446,8 @@ $conn->close();
                         <?php 
                         if ($_SESSION['user_type'] != 'Cashier'){
                             ?>
-                            <option value="Down Payment">Down Payment</option>
-                            <option value="Installment">Installment</option>
+                            <option value="Down Payment">Partial Payment</option>
+                            <!-- <option value="Installment">Installment</option> -->
                         <?php
                         }
                         ?>

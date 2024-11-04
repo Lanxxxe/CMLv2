@@ -88,14 +88,14 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                             <ul class="nav nav-tabs" role="tablist">
                                 <li role="presentation" class="active">
                                     <a href="#downpayment" aria-controls="downpayment" role="tab" data-toggle="tab">
-                                        <i class="fa fa-money"></i> Downpayment
+                                        <i class="fa fa-money"></i> Partial Payment
                                     </a>
                                 </li>
-                                <li role="presentation">
+                                <!-- <li role="presentation">
                                     <a href="#installment" aria-controls="installment" role="tab" data-toggle="tab">
                                         <i class="fa fa-calendar"></i> Installment
                                     </a>
-                                </li>
+                                </li> -->
                             </ul>
 
                             <!-- Tab panes -->

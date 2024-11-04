@@ -356,3 +356,24 @@
 (2024-11-04 10:12:07) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
 (2024-11-04 10:12:07) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
 (2024-11-04 10:12:07) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:23:16) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-04 10:23:16) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-04 10:24:02) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-04 10:24:02) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-04 10:24:13) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-04 10:24:13) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-04 10:24:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:24:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:24:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:24:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:24:40) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\shop.php:285
+(2024-11-04 10:25:49) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:49) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:49) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:49) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:49) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-04 10:25:55) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
