@@ -726,6 +726,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                 })
                 .then(response => response.text())
                 .then(data => {
+                    
                     window.location.reload();
                 })
                 .catch(error => {

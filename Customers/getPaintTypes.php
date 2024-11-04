@@ -15,6 +15,7 @@ try {
 
 
         $stmt = $DB_con->prepare("SELECT 
+                i.item_id, 
                 i.item_name, 
                 i.brand_name, 
                 i.item_image, 
