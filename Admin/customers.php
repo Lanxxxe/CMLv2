@@ -180,11 +180,124 @@ require_once 'config.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-    #modal-product-im, #modal-receipt-image{
-        max-width: 150px;
-        max-height: 150px;
+#modal-product-im, #modal-receipt-image{
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.recieptPar {
+    font-size: 1.4rem !important;
+}
+
+.receipt {
+    border: 1px solid #ccc;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.receipt h2 {
+    margin-bottom: 0.625rem;
+    font-size: 1.5rem;
+}
+
+.receipt p {
+    margin-bottom: 0.3125rem;
+    font-size: 1rem;
+}
+
+@media print {
+    @page {
+        size: 80mm auto;
+        margin: 0;
     }
-    </style>
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #cmlReciept {
+        border: none;
+    }
+
+    #cmlReciept, #cmlReciept * {
+        visibility: visible !important;
+    }
+
+    #cmlReciept {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 0.75rem !important;
+        margin: 0 !important;
+    }
+
+    /* Typography for receipt printing - 2.5x bigger */
+    #cmlReciept h2 {
+        font-size: 3rem !important;
+        margin-bottom: 1.25rem !important;
+        line-height: 1.2 !important;
+    }
+
+    #cmlReciept p {
+        font-size: 2.2rem !important;
+        margin-bottom: 0.75rem !important;
+        line-height: 1.4 !important;
+    }
+
+    #cmlReciept table {
+        font-size: 2.2rem !important;
+        width: 100% !important;
+        margin: 1.25rem 0 !important;
+    }
+
+    #cmlReciept th, 
+    #cmlReciept td {
+        padding: 0.625rem !important;
+        font-size: 2.2rem !important;
+    }
+
+    /* Company name styling */
+    #cmlReciept h2:first-child {
+        font-size: 3.5rem !important;
+        font-weight: 900 !important;
+        color: #044C92 !important;
+        padding: 0.3125rem !important;
+        margin-bottom: 1.875rem !important;
+    }
+
+    /* Increase spacing between sections */
+    #cmlReciept > * {
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* Hide modal elements when printing */
+    .modal-header,
+    .modal-footer,
+    .close,
+    .btn {
+        display: none !important;
+    }
+
+    /* Make strong tags (labels) stand out more */
+    #cmlReciept strong {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+    }
+
+    /* Add more spacing between table rows */
+    #cmlReciept tr {
+        margin-bottom: 0.625rem !important;
+    }
+
+    /* Ensure the payment image scales appropriately */
+    #cmlReciept img {
+        width: 125px !important;
+        height: 125px !important;
+    }
+}
+</style>
+
 </head>
 <body>
 <?php
@@ -557,36 +670,42 @@ if (isset($_GET['delete_return_id'])) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
-                    <p><strong>Customer Email:</strong> <span id="receiptEmail"></span></p>
-                    <p><strong>Payment Type:</strong> <span id="receiptPaymentType"></span></p>
-                    <p><strong>Order Status:</strong> <span id="receiptStatus"></span></p>
-                    <p><strong>Order Total:</strong> ₱<span id="receiptTotal"></span></p>
+                    <div id="cmlReciept" class="receipt">
+                        <h2 style="font-size: 26px; font-weight: 900; border: none; color: #044C92; padding: 2px;">CML Paint Trading</h2>
+                        <h2>Order Receipt</h2>
+                        <p class="recieptPar"><strong>Date:</strong> <span id="receiptDate"></span></p>
+                        <p class="recieptPar"><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
+                        <p class="recieptPar"><strong>Customer Email:</strong> <span id="receiptEmail"></span></p>
+                        <p class="recieptPar" style="padding-bottom: 16px; border-bottom: 1px solid #6c757d;">
+                            <strong>Payment Type:</strong> <span id="receiptPaymentType"></span>
+                        </p>
 
-                    <!-- Payment Proof Image -->
-                    <div class="payment-proof mt-3">
-                        <p><strong>Proof of Payment</strong></p>
-                        <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 30%; height: auto; border: 1px solid #ddd;">
+                        <table style="width: 100%; margin-bottom: 16px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #6c757d;">
+                                    <th style="padding: 4px 0;">Item</th>
+                                    <th style="padding: 4px 0;">Quantity</th>
+                                    <th style="padding: 4px 0;">Price</th>
+                                    <th style="padding: 4px 0;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItems">
+                                <!-- Items will be populated here dynamically -->
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+
+                        <p><strong>Order Status:</strong> <span id="receiptStatus"></span></p>
+                        <div class="payment-proof mt-3">
+                            <p><strong>Proof of Payment:</strong></p>
+                            <img id="paymentProofImage" src="" alt="Payment Proof" style="width: 50px; height: 50px; object-fit: cover;">
+                        </div>
                     </div>
-
-                    <!-- Order Items Table -->
-                    <h5>Order Items</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Item Name</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orderItems">
-                            <!-- Items will be populated here dynamically -->
-                        </tbody>
-                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="window.print()">Print</button>
                     <button type="button" class="btn btn-success" id="confirmOrderButton">Confirm Order</button>
                 </div>
             </div>
@@ -597,62 +716,112 @@ if (isset($_GET['delete_return_id'])) {
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
 <script>
-    document.querySelector("#nav_order_request").className = "active";
+document.querySelector("#nav_order_request").className = "active";
 
+function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment) {
+    // Populate the receipt modal with order details
+    document.getElementById("receiptOrderId").textContent = orderId;
+    document.getElementById("receiptEmail").textContent = email;
+    document.getElementById("receiptPaymentType").textContent = paymentType;
+    document.getElementById("receiptStatus").textContent = status;
 
-    function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment) {
-        // Populate the receipt modal with basic order details
-        document.getElementById("receiptOrderId").textContent = orderId;
-        document.getElementById("receiptEmail").textContent = email;
-        document.getElementById("receiptPaymentType").textContent = paymentType;
-        document.getElementById("receiptStatus").textContent = status;
-        document.getElementById("receiptTotal").textContent = total;
-        
-        document.getElementById("paymentProofImage").src = `../Customers/${proofOfPayment}`;
-        // Clear any previous items in the orderItems table body
-        const orderItemsBody = document.getElementById("orderItems");
-        orderItemsBody.innerHTML = "";
+    // Set the current date and time
+    const now = new Date();
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: 'numeric',
+        hour12: true 
+    };
+    document.getElementById("receiptDate").textContent = now.toLocaleDateString('en-US', options);
+    
+    // Set payment proof image
+    const paymentProofImage = document.getElementById("paymentProofImage");
+    paymentProofImage.src = `../Customers/${proofOfPayment}`;
+    paymentProofImage.onerror = function() {
+        this.style.display = 'none';
+        this.previousElementSibling.style.display = 'none';
+    };
+    paymentProofImage.onload = function() {
+        this.style.display = 'block';
+        this.previousElementSibling.style.display = 'block';
+    };
 
-        // Fetch order items using AJAX
-        fetch(`getOrderItems.php?payment_id=${orderId}`)
-            .then(response => response.json())
-            .then(items => {
-                // Populate the items in the table
-                console.log(items);
-                items.forEach(item => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${item.order_name}</td>
-                        <td>₱${item.order_price}</td>
-                        <td>${item.order_quantity}</td>
-                        <td>₱${item.order_total}</td>
-                    `;
-                    orderItemsBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error("Error fetching order items:", error));
+    // Clear previous items
+    const orderItemsBody = document.getElementById("orderItems");
+    orderItemsBody.innerHTML = "";
 
-        // Show the receipt modal
-        $('#receiptModal').modal('show');
-
-        // Set up the Confirm Order button inside the modal
-        document.getElementById("confirmOrderButton").onclick = function() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, confirm it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'customers.php?confirm_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
-                }
+    // Fetch and populate order items
+    fetch(`getOrderItems.php?payment_id=${orderId}`)
+        .then(response => response.json())
+        .then(items => {
+            console.log(items);
+            let totalAmount = 0;
+            
+            items.forEach(item => {
+                const itemTotal = parseFloat(item.order_total);
+                totalAmount += itemTotal;
+                
+                const row = document.createElement("tr");
+                row.style.borderBottom = "1px solid #6c757d";
+                row.innerHTML = `
+                    <td style="padding: 4px 0;">${item.order_name}</td>
+                    <td style="padding: 4px 0;">${item.order_quantity}</td>
+                    <td style="padding: 4px 0;">₱${parseFloat(item.order_price).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}</td>
+                    <td style="padding: 4px 0;">₱${itemTotal.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}</td>
+                `;
+                orderItemsBody.appendChild(row);
             });
-        };
-    }
 
+            // Add total row
+            const totalRow = document.createElement("tr");
+            totalRow.style.borderTop = "1px solid #6c757d";
+            totalRow.innerHTML = `
+                <th colspan="3" style="padding: 4px 0; text-align: left;">Total Amount:</th>
+                <th style="padding: 4px 0;">₱${totalAmount.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })}</th>
+            `;
+            orderItemsBody.appendChild(totalRow);
+        })
+        .catch(error => {
+            console.error("Error fetching order items:", error);
+            orderItemsBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">Error loading order items</td>
+                </tr>
+            `;
+        });
+
+    // Show the receipt modal
+    $('#receiptModal').modal('show');
+
+    // Set up the Confirm Order button
+    document.getElementById("confirmOrderButton").onclick = function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, confirm it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'customers.php?confirm_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+            }
+        });
+    };
+}
 
 
     function resetOrder(orderId, paymentType) {
