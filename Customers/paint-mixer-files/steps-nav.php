@@ -12,9 +12,9 @@
         <a href="color-change.php?step=3" >3</a>
         <span>Visualize Room</span>
     </li>
-    <li>
+    <!-- <li>
         <a href="color-change.php?step=4">4</a>
         <span>Download Paint</span>
-    </li>
+    </li> -->
   </ul>
 </nav>

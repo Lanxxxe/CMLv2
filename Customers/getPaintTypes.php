@@ -14,7 +14,24 @@ try {
         $brand_name = $brand_row ? $brand_row['brand_name'] : null;
 
 
-        $stmt = $DB_con->prepare("SELECT type, item_price, gl FROM items WHERE brand_name = ? AND gl = 'Gallon'");
+        $stmt = $DB_con->prepare("SELECT 
+                i.item_name, 
+                i.brand_name, 
+                i.item_image, 
+                i.type, 
+                i.item_price, 
+                i.gl, 
+                i.pallet_id,
+                p.rgb,
+                p.name,
+                p.code
+            FROM 
+                items i
+            JOIN 
+                pallets p ON i.pallet_id = p.pallet_id
+            WHERE 
+                i.brand_name = ? 
+                AND i.gl = 'Gallon'");
         $stmt->execute([$brand_name]);
         $types = $stmt->fetchAll(PDO::FETCH_ASSOC);
         

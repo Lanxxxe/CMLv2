@@ -103,6 +103,9 @@ extract($edit_row);
                   <td><?php echo $order_pick_place; ?></td>
                   <td>&#8369; <?php echo $order_total; ?> </td>
                   <td><?php echo $order_status; ?></td>
+                  <td>
+                    <button class="btn btn-primary" onclick="viewReceipt('<?php echo $order_id; ?>', '<?php echo $payment_id; ?>')">View Receipt</button>
+                  </td>
                 </tr>
 
 
@@ -116,7 +119,7 @@ extract($edit_row);
               echo "<tr>";
               echo "<td colspan='2' align='right'><b>Total Price Ordered:</b>";
               echo "</td>";
-              echo "<td colspan='5' align='right'><b>" . $totalx;
+              echo "<td colspan='5' align='right'><b>&#8369; " . $totalx;
               echo "</b></td>";
               echo "</tr>";
               echo "</tbody>";
@@ -149,6 +152,54 @@ extract($edit_row);
   </div>
   <!-- /#wrapper -->
   <!-- Mediul Modal -->
+<!-- Receipt Modal -->
+
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptModalLabel">Order Receipt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
+                <p><strong>Pick Up Date:</strong> <span id="receiptPickUpDate"></span></p>
+                <p><strong>Pick Up Place:</strong> <span id="receiptPickUpPlace"></span></p>
+                <p><strong>Order Status:</strong> <span id="receiptOrderStatus"></span></p>
+
+                <!-- Payment Proof Image -->
+                <div class="payment-proof mt-3">
+                    <h5>Proof of Payment</h5>
+                    <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+                </div>
+
+                <!-- Order Items Table -->
+                <h5 class="mt-3">Order Items</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItems">
+                        <!-- Items will be populated here dynamically -->
+                    </tbody>
+                </table>
+
+                <p><strong>Total Price:</strong> &#8369;<span id="receiptTotal"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
   <div class="modal fade" id="setAccount" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-sm">
       <div style="color:white;background-color:#008CBA" class="modal-content">
@@ -160,46 +211,24 @@ extract($edit_row);
 
           <form enctype="multipart/form-data" method="post" action="settings.php">
             <fieldset>
-
-
               <p>Firstname:</p>
               <div class="form-group">
-
                 <input class="form-control" placeholder="Firstname" name="user_firstname" type="text" value="<?php echo $user_firstname; ?>" required>
-
-
               </div>
-
-
               <p>Lastname:</p>
               <div class="form-group">
-
                 <input class="form-control" placeholder="Lastname" name="user_lastname" type="text" value="<?php echo $user_lastname; ?>" required>
-
-
               </div>
-
               <p>Address:</p>
               <div class="form-group">
-
                 <input class="form-control" placeholder="Address" name="user_address" type="text" value="<?php echo $user_address; ?>" required>
-
-
               </div>
-
               <p>Password:</p>
               <div class="form-group">
-
                 <input class="form-control" placeholder="Password" name="user_password" type="password" value="<?php echo $user_password; ?>" required>
-
-
               </div>
-
               <div class="form-group">
-
                 <input class="form-control hide" name="user_id" type="text" value="<?php echo $user_id; ?>" required>
-
-
               </div>
             </fieldset>
         </div>
@@ -229,6 +258,39 @@ extract($edit_row);
         return false;
 
       return true;
+    }
+
+    function viewReceipt(orderId, paymentId) {
+      fetch(`getOrderDetails.php?order_id=${orderId}&payment_id=${paymentId}`)
+          .then(response => response.json())
+          .then(data => {
+              const { orderDetails, paymentDetails } = data;
+
+              // Populate modal fields with order details
+              document.getElementById("receiptOrderId").textContent = orderDetails.order_id;
+              document.getElementById("receiptPickUpDate").textContent = orderDetails.order_pick_up;
+              document.getElementById("receiptPickUpPlace").textContent = orderDetails.order_pick_place;
+              document.getElementById("receiptOrderStatus").textContent = orderDetails.order_status;
+              document.getElementById("receiptTotal").textContent = orderDetails.order_total;
+
+              // Set payment proof image
+              document.getElementById("paymentProofImage").src = paymentDetails.payment_image_path ? `uploaded_images/${paymentDetails.payment_image_path}` : '';
+
+              // Populate order items
+              const orderItemsBody = document.getElementById("orderItems");
+              orderItemsBody.innerHTML = `
+                  <tr>
+                      <td>${orderDetails.order_name} (${orderDetails.gl})</td>
+                      <td>&#8369; ${orderDetails.order_price}</td>
+                      <td>${orderDetails.order_quantity} ${orderDetails.gl}</td>
+                      <td>&#8369; ${orderDetails.order_total}</td>
+                  </tr>
+              `;
+
+              // Show the receipt modal
+              $('#receiptModal').modal('show');
+          })
+          .catch(error => console.error("Error fetching order details:", error));
     }
   </script>
 </body>

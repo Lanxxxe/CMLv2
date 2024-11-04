@@ -79,7 +79,7 @@ function isActivated($s) {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
     <style>
         .dashboard-circle {
-            width: 180px;
+            width: 170px;
             height: 90px;
             border-radius: 1rem;
             background-color: #f1f1f1;

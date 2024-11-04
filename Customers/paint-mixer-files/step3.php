@@ -63,17 +63,17 @@
       
       <div class="right-side-bar">
         <div class="rsb-container-1">
-          <div class="cml-button order-paint">
+          <!-- <div class="cml-button order-paint">
             <span>Order Paint</span>
             <span class="material-symbols-outlined">
               keyboard_arrow_right
             </span>
-          </div>
+          </div> -->
           <div class="cml-button save-project">
             <span class="material-symbols-outlined icon">
             save 
             </span>
-            <span>Save Project</span>
+            <span>Save</span>
           </div>
         </div>
 

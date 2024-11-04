@@ -426,143 +426,234 @@ if (isset($_GET['delete_return_id'])) {
 }
 
 ?>
-<div id="wrapper">
-    <?php include("navigation.php"); ?>
+    <div id="wrapper">
+        <?php include("navigation.php"); ?>
 
-    <div id="page-wrapper">
-        <div class="alert alert-danger">
-            <center><h3><strong>Customer Management</strong></h3></center>
-        </div>
-        <br />
-        <div class="table-responsive" style="margin-bottom: 50px;">
-            <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
-                <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer Email</th>
-                    <th>Payment Type</th>
-                    <th>Order Status</th>
-                    <th>Order Total</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                // $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
-                // INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status NOT IN ("Confirmed", "Returned", "rejected")');
-                $stmt = $DB_con->prepare("
-                    SELECT 
-                        u.user_email,
-                        u.user_firstname,
-                        u.user_lastname,
-                        u.user_address,
-                        pf.id AS order_id,
-                        pf.id AS payment_id,
-                        pf.payment_status AS order_status,
-                        pf.payment_type,
-                        SUM(od.order_total) AS order_total
-                    FROM 
-                        users u
-                        INNER JOIN orderdetails od ON u.user_id = od.user_id
-                        INNER JOIN paymentform pf ON od.payment_id = pf.id
-                    WHERE 
-                        (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed'))
-                    GROUP BY 
-                        u.user_email,
-                        u.user_firstname,
-                        u.user_lastname,
-                        u.user_address,
-                        pf.id,
-                        pf.payment_status;
-                ");
-                $stmt->execute();
-                $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        <div id="page-wrapper">
+            <div class="alert alert-danger">
+                <center><h3><strong>Customer Management</strong></h3></center>
+            </div>
+            <br />
+            <div class="table-responsive" style="margin-bottom: 50px;">
+                <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Email</th>
+                        <th>Payment Type</th>
+                        <th>Order Status</th>
+                        <th>Order Total</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    // $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
+                    // INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status NOT IN ("Confirmed", "Returned", "rejected")');
+                    $stmt = $DB_con->prepare("
+                        SELECT 
+                            u.user_email,
+                            u.user_firstname,
+                            u.user_lastname,
+                            u.user_address,
+                            pf.id AS order_id,
+                            pf.id AS payment_id,
+                            pf.payment_status AS order_status,
+                            pf.payment_type,
+                            pf.payment_image_path,
+                            SUM(od.order_total) AS order_total
+                        FROM 
+                            users u
+                            INNER JOIN orderdetails od ON u.user_id = od.user_id
+                            INNER JOIN paymentform pf ON od.payment_id = pf.id
+                        WHERE 
+                            (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed'))
+                        GROUP BY 
+                            u.user_email,
+                            u.user_firstname,
+                            u.user_lastname,
+                            u.user_address,
+                            pf.id,
+                            pf.payment_status;
+                    ");
+                    $stmt->execute();
+                    $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                $stmt = $DB_con->prepare("
-                    SELECT 
-                        u.user_email,
-                        u.user_firstname,
-                        u.user_lastname,
-                        u.user_address,
-                        pt.track_id AS order_id,
-                        pt.status AS order_status,
-                        pf.payment_type,
-                        pf.id as payment_id,
-                        pt.amount AS order_total
-                    FROM 
-                        users u
-                        INNER JOIN orderdetails od ON u.user_id = od.user_id
-                        INNER JOIN paymentform pf ON od.payment_id = pf.id
-                        LEFT JOIN payment_track pt ON pt.payment_id = pf.id
-                    WHERE 
-                       pt.status = 'Requested'
-                    GROUP BY 
-                        u.user_email,
-                        u.user_firstname,
-                        u.user_lastname,
-                        u.user_address,
-                        pf.id,
-                        pf.payment_status;
-                ");
-                $stmt->execute();
-                $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $data = array_merge($payments, $tracks);
+                    $stmt = $DB_con->prepare("
+                        SELECT 
+                            u.user_email,
+                            u.user_firstname,
+                            u.user_lastname,
+                            u.user_address,
+                            pt.track_id AS order_id,
+                            pt.status AS order_status,
+                            pf.payment_type,
+                            pf.payment_image_path,
+                            pf.id as payment_id,
+                            pt.amount AS order_total
+                        FROM 
+                            users u
+                            INNER JOIN orderdetails od ON u.user_id = od.user_id
+                            INNER JOIN paymentform pf ON od.payment_id = pf.id
+                            LEFT JOIN payment_track pt ON pt.payment_id = pf.id
+                        WHERE 
+                        pt.status = 'Requested'
+                        GROUP BY 
+                            u.user_email,
+                            u.user_firstname,
+                            u.user_lastname,
+                            u.user_address,
+                            pf.id,
+                            pf.payment_status;
+                    ");
+                    $stmt->execute();
+                    $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $data = array_merge($payments, $tracks);
 
-                if (count($data) > 0) {
-                    foreach ($data as $row) {
+                    if (count($data) > 0) {
+                        foreach ($data as $row) {
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
+                                <td><?php echo htmlspecialchars($row['user_email']); ?></td>
+                                <td><?php echo htmlspecialchars($row['payment_type']); ?></td>
+                                <td><?php echo htmlspecialchars($row['order_status']); ?></td>
+                                <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
+                                <td>
+                                    <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>', '<?php echo htmlspecialchars($row['payment_image_path']); ?>');">
+                                        <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order
+                                    </a>                                
+                                    <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
+                                    <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
+                                </td>
+                            </tr>
+                            <?php
+                        }
+                    } else {
                         ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
-                            <td><?php echo htmlspecialchars($row['user_email']); ?></td>
-                            <td><?php echo htmlspecialchars($row['payment_type']); ?></td>
-                            <td><?php echo htmlspecialchars($row['order_status']); ?></td>
-                            <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
-                            <td>
-                                <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');"><span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order</a>
-                                <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
-                                <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
-                            </td>
+                            <td colspan="5" class="text-center">No orders found</td>
                         </tr>
                         <?php
                     }
-                } else {
                     ?>
-                    <tr>
-                        <td colspan="5" class="text-center">No orders found</td>
-                    </tr>
-                    <?php
-                }
-                ?>
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="alert alert-default" style="background-color:#033c73;">
-            <p style="color:white;text-align:center;">&copy 2024 CML Paint Trading Shop | All Rights Reserved</p>
+            <div class="alert alert-default" style="background-color:#033c73;">
+                <p style="color:white;text-align:center;">&copy 2024 CML Paint Trading Shop | All Rights Reserved</p>
+            </div>
+        </div>
+    </div>  
+    <!-- Receipt Modal -->
+    <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="receiptModalLabel">Order Receipt</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
+                    <p><strong>Customer Email:</strong> <span id="receiptEmail"></span></p>
+                    <p><strong>Payment Type:</strong> <span id="receiptPaymentType"></span></p>
+                    <p><strong>Order Status:</strong> <span id="receiptStatus"></span></p>
+                    <p><strong>Order Total:</strong> ₱<span id="receiptTotal"></span></p>
+
+                    <!-- Payment Proof Image -->
+                    <div class="payment-proof mt-3">
+                        <p><strong>Proof of Payment</strong></p>
+                        <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 30%; height: auto; border: 1px solid #ddd;">
+                    </div>
+
+                    <!-- Order Items Table -->
+                    <h5>Order Items</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderItems">
+                            <!-- Items will be populated here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="confirmOrderButton">Confirm Order</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
 	<!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
 <script>
     document.querySelector("#nav_order_request").className = "active";
-    function confirmOrder(orderId, paymentType) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, confirm it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'customers.php?confirm_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
-            }
-        });
+
+
+    function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment) {
+        // Populate the receipt modal with basic order details
+        document.getElementById("receiptOrderId").textContent = orderId;
+        document.getElementById("receiptEmail").textContent = email;
+        document.getElementById("receiptPaymentType").textContent = paymentType;
+        document.getElementById("receiptStatus").textContent = status;
+        document.getElementById("receiptTotal").textContent = total;
+        
+        document.getElementById("paymentProofImage").src = `../Customers/${proofOfPayment}`;
+        // Clear any previous items in the orderItems table body
+        const orderItemsBody = document.getElementById("orderItems");
+        orderItemsBody.innerHTML = "";
+
+        // Fetch order items using AJAX
+        fetch(`getOrderItems.php?payment_id=${orderId}`)
+            .then(response => response.json())
+            .then(items => {
+                // Populate the items in the table
+                console.log(items);
+                items.forEach(item => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${item.order_name}</td>
+                        <td>₱${item.order_price}</td>
+                        <td>${item.order_quantity}</td>
+                        <td>₱${item.order_total}</td>
+                    `;
+                    orderItemsBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error("Error fetching order items:", error));
+
+        // Show the receipt modal
+        $('#receiptModal').modal('show');
+
+        // Set up the Confirm Order button inside the modal
+        document.getElementById("confirmOrderButton").onclick = function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, confirm it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'customers.php?confirm_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+                }
+            });
+        };
     }
+
+
 
     function resetOrder(orderId, paymentType) {
         Swal.fire({
