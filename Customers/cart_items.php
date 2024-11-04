@@ -144,9 +144,9 @@ if (isset($_GET['update_id'])) {
                                 <tr>
                                     <td><?php echo $order_name . " (" . $gl . ")"; ?></td>
                                     <td>&#8369; <?php echo $order_price; ?> </td>
-                                    <td><?php echo $order_quantity . " " . $gl; ?></td>
-                                    <td><?php echo $formattedDate; ?></td>
-                                    <td><?php echo $order_pick_place; ?></td>
+                                    <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
+                                    <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
+                                    <td onclick="updatePickUpPlace('<?php echo $order_pick_place ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_pick_place; ?></td>
                                     <td>&#8369; <?php echo $order_total; ?> </td>
                                     <td>
                                         <div style="display: flex; justify-content: center; align-items: center;">
@@ -205,10 +205,10 @@ if (isset($_GET['update_id'])) {
                             <?php
                         }
                         ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- /#wrapper -->
     <!-- Mediul Modal -->
@@ -258,6 +258,7 @@ if (isset($_GET['update_id'])) {
             </div>
         </div>
     </div>
+    
     <script>
         $(document).ready(function () {
             $('#priceinput').keypress(function (event) {
@@ -275,167 +276,347 @@ if (isset($_GET['update_id'])) {
 
             return true;
         }    
-    </script>
-    <script>
-    function confirmDelete(event, orderId) {
-        event.preventDefault();
-        
-        Swal.fire({
-            icon: 'warning',
-            title: 'Are you sure?',
-            text: 'You are about to remove this item!',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect or perform delete action
-                window.location.href = '?delete_id=' + orderId;
-            } else {
-                // Do nothing or handle cancel
+
+        function confirmDelete(event, orderId) {
+            event.preventDefault();
+            
+            Swal.fire({
+                icon: 'warning',
+                title: 'Are you sure?',
+                text: 'You are about to remove this item!',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, keep it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect or perform delete action
+                    window.location.href = '?delete_id=' + orderId;
+                } else {
+                    // Do nothing or handle cancel
+                }
+            });
+        }   
+
+        const totalPrice = document.getElementById('totalPrice');
+        const checkAllBtn = document.getElementById('checkAllBtn');
+        const unselectAllBtn = document.getElementById('unselectAllBtn');
+        const removeSelectedBtn = document.getElementById('removeSelectedBtn');
+
+        let formData = new FormData();
+
+        function getTotalPriceByCheck() {
+            const orders = document.querySelectorAll('.checkOrdered');
+            let total = 0;
+            let allBtnChecked = true;
+            for (let key of formData.keys()) {
+                formData.delete(key);
             }
-        });
-    }
-
-    const totalPrice = document.getElementById('totalPrice');
-    const checkAllBtn = document.getElementById('checkAllBtn');
-    const unselectAllBtn = document.getElementById('unselectAllBtn');
-    const removeSelectedBtn = document.getElementById('removeSelectedBtn');
-
-    let formData = new FormData();
-
-    function getTotalPriceByCheck() {
-        const orders = document.querySelectorAll('.checkOrdered');
-        let total = 0;
-        let allBtnChecked = true;
-        for (let key of formData.keys()) {
-            formData.delete(key);
+            orders.forEach(order => {
+                const dataOrder = order.getAttribute('data-order').split(':');
+                console.log(dataOrder); 
+                if (order.checked) {
+                    sub = dataOrder[1] * dataOrder[2];
+                    total += sub;
+                    
+                    formData.append('order_ids[]', dataOrder[0]);
+                } else {
+                    allBtnChecked = false;
+                }
+            });
+            totalPrice.textContent = total;
+            return allBtnChecked;
         }
-        orders.forEach(order => {
-            const dataOrder = order.getAttribute('data-order').split(':');
-            console.log(dataOrder); 
-            if (order.checked) {
-                sub = dataOrder[1] * dataOrder[2];
-                total += sub;
-                
-                formData.append('order_ids[]', dataOrder[0]);
-            } else {
-                allBtnChecked = false;
-            }
-        });
-        totalPrice.textContent = total;
-        return allBtnChecked;
-    }
 
-    function unselectAllBtnF() {
-        const orders = document.querySelectorAll('.checkOrdered');
-        orders.forEach(order => {
-            order.checked = false;
-        });
-        checkAllBtn.checked = false;
-    }
-
-    function checkAllCheckBtn() {
-        if (checkAllBtn.checked) {
+        function unselectAllBtnF() {
             const orders = document.querySelectorAll('.checkOrdered');
             orders.forEach(order => {
-                order.checked = true;
+                order.checked = false;
             });
-        } else {
-            unselectAllBtnF();
-        }
-    }
-
-    function toggleBtns() {
-        const orders = document.querySelectorAll('.checkOrdered');
-        const anyCheked = Array.from(orders).some(order => order.checked);
-        if (anyCheked) {
-            unselectAllBtn.style.visibility = 'visible';
-            removeSelectedBtn.disabled = false;
-        } else {
-            unselectAllBtn.style.visibility = 'hidden';
-            removeSelectedBtn.disabled = true;
-        }
-    };
-    toggleBtns();
-    document.addEventListener('click', (event) => {
-        const _unselectAllBtn = event.target.closest('#unselectAllBtn');
-        if (_unselectAllBtn) {
-            unselectAllBtnF();
+            checkAllBtn.checked = false;
         }
 
-        const _checkAllBtn = event.target.closest('#checkAllBtn');
-        if (_checkAllBtn) {
-            checkAllCheckBtn();
-            checkAllBtn.checked = getTotalPriceByCheck();
+        function checkAllCheckBtn() {
+            if (checkAllBtn.checked) {
+                const orders = document.querySelectorAll('.checkOrdered');
+                orders.forEach(order => {
+                    order.checked = true;
+                });
+            } else {
+                unselectAllBtnF();
+            }
         }
 
-        const checkOrdered = event.target.closest('.checkOrdered');
-        if (checkOrdered) {
-            checkAllBtn.checked = getTotalPriceByCheck();
-        }
-
+        function toggleBtns() {
+            const orders = document.querySelectorAll('.checkOrdered');
+            const anyCheked = Array.from(orders).some(order => order.checked);
+            if (anyCheked) {
+                unselectAllBtn.style.visibility = 'visible';
+                removeSelectedBtn.disabled = false;
+            } else {
+                unselectAllBtn.style.visibility = 'hidden';
+                removeSelectedBtn.disabled = true;
+            }
+        };
         toggleBtns();
-    });
+        document.addEventListener('click', (event) => {
+            const _unselectAllBtn = event.target.closest('#unselectAllBtn');
+            if (_unselectAllBtn) {
+                unselectAllBtnF();
+            }
+
+            const _checkAllBtn = event.target.closest('#checkAllBtn');
+            if (_checkAllBtn) {
+                checkAllCheckBtn();
+                checkAllBtn.checked = getTotalPriceByCheck();
+            }
+
+            const checkOrdered = event.target.closest('.checkOrdered');
+            if (checkOrdered) {
+                checkAllBtn.checked = getTotalPriceByCheck();
+            }
+
+            toggleBtns();
+        });
 
 
-    document.getElementById('checkOutBtn').addEventListener('click', () => {
-        fetch('./checkout.php', {
-            method: 'post',
-            body: formData,
-        })
-            .then(response => response.json())
-            .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = './payment_form.php';
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Checkout Error!',
-                            text: data.message,
-                            confirmButtonText: 'OK'
-                        });
-                    }
+        document.getElementById('checkOutBtn').addEventListener('click', () => {
+            fetch('./checkout.php', {
+                method: 'post',
+                body: formData,
             })
-            .catch(console.error);
-    });
-
-    removeSelectedBtn.addEventListener('click', () => {
-        for (const n of formData.values()) {
-            console.log(n);
-        }
-        Swal.fire({
-            icon: 'warning',
-            title: 'Are you sure?',
-            text: 'You are about to remove the selected items!',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, keep it'
-        }).then(result => {
-            if (result.isConfirmed) {
-                fetch('./delete_cart_item.php', {
-                    method: 'post',
-                    body: formData,
-                })
                 .then(response => response.json())
                 .then(data => {
-                        if(data.status === 'success'){
-                            window.location.reload();
-                        }else {
+                        if (data.status === 'success') {
+                            window.location.href = './payment_form.php';
+                        } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Unable to remove items!',
+                                title: 'Checkout Error!',
                                 text: data.message,
                                 confirmButtonText: 'OK'
                             });
-                    }
+                        }
                 })
                 .catch(console.error);
-            }
-        })
-    });
+        });
 
-    getTotalPriceByCheck();
+        removeSelectedBtn.addEventListener('click', () => {
+            for (const n of formData.values()) {
+                console.log(n);
+            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Are you sure?',
+                text: 'You are about to remove the selected items!',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, keep it'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch('./delete_cart_item.php', {
+                        method: 'post',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                            if(data.status === 'success'){
+                                window.location.reload();
+                            }else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to remove items!',
+                                    text: data.message,
+                                    confirmButtonText: 'OK'
+                                });
+                        }
+                    })
+                    .catch(console.error);
+                }
+            })
+        });
+
+        getTotalPriceByCheck();
+
+        // Update Shopping Cart
+        
+        function updateQuantity(quantity, orderID, itemPrice){
+            Swal.fire({
+                title: 'Edit Quantity',
+                html: `
+                    <div class="form-group">
+                        <label class="form-label" for="editQuantity">Quantity</label>
+                        <input type="number" id="editQuantity" class="swal2-input" min='1' value="${quantity}">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const newQuantity = document.getElementById('editQuantity').value;
+                    if (!newQuantity || newQuantity <= 0) {
+                        Swal.showValidationMessage('Please enter a valid quantity');
+                        return false;
+                    }
+                    let newTotal = newQuantity * itemPrice;
+                    return { quantity: newQuantity, total: newTotal};
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('action', 'update_quantity');
+                    formData.append('order_id', orderID);
+                    formData.append('quantity', result.value.quantity);
+                    formData.append('total', result.value.total);
+
+                    fetch('updateShoppingCart.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Update!',
+                        text: 'Quantity updated successfully',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to update quantity', 'error');
+                    });
+                }
+            });
+        }
+
+        function updatePickUpDate(pickUpDate, orderID){
+            Swal.fire({
+                title: 'Edit Pick Up Date',
+                html: `
+                    <div class="form-group">
+                        <label class="form-label" for="editPickUpDate">Pick Up Date</label>
+                        <input type="datetime-local" id="editPickUpDate" class="swal2-input" value="${pickUpDate}">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const newPickUpDate = document.getElementById('editPickUpDate').value;
+                    if (!newPickUpDate) {
+                        Swal.showValidationMessage('Please select a pick up date');
+                        return false;
+                    }
+                    return { pickUpDate: newPickUpDate };
+                },
+                didOpen: () => {
+                    calendarRestriction('editPickUpDate');
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('action', 'update_pickup_date');
+                    formData.append('order_id', orderID);
+                    formData.append('pickup_date', result.value.pickUpDate);
+
+                    fetch('updateShoppingCart.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Update!',
+                        text: 'Pickup date updated successfully',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to update pick up date', 'error');
+                    });
+                }
+            });
+        }
+
+        function updatePickUpPlace(pickUpPlace, orderID){
+            Swal.fire({
+                title: 'Edit Pick Up Place',
+                html: `
+                    <div class="form-group">
+                        <label class="form-label" for="editPickUpPlace">Pick Up Place</label>
+                        <select name="editPickUpPlace" id="editPickUpPlace" class="form-control" required>
+                            <option value="" selected>Select Location</option>
+                            <option value="Caloocan">Caloocan</option>
+                            <option value="Valenzuela">Valenzuela</option>
+                            <option value="Quezon City">Quezon City</option>
+                            <option value="San Jose de Monte">San Jose de Monte</option>
+                        </select>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const newPickUpPlace = document.getElementById('editPickUpPlace').value;
+                    if (!newPickUpPlace) {
+                        Swal.showValidationMessage('Please select a pick up place');
+                        return false;
+                    }
+                    return { pickUpPlace: newPickUpPlace };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('action', 'update_pickup_place');
+                    formData.append('order_id', orderID);
+                    formData.append('pickup_place', result.value.pickUpPlace);
+
+                    fetch('updateShoppingCart.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        Swal.fire({
+                        icon: 'success',
+                        title: 'Update!',
+                        text: 'Pickup place updated successfully',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to update pick up place', 'error');
+                    });
+                }
+            });
+        }
+
+        function calendarRestriction(editPickUpDate) {
+            // Get the current date
+            const today = new Date();
+    
+            // Set the date to tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+    
+            // Format the date to YYYY-MM-DDTHH:MM
+            const formattedTomorrow = tomorrow.toISOString().slice(0, 16);
+            
+            // Set the min attribute to tomorrow
+            const dateInput = document.getElementById(editPickUpDate);
+            dateInput.setAttribute('min', formattedTomorrow);
+            dateInput.value = formattedTomorrow; // Set default to tomorrow
+    
+            // Optional: Add an event listener to reset the date if clicked
+            dateInput.addEventListener('click', function () {
+                dateInput.value = formattedTomorrow; // Reset to tomorrow when clicked
+            });
+        }
+
+        
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

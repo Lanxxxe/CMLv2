@@ -153,6 +153,12 @@ try {
                                 <p style="display: block;">Pallet Color: <span id="pallet_item_code"></span></p>
                                 <div id="pallet-container" style="width: 500px; height: 20px; margin-top: 6px; border-radius: 7px"></div>
                             </div>
+                            
+                            <div>
+                                <a class='btn btn-danger' id="addToCart" style='flex: 1;'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
+                                <a class='btn btn-primary' id="addToWishlist" style='margin-left: 7px;' ><span class='glyphicon glyphicon-heart'></span></a>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -253,7 +259,7 @@ try {
         // Set up event listeners for brand and type select elements
         document.getElementById("brandSelect").addEventListener("change", function() {
             const brandId = this.value;
-            console.log(brandId);
+            // console.log(brandId);
             const typeSelect = document.getElementById("typeSelect");
 
             // Fetch available types for selected brand
@@ -264,12 +270,13 @@ try {
                     if (xhr.status === 200) {
                         const types = JSON.parse(xhr.responseText);
                         console.log(types);
-
+                        // console.log(types['item_id']);
                         // Populate typeSelect with available types in gallons only
                         typeSelect.innerHTML = '<option value="">Select Type</option>';
                         types.forEach(type => {
                             if (type.gl === "Gallon") {
                                 typeSelect.innerHTML += `<option value="${type.type}" 
+                                    data-item-id="${type.item_id}"
                                     data-brand-name="${type.brand_name}" 
                                     data-item-name="${type.item_name}" 
                                     data-item-price="${type.item_price}"
@@ -279,6 +286,7 @@ try {
                                 </option>`;
                             }
                         });
+
                         typeSelect.disabled = false;
                     } else {
                         console.error("Error fetching paint types");
@@ -298,6 +306,7 @@ try {
             if (selectedOption.value) {
                 document.querySelector('.item-preview-container').style.display = 'block';
                 // Get details from the selected option's data attributes
+                const itemID = selectedOption.getAttribute("data-item-id");
                 const brandName = selectedOption.getAttribute("data-brand-name");
                 const itemName = selectedOption.getAttribute("data-item-name");
                 const itemPrice = selectedOption.getAttribute("data-item-price");
@@ -305,6 +314,8 @@ try {
                 const itemColor = selectedOption.getAttribute("data-item-color");
                 
                 // Update the preview container
+                document.querySelector('#addToCart').href = `add_to_cart.php?cart=${itemID}`;
+                document.querySelector('#addToWishlist').href = `./add_to_wishlist.php?item=${itemID}&user=${<?php echo $_SESSION['user_id'] ?>}`;
                 document.querySelector("#paint_brand_name").textContent = brandName;
                 document.querySelector("#paint_item_name").textContent = itemName;
                 document.querySelector("#paint_item_price").textContent = itemPrice;

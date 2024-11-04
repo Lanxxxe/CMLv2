@@ -78,6 +78,7 @@ extract($edit_row);
               <th>Pick Up Place</th>
               <th>Total</th>
               <th>Order Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -102,9 +103,9 @@ extract($edit_row);
                   <td><?php echo $formattedDate; ?></td>
                   <td><?php echo $order_pick_place; ?></td>
                   <td>&#8369; <?php echo $order_total; ?> </td>
-                  <td><?php echo $order_status; ?></td>
+                  <td><?php echo $order_status ?></td>
                   <td>
-                    <button class="btn btn-primary" onclick="viewReceipt('<?php echo $order_id; ?>', '<?php echo $payment_id; ?>')">View Receipt</button>
+                    <button class="btn btn-primary" onclick="viewReceipt('<?php echo htmlspecialchars($order_id); ?>', '<?php echo htmlspecialchars($payment_id); ?>')">View Receipt</button>
                   </td>
                 </tr>
 
@@ -132,8 +133,8 @@ extract($edit_row);
 
 						</p>
                         
-                    </div>
-	</div>';
+                        </div>
+	                    </div>';
               echo "</div>";
             } else {
               ?>
@@ -152,46 +153,55 @@ extract($edit_row);
   </div>
   <!-- /#wrapper -->
   <!-- Mediul Modal -->
-<!-- Receipt Modal -->
 
+
+<!-- Receipt Modal -->
 <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="receiptModalLabel">Order Receipt</h5>
+                <h2 class="modal-title" id="receiptModalLabel">Order Receipt</h2>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
-                <p><strong>Pick Up Date:</strong> <span id="receiptPickUpDate"></span></p>
-                <p><strong>Pick Up Place:</strong> <span id="receiptPickUpPlace"></span></p>
-                <p><strong>Order Status:</strong> <span id="receiptOrderStatus"></span></p>
 
-                <!-- Payment Proof Image -->
-                <div class="payment-proof mt-3">
-                    <h5>Proof of Payment</h5>
-                    <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+                <h3 class='text-center' id="receipt-error">Receipt not avaible. Please checkout the item first.</h3>
+                
+                <div id="receipt-body">
+                  <p><strong>Order ID:</strong> <span id="receiptOrderId"></span></p>
+                  <p><strong>Pick Up Date:</strong> <span id="receiptPickUpDate"></span></p>
+                  <p><strong>Pick Up Place:</strong> <span id="receiptPickUpPlace"></span></p>
+                  <p><strong>Order Status:</strong> <span id="receiptOrderStatus"></span></p>
+  
+                  <!-- Payment Proof Image -->
+                  <div class="payment-proof mt-3">
+                      <h5>Proof of Payment</h5>
+                      <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 30%; height: auto; border: 1px solid #ddd;">
+                  </div>
+  
+                  <!-- Order Items Table -->
+                  <!-- <h5 class="mt-3">Order Items</h5> -->
+                  <table class="table table-bordered" style="margin-top: 20px;">
+                      <thead>
+                          <tr>
+                              <th>Item</th>
+                              <th>Price</th>
+                              <th>Quantity</th>
+                              <!-- <th>Total</th> -->
+                          </tr>
+                      </thead>
+                      <tbody id="orderItems">
+                          <tr>
+                            <td id="item_name"></td>
+                            <td id="item_price"></td>
+                            <td id="item_quantity"></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  <p><strong>Total Price:</strong> &#8369;<span id="receiptTotal"></span></p>
                 </div>
-
-                <!-- Order Items Table -->
-                <h5 class="mt-3">Order Items</h5>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orderItems">
-                        <!-- Items will be populated here dynamically -->
-                    </tbody>
-                </table>
-
-                <p><strong>Total Price:</strong> &#8369;<span id="receiptTotal"></span></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -260,37 +270,74 @@ extract($edit_row);
       return true;
     }
 
+      function formatDateTime(dateTimeString) {
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: '2-digit',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true 
+        };
+        
+        const dateTime = new Date(dateTimeString);
+        return dateTime.toLocaleString('en-US', options);
+    }
+
     function viewReceipt(orderId, paymentId) {
+      // console.log('Function called with:', orderId, paymentId); // Debug log
+      document.getElementById("receipt-error").style.display = "none";
+      document.getElementById("receipt-body").style.display = "block";
+      
       fetch(`getOrderDetails.php?order_id=${orderId}&payment_id=${paymentId}`)
-          .then(response => response.json())
+          .then(response => {
+              // console.log('Raw response:', response); // Debug log
+              return response.json();
+          })
           .then(data => {
+              // console.log('Received data:', data); // Debug log
+              if (data.error) {
+                  console.error('Server returned error:', data.error);
+                  document.getElementById("receipt-error").style.display = "block";
+                  document.getElementById("receipt-body").style.display = "none";
+
+                  // Show the modal
+                  $('#receiptModal').modal('show');
+                  return;
+              }
+
               const { orderDetails, paymentDetails } = data;
 
               // Populate modal fields with order details
               document.getElementById("receiptOrderId").textContent = orderDetails.order_id;
-              document.getElementById("receiptPickUpDate").textContent = orderDetails.order_pick_up;
+              document.getElementById("receiptPickUpDate").textContent =  formatDateTime(orderDetails.order_pick_up);
               document.getElementById("receiptPickUpPlace").textContent = orderDetails.order_pick_place;
               document.getElementById("receiptOrderStatus").textContent = orderDetails.order_status;
               document.getElementById("receiptTotal").textContent = orderDetails.order_total;
 
               // Set payment proof image
-              document.getElementById("paymentProofImage").src = paymentDetails.payment_image_path ? `uploaded_images/${paymentDetails.payment_image_path}` : '';
-
-              // Populate order items
+              if (paymentDetails && paymentDetails.payment_image_path) {
+                  document.getElementById("paymentProofImage").src = `${paymentDetails.payment_image_path}`;
+              }
               const orderItemsBody = document.getElementById("orderItems");
-              orderItemsBody.innerHTML = `
-                  <tr>
-                      <td>${orderDetails.order_name} (${orderDetails.gl})</td>
-                      <td>&#8369; ${orderDetails.order_price}</td>
-                      <td>${orderDetails.order_quantity} ${orderDetails.gl}</td>
-                      <td>&#8369; ${orderDetails.order_total}</td>
-                  </tr>
-              `;
-
-              // Show the receipt modal
+              if (orderItemsBody) {
+                  orderItemsBody.innerHTML = `
+                      <tr>
+                          <td>${orderDetails['order_name']} (${orderDetails['gl']})</td>
+                          <td>₱ ${orderDetails['order_price']}</td>
+                          <td>${orderDetails['order_quantity']} ${orderDetails['gl']}</td>
+                      </tr>
+                  `;
+              } else {
+                  console.error('orderItems tbody not found!');
+              }
+              // Show the modal
               $('#receiptModal').modal('show');
           })
-          .catch(error => console.error("Error fetching order details:", error));
+          .catch(error => {
+              console.error("Error:", error);
+              alert('Error loading receipt details. Please try again.');
+          });
     }
   </script>
 </body>
