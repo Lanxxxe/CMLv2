@@ -2,11 +2,11 @@
   <ul class="">
     <li>
         <a class="" href="paint-match.php?step=1">1</a>
-        <span>Select Brand</span>
+        <span>Select Paint Color</span>
     </li>
     <li>
         <a href="paint-match.php?step=2">2</a>
-        <span>Select Paint Color</span>
+        <span>Select Brand</span>
     </li>
     <li>
         <a href="paint-match.php?step=3">3</a>

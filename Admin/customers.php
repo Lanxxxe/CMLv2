@@ -636,7 +636,7 @@ if (isset($_GET['delete_return_id'])) {
                                     <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>', '<?php echo htmlspecialchars($row['payment_image_path']); ?>');">
                                         <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order
                                     </a>                                
-                                    <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Reject Order</a>
+                                    <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Cancel Order</a>
                                     <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
                                 </td>
                             </tr>
