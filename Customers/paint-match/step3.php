@@ -6,7 +6,7 @@
         ?>
 
         <div class="">
-            <a class="returnLink" href="paint-match.php?step=2&brandName=<?php echo htmlspecialchars($brand) ?>">< Return</a>
+            <a class="returnLink" href="paint-match.php?step=2">< Return</a>
 
             <h1 class="stepHeader">
                 Order Summary: <?php echo htmlspecialchars($brand) . ' Latex Paint' ?>
@@ -16,7 +16,7 @@
                 <?php 
                 $palletColors = '';
                 
-                $query = "SELECT * FROM items WHERE brand_name = :brand AND type = 'Latex' LIMIT 1";
+                $query = "SELECT * FROM items WHERE brand_name = :brand AND type = 'Latex Paint' LIMIT 1";
                 $statement = $DB_con->prepare($query);
                 $statement->bindParam(':brand', $brand);
 
@@ -111,7 +111,7 @@
                                     </div>                      
 
                                     <div class="form-buttons">
-                                        <button type="submit" name="checkout" id="checkout">Proceed to Review</button>
+                                        <!-- <button type="submit" name="checkout" id="checkout">Proceed to Review</button> -->
                                         <button type="submit" name="addToCart" id="addToCart">Add to Cart</button>
                                     </div>
                                 </form>

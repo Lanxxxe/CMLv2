@@ -110,11 +110,11 @@ if (isset($_GET['update_id'])) {
                 
                     if (empty($step) || $step === "1") {
                         include_once("paint-match/step1.php");
-                    } else if ($step === "2" && !empty($brand)) {
+                    } else if ($step === "2") {
                         include_once("paint-match/step2.php");
-                    } else if ($step === "2browse" && !empty($brand)) {
+                    } else if ($step === "2browse") {
                         include_once("paint-match/step2-browse.php");
-                    } else if ($step === "2search" && !empty($brand)) {
+                    } else if ($step === "2search") {
                         include_once("paint-match/step2-search.php");
                     } else if ($step === "3" && !empty($brand)) {
                         include_once("paint-match/step3.php");

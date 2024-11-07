@@ -8,8 +8,7 @@
 
         <div class="choose-pallets-container">
 
-
-            <a class="returnLink" href="paint-match.php?step=2&brandName=<?php echo htmlspecialchars($brand) ?>">< Return</a>
+            <a class="returnLink" href="paint-match.php?step=2">< Return</a>
     
             <h1>
                 Search Color for Latex Paint: <span id="choosen-brand"><?php echo htmlspecialchars($brand) ?></span>
@@ -115,7 +114,7 @@
                         ?>
 
 
-                    <a href="paint-match.php?step=3&brandName=<?php echo htmlspecialchars($brand) ?>" class="checkoutButton" role="button">Proceed to checkout</a>
+                    <a href="paint-match.php?step=2" class="checkoutButton" role="button">Proceed to checkout</a>
                 </div>
                 
             </div>
