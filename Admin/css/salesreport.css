@@ -17,6 +17,12 @@ h1 {
     color: #1c1c1c;
 }
 
+.pageTitle {
+    font-size: 5rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
 .sales-report-content {
     display: flex;
     justify-content: center;
@@ -25,6 +31,7 @@ h1 {
     width: 100%;
     gap: 1.5rem;
     margin-top: 1rem;
+    margin-bottom: 32px;
     /* border: 1px solid #008CBA; */
 }
 
@@ -81,8 +88,9 @@ h1 {
 }
 
 .transactions-table table, .users-container div table {
+    border: 1px solid #dee2e6;
     width: 100%;
-    border: 2px solid #008CBA;
+    /* border: 2px solid #008CBA; */
     padding: 1rem;
     border-radius: 7px;
     table-layout: fixed;
@@ -92,7 +100,7 @@ h1 {
 
 .transactions-table table tr, 
 .users-container div table tr {
-    border: 1px solid #008CBA;
+    /* border: 1px solid #008CBA; */
     height: 50px; 
 }
 
@@ -100,13 +108,15 @@ h1 {
 .users-container div table tr td,
 .transactions-table table tr th, 
 .users-container div table tr th {
-    border: 1px solid #008CBA;
+    /* border: 1px solid #008CBA; */
+    border-left: 1px solid #dee2e6;
     text-align: start;
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
     padding: 0 7px;
 }
+
 
 .users-container > div {
     margin-top: 5rem;
@@ -142,3 +152,8 @@ h1 {
 .add-account:hover {
     color: #fff;
 }
+
+.table-striped tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
