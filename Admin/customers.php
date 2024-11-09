@@ -375,7 +375,7 @@ if (isset($_GET['reset_payment_id'])) {
             $stmt_reject = $DB_con->prepare("UPDATE payment_track SET status = 'Rejected' WHERE payment_id = :payment_id");
             $stmt_reject->execute([':payment_id' => $payment_id]);
         }
-        $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "rejected" WHERE payment_id = :payment_id');
+        $stmt_reset = $DB_con->prepare('UPDATE orderdetails SET order_status = "Rejected" WHERE payment_id = :payment_id');
         $stmt_reset->bindParam(':payment_id', $payment_id);
         $stmt_reset->execute();
 
@@ -655,7 +655,7 @@ if (isset($_GET['delete_return_id'])) {
                                     <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>', '<?php echo htmlspecialchars($row['payment_image_path']); ?>');">
                                         <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order
                                     </a>                                
-                                    <a class="btn btn-warning" href="javascript:resetOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Cancel Order</a>
+                                    <a class="btn btn-warning" href="javascript:cancelOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Cancel Order</a>
                                     <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
 
                                     <a class="btn btn-info" href="javascript:sendReminder('<?php echo htmlspecialchars($row['payment_id']); ?>');">
@@ -849,18 +849,18 @@ function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment
 }
 
 
-    function resetOrder(orderId, paymentType) {
+    function cancelOrder(orderId, paymentType) {
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to reject this order!",
+            text: "You are about to cancel this order!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, reset it!',
+            confirmButtonText: 'Yes, cancel it!',
             cancelButtonText: 'No, cancel!',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = 'customers.php?reset_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
+                window.location.href = 'return_payment_page.php?reset_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
             }
         });
     }

@@ -7,6 +7,21 @@ if (!isset($_SESSION['admin_username'])) {
     exit;
 }
 
+// Display alert if exists
+if (isset($_SESSION['alert'])) {
+    $alert = $_SESSION['alert'];
+    echo "<script>
+        Swal.fire({
+            icon: '" . $alert['type'] . "',
+            title: '" . ucfirst($alert['type']) . "!',
+            text: '" . htmlspecialchars($alert['message']) . "',
+            timer: 2000,
+            showConfirmButton: true
+        });
+    </script>";
+    unset($_SESSION['alert']); // Clear the alert after displaying
+}
+
 require_once 'config.php';
 
 // Handle delete request
@@ -20,7 +35,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 // Fetch data for the dashboard
-$stmt_total_orders = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails');
+$stmt_total_orders = $DB_con->prepare('SELECT COUNT(*) AS total FROM orderdetails WHERE order_status <> "Pending"');
 $stmt_total_orders->execute();
 $total_orders = $stmt_total_orders->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -152,7 +167,7 @@ function isActivated($s) {
                 <div style="text-align:center">Verification<br><?php echo $total_verification; ?></div>
             </div>
             <div class="dashboard-circle danger <?php isActivated('3') ?>" onclick="window.location.href='./orderdetails.php?action=rejected&q=3'">
-                <div style="text-align:center">Rejected<br><?php echo $total_rejected; ?></div>
+                <div style="text-align:center">Cancelled<br><?php echo $total_rejected; ?></div>
             </div>
             <div class="dashboard-circle primary <?php isActivated('4') ?>" onclick="window.location.href='./orderdetails.php?action=returned&q=4'">
                 <div style="text-align:center">Returned Items<br><?php echo $returnItems; ?></div>
@@ -196,12 +211,15 @@ function isActivated($s) {
 			   $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
+                    
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $orderStatus = ucfirst($row['order_status']); 
+                        if ($orderStatus != 'Pending'){
                         $date = new DateTime($row['order_pick_up']);
                         $formattedDate = $date->format('F j, Y');
                         ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row['order_date']); ?></td>
+                            <td><?php echo htmlspecialchars($row['order_date'])?></td>
                             <td><?php echo htmlspecialchars($row['user_firstname']) . ' ' . htmlspecialchars($row['user_lastname']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_name']); ?></td>
                             <td>&#8369; <?php echo htmlspecialchars($row['order_price']); ?></td>
@@ -210,27 +228,38 @@ function isActivated($s) {
                             <td><?php echo htmlspecialchars($formattedDate); ?></td>
                             <td><?php echo htmlspecialchars($row['order_pick_place']); ?></td>
                             <td>&#8369; <?php echo htmlspecialchars($row['order_total']); ?></td>
-                            <td><?php
-                                $order_status = ucfirst($row['order_status']);
-                                $due = (new DateTime($row['order_date'])) < (new DateTime());
+                            <td style="cursor: pointer;" 
+                                <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') 
+                                    ? "onclick=\"changeStatus('" . htmlspecialchars($row['user_id']) . "', '" . htmlspecialchars($row['payment_id']) . "')\"" 
+                                    : ''; 
+                                ?>>                                
+                                <?php
+                                    $order_status = ucfirst($row['order_status']);
+                                    $due = (new DateTime($row['order_date'])) < (new DateTime());
+                                    $payment_id = $row['payment_id'];
+                                    if ($due && $order_status === 'Confirmed') {
+                                        echo 'Picked up';
+                                    } elseif (!$due && $order_status === 'Confirmed') {
+                                        echo 'Waiting';
+                                    } elseif ($order_status === 'Pending' || $order_status === 'Verification') {
+                                        echo 'Processing';  // Shows the order is being processed but not yet confirmed
+                                    } elseif ($order_status === 'Rejected') {
+                                        echo 'Cancelled';   // Indicates the order was not accepted/cancelled
+                                    } elseif ($order_status === 'Returned') {
+                                        echo 'Refunded';    // Shows the order was returned and likely refunded
+                                    } else {
+                                        echo 'N/A';
+                                    }
 
-                                if ($due && $order_status === 'Confirmed') {
-                                    echo 'Picked up';
-                                } elseif (!$due && $order_status === 'Confirmed') {
-                                    echo 'Waiting';
-                                } elseif ($order_status === 'Pending' || $order_status === 'Verification') {
-                                    echo 'Processing';  // Shows the order is being processed but not yet confirmed
-                                } elseif ($order_status === 'Rejected') {
-                                    echo 'Cancelled';   // Indicates the order was not accepted/cancelled
-                                } elseif ($order_status === 'Returned') {
-                                    echo 'Refunded';    // Shows the order was returned and likely refunded
-                                } else {
-                                    echo 'N/A';
-                                }
-                            ?></td>
-							<td><?php echo htmlspecialchars($row['order_status']); ?></td>
+                                    if ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') {
+                                        echo ' <i class="fa fa-caret-square-o-down"></i>';
+                                    }
+                                ?> 
+                            </td>
+							<td><?php echo htmlspecialchars($row['order_status']) ?></td>
                         </tr>
                         <?php
+                        }
                     }
                 } else {
                     ?>
@@ -284,6 +313,95 @@ function isActivated($s) {
             return false;
 
         return true;
+    }
+
+    function changeStatus(userID, payment_id) {
+        if (payment_id){
+            Swal.fire({
+                title: 'Edit Product',
+                html: `
+                    <div> 
+                        <select name="order_status" id="order_status" class="form-control" required>
+                            <option value="" selected>Choose status</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Rejected">Cancelled</option>
+                            <option value="Returned">Return</option>
+                        </select>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const statusSelect = document.getElementById('order_status');
+                    const selectedStatus = statusSelect.value;
+
+                    if (!selectedStatus) {
+                        Swal.showValidationMessage('Please choose a status before saving.');
+                        return false;
+                    }
+
+                    if (!payment_id) {
+                        Swal.showValidationMessage('The order is unpaid. Please contact the customer.');
+                        return false;
+                    }
+
+                    return { userID, payment_id, selectedStatus };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('action', 'update_status');
+                    formData.append('user_id', result.value.userID);
+                    formData.append('payment_id', result.value.payment_id);
+                    formData.append('status', result.value.selectedStatus);
+                    console.log(result.value.userID);
+                    console.log(result.value.payment_id);
+                    console.log(result.value.selectedStatus);
+                    // console.log(result);
+                    fetch('updateStatus.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // data_obj = JSON.json_encode(data);
+                        console.log(typeof(data));
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Order Status Updated',
+                                text: `The status has been updated.`
+                            }).then(() => {
+                                // Optionally, reload the page or update the UI
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: data.message || 'An error occurred while updating the order status.'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating order status:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Request Failed',
+                            text: 'There was an error processing your request. Please try again later.'
+                        });
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Unpaid Order',
+                text: 'Order unpaid, please contact the customer',
+                confirmButtonText: 'OK'
+            });
+        }
     }
 </script>
 </body>

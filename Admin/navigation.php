@@ -18,6 +18,7 @@
             <li id="nav_order_request"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Order Request</a></li>
             <li id="nav_return_request"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Return Request</a></li>
             <li id="nav_sales_report"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
+            <li id="nav_invoice_report"><a href="invoice_report.php"> &nbsp; &nbsp; &nbsp; Invoice Report</a></li>
             <li id="nav_maintenance"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
             <li id="nav_user_management"><a href="userManagement.php"> &nbsp; &nbsp; &nbsp; User Management</a></li>
             <li id="nav_logout"><a href="javascript:confirmLogout()"> &nbsp; &nbsp; &nbsp; Logout</a></li>
