@@ -549,14 +549,15 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
 
     <?php
         $sumqty_stmt = $DB_con->prepare('SELECT order_name, SUM(order_quantity) as sum_qty
-        FROM orderdetails  GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5');
+        FROM orderdetails LEFT JOIN paymentform ON paymentform.id = orderdetails.payment_id ' . $order_type_str_r . ' GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5');
     $sumqty_stmt->execute();
     $sum_qty = $sumqty_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
     $top_requested_product = [];
     $top_requested_product_qty = [];
-    foreach ($sum_qty as $sum) {
+    for ($i = 0; $i < 5; ++$i) {
+        $sum = $sum_qty[$i] ?? ['order_name' => '-', 'sum_qty' => 0];
         $top_requested_product[] = $sum['order_name'];
         $top_requested_product_qty[] = $sum['sum_qty'];
     }
@@ -608,7 +609,7 @@ new Chart(ctx, {
             },
             title: {
                 display: true,
-                text: 'Most Requested Products',
+                text: 'Top Requested Products',
                 font: {
                     size: 16,
                     weight: 'bold',
