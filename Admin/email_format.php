@@ -154,13 +154,12 @@ function composeReminderMessage($order, $remaining_balance) {
             <div class="content">
                 <p><strong>Dear ' . htmlspecialchars($order['user_firstname'] . ' ' . $order['user_lastname']) . ',</strong></p>
                 
-                <p>This is a friendly reminder regarding your remaining balance for Order #' . htmlspecialchars($order['payment_id']) . '.</p>
+                <p>This is a friendly reminder regarding your payment for Order #' . htmlspecialchars($order['payment_id']) . '.</p>
                 
                 <div class="important-notice">
                     <h2>Payment Details</h2>
                     <p><strong>Order ID:</strong> ' . htmlspecialchars($order['payment_id']) . '</p>
-                    <p><strong>Remaining Balance:</strong> ₱' . number_format($remaining_balance, 2) . '</p>
-                    <p><strong>Due Date:</strong> ' . date('F j, Y', strtotime('+3 days')) . '</p>
+                    <p><strong>Amount:</strong> ₱' . number_format($remaining_balance, 2) . '</p>
                 </div>
                 
                 <div class="reply-instructions">
