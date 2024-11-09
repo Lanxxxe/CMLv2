@@ -52,6 +52,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="js/datatables.min.js"></script>
+    <script src="../assets/js/chart.umd.min.js"></script>
     
     <!-- Include SweetAlert2 CSS and JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -86,9 +87,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
         .printBtn {
             margin-right: 10px;
         }
-        .sales-report-container {
-            margin-top: 50px;
-        }
+
         #filterTab .activeFilterTab {
             background: gray;
             color: white;
@@ -100,85 +99,238 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
         .sales-report-container {
             height: auto;
         }
-    @media print {
-        @page {
-            size: 800px auto;
+        @media print {
+            @page {
+                size: 800px auto;
+                margin: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            .printable, .printable * {
+                visibility: visible !important;
+            }
+
+            .printable {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                padding: 0.75rem !important;
+                margin: 0 !important;
+            }
+
+            #page-wrapper:not(.printable) {
+                display: none !important;
+            }
+
+            /* Force background colors to print */
+            .sales-report-item {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Apply specific background colors */
+            .sales-report-item:nth-child(1) {
+                background-color: #bfea91 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .sales-report-item:nth-child(2) {
+                background-color: #91d4ea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .sales-report-item:nth-child(3) {
+                background-color: #cb91ea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Ensure text remains visible */
+            .sales-report-item h2,
+            .sales-report-item p {
+                color: black !important;
+            }
+            
+            .hide-in-print {
+                display: none !important;
+            }
+            .modal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .modal-dialog {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .close {
+                display: none !important;
+            }
+        }
+
+        .sales-report-transactions {
+            margin: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sales-report-transactions h2 {
+            padding: 20px;
             margin: 0;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+            color: #333;
+            font-size: 1.5rem;
         }
 
-        body * {
-            visibility: hidden !important;
+        .transactions-table {
+            padding: 20px;
+            overflow-x: auto;
         }
 
-        .printable, .printable * {
-            visibility: visible !important;
+        .transactions-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
         }
 
-        .printable {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            padding: 0.75rem !important;
-            margin: 0 !important;
+        .transactions-table thead th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
         }
 
-        #page-wrapper:not(.printable) {
-            display: none !important;
+        .transactions-table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            color: #212529;
         }
 
-        /* Force background colors to print */
-        .sales-report-item {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .transactions-table tbody tr:hover {
+            background-color: #f8f9fa;
         }
 
-        /* Apply specific background colors */
-        .sales-report-item:nth-child(1) {
-            background-color: #bfea91 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .order-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            display: inline-block;
+            min-width: 100px;
         }
 
-        .sales-report-item:nth-child(2) {
-            background-color: #91d4ea !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
         }
 
-        .sales-report-item:nth-child(3) {
-            background-color: #cb91ea !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
         }
 
-        /* Ensure text remains visible */
-        .sales-report-item h2,
-        .sales-report-item p {
-            color: black !important;
-        }
-        
-        .hide-in-print {
-            display: none !important;
-        }
-        .modal {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
-        .modal-dialog {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        .close {
-            display: none !important;
-        }
-    }
+.transactions-header {
+    padding: 0;
+    width: 100%;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transactions-tabs {
+    display: flex;
+    flex: 1;
+}
+
+.tab-btn {
+    padding: 15px 25px;
+    color: #495057;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    border-right: 1px solid #dee2e6;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background: rgba(13, 110, 253, 0.05);
+    color: #0d6efd;
+}
+
+.tab-btn.active {
+    background: #0d6efd;
+    color: white;
+}
+
+.transactions-actions {
+    display: flex;
+    padding-right: 15px;
+    gap: 10px;
+}
+
+.transactions-separator {
+    flex: 1;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.action-btn i {
+    font-size: 14px;
+}
+
+.transactions-header .tab-btn:first-child {
+    border-top-left-radius: 8px;
+}
+
+.transactions-header .tab-btn.active {
+    background-color: #666;
+}
+
+.transactions-header .tab-btn:hover {
+    text-decoration: none;
+}
+
+.transactions-header .tab-btn:not(.active):hover {
+    color: inherit;
+}
+
+
     </style>
 
 </head>
@@ -187,16 +339,14 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <div id="wrapper">
         <?php include("navigation.php"); ?>
 
-        <nav id="filterTab" class="navbar navbar-inverse">
-            <a class="btn mnav <?php echo ($order_type !== 'walk_in' && $order_type !== 'gcash')? 'activeFilterTab' : '' ?>" href="./salesreport.php">All</a>
-            <a class="btn mnav <?php echo ($order_type === 'walk_in')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=walk_in">Walk In</a>
-            <a class="btn mnav <?php echo ($order_type === 'gcash')? 'activeFilterTab': '' ?>" href="./salesreport.php?order_type=gcash">Gcash</a>
-            <a type="button" class="btn btn-primary" id="saveAsPDFBtn" href="generate_pdf.php<?php echo ($order_type)? "?order_type=$order_type": '' ?>">Save as PDF</a>
-            <button type="button" class="printBtn btn btn-primary" onclick="printContent('page-wrapper')">Print Sales Report</button> 
-        </nav>
         <div id="page-wrapper" class="printable">
             <div class="sales-report-container">
-                <h1>Sales Report</h1>
+                <h1 class="pageTitle">Sales Report</h1>
+
+            <div id="analyticReports">
+                <div id="trpContainer">
+                    <canvas id="topRequestedProduct"></canvas>
+                </div>
 
                 <div class="sales-report-content">
                     <?php
@@ -228,9 +378,9 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                 DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
                          FROM orderdetails 
                             LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                         WHERE DATE(order_date) BETWEEN 
+                         WHERE (DATE(order_date) BETWEEN 
                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
+                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY))' . $order_type_str
                     );
                     $stmt_weekly->execute();
                     $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
@@ -287,51 +437,100 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                     </div>
                 </div>
 
+            </div>
 
-                <div class="sales-report-transactions">
-                    <h2>Transactions</h2>
-                    <div class="transactions-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Customer</th>
-                                    <th>Products Ordered</th>
-                                    <th>Total Payment</th>
-                                    <th>Order Status</th>
-                                </tr>
-                            </thead>    
-                            <tbody>
-                                <?php
-                                $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users INNER JOIN orderdetails ON users.user_id = orderdetails.user_id ORDER BY orderdetails.order_pick_up DESC');
-                                $stmt->execute();
+            <div class="sales-report-transactions">
 
-                                if ($stmt->rowCount() > 0) {
-                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
-                                        $productsOrdered = $row['order_name'];
-                                        $orderStatus = $row['order_status'];
-                                        $totalBill = $row['order_total'];
-                                        ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($customerName); ?></td>
-                                            <td><?php echo htmlspecialchars($productsOrdered); ?></td>
-                                            <td><?php echo htmlspecialchars($totalBill); ?></td>
-                                            <td><?php echo htmlspecialchars($orderStatus); ?></td>
-                                        </tr>
-                                        <?php
-                                    }
-                                } else {
+                <div class="transactions-header hide-in-print">
+                    <div class="transactions-tabs">
+                        <a href="./salesreport.php" class="tab-btn <?php echo (!$order_type ? 'active' : ''); ?>">
+                            All Transactions
+                        </a>
+                        <a href="./salesreport.php?order_type=walk_in" class="tab-btn <?php echo ($order_type === 'walk_in' ? 'active' : ''); ?>">
+                            Walk In Transactions
+                        </a>
+                        <a href="./salesreport.php?order_type=gcash" class="tab-btn <?php echo ($order_type === 'gcash' ? 'active' : ''); ?>">
+                            GCash Transactions
+                        </a>
+                    </div>
+                    <div class="transactions-actions">
+                        <!-- <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary"> -->
+                        <!--     <i class="fa fa-file-pdf-o"></i> Save PDF -->
+                        <!-- </a> -->
+                        <button type="button" class="action-btn btn btn-primary" onclick="printContent('page-wrapper')">
+                            <i class="fa fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+
+                <div class="transactions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction Date</th>
+                                <th>Invoice No.</th>
+                                <th>Customer</th>
+                                <th>Products Ordered</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                                <th>Payment Method</th>
+                                <th>Order Status</th>
+                            </tr>
+                        </thead>    
+                        <tbody class="table-striped">
+                            <?php
+                            $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
+
+                            $stmt = $DB_con->prepare('
+                                SELECT 
+                                    users.user_email, 
+                                    users.user_firstname, 
+                                    users.user_lastname, 
+                                    users.user_address, 
+                                    orderdetails.*,
+                                    paymentform.payment_method
+                                FROM users 
+                                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id '
+                                 . $order_type_str_r .
+                                'ORDER BY orderdetails.order_date DESC
+                            ');
+                            $stmt->execute();
+
+
+                            if ($stmt->rowCount() > 0) {
+                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                    $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
+                                    $orderDate = date('M d, Y', strtotime($row['order_date']));
+                                    $statusClass = strtolower($row['order_status']) == 'completed' ? 'status-completed' : 
+                                                 (strtolower($row['order_status']) == 'cancelled' ? 'status-cancelled' : 'status-pending');
                                     ?>
                                     <tr>
-                                        <td colspan="3">No transactions found.</td>
+                                        <td><?php echo htmlspecialchars($orderDate); ?></td>
+                                        <td><?php echo htmlspecialchars($row['order_id']); ?></td>
+                                        <td><?php echo htmlspecialchars($customerName); ?></td>
+                                        <td><?php echo htmlspecialchars($row['order_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
+                                        <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
+                                        <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
+                                        <td><span class="order-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['order_status']); ?></span></td>
                                     </tr>
                                     <?php
                                 }
+                            } else {
                                 ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">No transactions found.</td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
+
+
             </div>
 
             <div class="alert alert-default" style="background-color:#033c73;">
@@ -348,7 +547,117 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <?php require_once "insertBrandsModal.php"; ?>
     <?php require_once "salesReportModal.php"; ?>
 
+    <?php
+        $sumqty_stmt = $DB_con->prepare('SELECT order_name, SUM(order_quantity) as sum_qty
+        FROM orderdetails  GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5');
+    $sumqty_stmt->execute();
+    $sum_qty = $sumqty_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    $top_requested_product = [];
+    $top_requested_product_qty = [];
+    foreach ($sum_qty as $sum) {
+        $top_requested_product[] = $sum['order_name'];
+        $top_requested_product_qty[] = $sum['sum_qty'];
+    }
+    ?>
+
     <script type="text/javascript" charset="utf-8">
+const ctx = document.getElementById('topRequestedProduct');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode($top_requested_product) ?>,
+        datasets: [{
+            label: 'Most Requested Products',
+            data: <?= json_encode($top_requested_product_qty) ?>,
+            backgroundColor: [
+                'rgba(59, 130, 246, 0.8)',  // Blue
+                'rgba(16, 185, 129, 0.8)',  // Green
+                'rgba(245, 158, 11, 0.8)',  // Orange
+                'rgba(236, 72, 153, 0.8)',  // Pink
+                'rgba(139, 92, 246, 0.8)'   // Purple
+            ],
+            borderColor: [
+                'rgba(59, 130, 246, 1)',
+                'rgba(16, 185, 129, 1)',
+                'rgba(245, 158, 11, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(139, 92, 246, 1)'
+            ],
+            borderWidth: 2,
+            borderRadius: 6,
+            maxBarThickness: 40
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 13,
+                        family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                    },
+                    padding: 20
+                }
+            },
+            title: {
+                display: true,
+                text: 'Most Requested Products',
+                font: {
+                    size: 16,
+                    weight: 'bold',
+                    family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                },
+                padding: {
+                    top: 10,
+                    bottom: 20
+                }
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                grid: {
+                    display: true,
+                    drawBorder: true,
+                    drawOnChartArea: true,
+                    drawTicks: true,
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                    font: {
+                        size: 12
+                    }
+                }
+            },
+            y: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    font: {
+                        size: 12
+                    }
+                }
+            }
+        },
+        layout: {
+            padding: {
+                left: 20,
+                right: 20,
+                top: 0,
+                bottom: 10
+            }
+        }
+    }
+});
+
         document.querySelector("#nav_sales_report").className = "active";
 
         function confirmEdit(itemName) {
