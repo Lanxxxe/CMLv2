@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 31, 2024 at 08:47 PM
+-- Generation Time: Nov 09, 2024 at 03:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,199 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `cml_paint_db`
 --
-
-DELIMITER $$
---
--- Procedures
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
-    DECLARE v_payment_id INT;
-    DECLARE v_amount DECIMAL(10,2);
-    DECLARE v_payment_type VARCHAR(255);
-    DECLARE v_total_amount DECIMAL(10,2);
-    DECLARE v_current_amount DECIMAL(10,2);
-    
-    -- Get payment details
-    SELECT pt.payment_id, pt.amount, pf.payment_type, pf.amount, 
-           (SELECT SUM(order_total) FROM orderdetails WHERE payment_id = pt.payment_id)
-    INTO v_payment_id, v_amount, v_payment_type, v_current_amount, v_total_amount
-    FROM payment_track pt
-    JOIN paymentform pf ON pt.payment_id = pf.id
-    WHERE pt.track_id = p_track_id;
-    
-    START TRANSACTION;
-    
-    -- Update payment track status
-    UPDATE payment_track
-    SET status = 'Confirmed'
-    WHERE track_id = p_track_id;
-    
-    -- Update paymentform based on payment type
-    IF v_payment_type = 'Installment' THEN
-        UPDATE paymentform
-        SET months_paid = months_paid + 1,
-            payment_status = IF(months_paid + 1 >= 12, 'Confirmed', payment_status)
-        WHERE id = v_payment_id;
-    ELSE -- Down payment
-        UPDATE paymentform
-        SET amount = amount + v_amount,
-            payment_status = IF(amount + v_amount >= v_total_amount, 'Confirmed', payment_status)
-        WHERE id = v_payment_id;
-    END IF;
-    
-    -- Update orderdetails status if payment is complete
-    IF (v_payment_type = 'Installment' AND (SELECT months_paid FROM paymentform WHERE id = v_payment_id) >= 12)
-        OR (v_payment_type = 'Down payment' AND (v_current_amount + v_amount >= v_total_amount)) THEN
-        
-        UPDATE orderdetails
-        SET order_status = 'Confirmed'
-        WHERE payment_id = v_payment_id;
-    END IF;
-    
-    COMMIT;
-    
-    SELECT 'success' as status, 'Payment confirmed successfully' as message;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
-    DECLARE current_qty INT;
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE v_order_id INT;
-    DECLARE v_order_quantity INT;
-    DECLARE v_user_id INT;
-    DECLARE v_order_name VARCHAR(1000);
-    DECLARE v_order_price DOUBLE;
-    DECLARE v_order_total DOUBLE;
-    DECLARE v_order_status VARCHAR(45);
-    DECLARE v_order_date DATE;
-    DECLARE v_order_pick_up DATETIME(6);
-    DECLARE v_order_pick_place VARCHAR(45);
-    DECLARE v_gl VARCHAR(45);
-    DECLARE v_payment_id INT;
-    DECLARE v_product_id INT;
-    
-    -- Cursor for orders sorted by date
-    DECLARE order_cursor CURSOR FOR 
-        SELECT order_id, order_quantity,
-               user_id, order_name, order_price, order_total,
-               order_status, order_date, order_pick_up, order_pick_place,
-               gl, payment_id, product_id
-        FROM orderdetails 
-        WHERE user_id = (SELECT user_id FROM returnitems WHERE return_id = p_return_id)
-        AND product_id = (SELECT product_id FROM orderdetails WHERE order_name = 
-                        (SELECT product_name FROM returnitems WHERE return_id = p_return_id) LIMIT 1)
-        ORDER BY order_date DESC;
-    
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
-    -- Start transaction
-    START TRANSACTION;
-    
-    -- Get initial return quantity
-    SELECT quantity INTO current_qty
-    FROM returnitems
-    WHERE return_id = p_return_id;
-    
-    -- Open cursor
-    OPEN order_cursor;
-    
-    read_loop: LOOP
-        FETCH order_cursor INTO v_order_id, v_order_quantity,
-                               v_user_id, v_order_name, v_order_price, v_order_total,
-                               v_order_status, v_order_date, v_order_pick_up, v_order_pick_place,
-                               v_gl, v_payment_id, v_product_id;
-                               
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-        
-        IF v_order_quantity <= current_qty THEN
-            -- Update entire order to 'return' status
-            UPDATE orderdetails 
-            SET order_status = 'Returned'
-            WHERE order_id = v_order_id;
-            
-            SET current_qty = current_qty - v_order_quantity;
-        ELSE
-            -- Split the order
-            UPDATE orderdetails
-            SET order_quantity = order_quantity - current_qty,
-                order_total = order_price * (order_quantity - current_qty)
-            WHERE order_id = v_order_id;
-            
-            -- Insert new order for the returned portion
-            INSERT INTO orderdetails (
-                user_id, order_name, order_price, order_quantity, 
-                order_total, order_status, order_date, order_pick_up,
-                order_pick_place, gl, payment_id, product_id
-            )
-            VALUES (
-                v_user_id, v_order_name, v_order_price, current_qty,
-                v_order_price * current_qty, 'Returned', v_order_date, 
-                v_order_pick_up, v_order_pick_place, v_gl,
-                v_payment_id, v_product_id
-            );
-            
-            SET current_qty = 0;
-            LEAVE read_loop;
-        END IF;
-        
-        IF current_qty = 0 THEN
-            LEAVE read_loop;
-        END IF;
-    END LOOP;
-    
-    -- Close cursor
-    CLOSE order_cursor;
-    
-    -- Update return item status
-    UPDATE returnitems 
-    SET status = 'Confirmed'
-    WHERE return_id = p_return_id;
-    
-    -- Commit transaction
-    COMMIT;
-    
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `request_payment` (IN `p_payment_id` INT, IN `p_amount` DECIMAL(10,2), IN `p_payment_image` VARCHAR(255))   BEGIN
-    DECLARE last_track_status VARCHAR(20);
-    DECLARE v_payment_type VARCHAR(255);
-    DECLARE v_payment_status VARCHAR(20);
-    
-    -- Get the status of the latest track record
-    SELECT status INTO last_track_status
-    FROM payment_track
-    WHERE payment_id = p_payment_id
-    ORDER BY track_id DESC
-    LIMIT 1;
-    
-    -- Get payment type
-    SELECT payment_type INTO v_payment_type
-    FROM paymentform
-    WHERE id = p_payment_id;
-    
-    SELECT payment_status INTO v_payment_status
-    FROM paymentform
-    WHERE id = p_payment_id;
-    -- Check if we can process new payment (no track or last track was confirmed)
-    IF (v_payment_status = 'Confirmed' AND (last_track_status IS NULL OR last_track_status = 'Confirmed')) THEN
-        -- Insert new payment track record
-        INSERT INTO payment_track (payment_id, amount, status)
-        VALUES (p_payment_id, p_amount, 'Requested');
-        
-        -- Update payment image in paymentform
-        UPDATE paymentform
-        SET payment_image_path = p_payment_image
-        WHERE id = p_payment_id;
-        
-        SELECT 'success' as status, 'Payment request submitted successfully' as message;
-    ELSE
-        SELECT 'error' as status, 'Previous payment is still pending confirmation' as message;
-    END IF;
-END$$
-
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -252,7 +59,8 @@ CREATE TABLE `brands` (
 INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`) VALUES
 (2, 'Boysen', 'local_image/1730109970_boysen.jpg'),
 (9, 'Rain or Shine', 'local_image/1730110516_rain-or-shine.png'),
-(10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg');
+(10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg'),
+(12, 'Hippo', 'local_image/1730651776_hippo.png');
 
 -- --------------------------------------------------------
 
@@ -292,10 +100,12 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`) VALUES
-(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 20, 'Gallon', 9),
-(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 20, 'Gallon', 3),
-(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 100, 'Gallon', 12),
-(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 100, 'Gallon', 17);
+(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 18, 'Gallon', 9),
+(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 10, 'Gallon', 3),
+(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 96, 'Gallon', 12),
+(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 98, 'Gallon', 17),
+(50, 'Boysen Paint', 'Boysen', '80066.jpeg', '2024-11-04 00:00:00.000000', '2026-11-03', '120', 'Flat Paint', 98, 'Gallon', 16),
+(51, 'Latex Paint', 'Boysen', '512213.jpeg', '2024-11-07 00:00:00.000000', '2026-11-20', '100', 'Latex Paint', 97, 'Gallon', 1);
 
 -- --------------------------------------------------------
 
@@ -318,6 +128,21 @@ CREATE TABLE `orderdetails` (
   `payment_id` int(11) DEFAULT NULL,
   `product_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `orderdetails`
+--
+
+INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
+(108, 8, 'Boysen Paint', 100, 1, 100, 'Returned', '2024-11-04', '2024-11-04 19:06:00.000000', 'Caloocan', 'Gallon', 53, 46),
+(109, 8, 'Boysen Gloss', 100, 1, 100, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 47),
+(110, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 50),
+(111, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 49),
+(120, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:32:00.000000', 'Caloocan', 'Gallon', 57, 50),
+(121, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:33:00.000000', 'Caloocan', 'Gallon', 58, 49),
+(122, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 60, 47),
+(123, 8, 'Latex Paint', 100, 1, 100, 'Verification', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 61, 51),
+(124, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-09', '2024-11-10 05:19:00.000000', 'Caloocan', 'Gallon', 59, 47);
 
 -- --------------------------------------------------------
 
@@ -609,13 +434,14 @@ CREATE TABLE `paymentform` (
 --
 
 INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`, `months_paid`) VALUES
-(44, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:01:19', NULL, 'Confirmed', 0),
-(45, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-10-20 15:26:24', NULL, 'Confirmed', 0),
-(46, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/august.png', '2024-10-24 14:33:54', NULL, 'verification', 0),
-(48, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:41:44', NULL, 'verification', 0),
-(49, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:44:07', NULL, 'verification', 0),
-(50, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 215.00, './uploaded_images/april.png', '2024-10-24 14:52:56', NULL, 'verification', 0),
-(52, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', NULL, '', '2024-10-30 01:11:37', NULL, 'Confirmed', 0);
+(53, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 50.00, './uploaded_images/person-1.jpg', '2024-11-03 19:17:09', NULL, 'Confirmed', 0),
+(54, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 340.00, './uploaded_images/person-4.jpg', '2024-11-03 19:29:17', NULL, 'failed', 0),
+(56, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 900.00, './uploaded_images/THALO GREEN acrylic.jpeg', '2024-11-08 07:42:56', NULL, 'failed', 0),
+(57, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 60.00, './uploaded_images/TOULIDINE RED.jpeg', '2024-11-08 07:43:15', NULL, 'Confirmed', 0),
+(58, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 120.00, './uploaded_images/BURNT UMBER.jpeg', '2024-11-08 07:43:34', NULL, 'Confirmed', 0),
+(59, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/BURNT UMBER.jpeg', '2024-11-09 05:20:23', NULL, 'Returned', 0),
+(60, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/MAHOGANY BROWN.jpeg', '2024-11-09 05:38:41', NULL, 'Returned', 0),
+(61, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/ORIENT GOLD.jpeg', '2024-11-09 05:39:01', NULL, 'verification', 0);
 
 -- --------------------------------------------------------
 
@@ -662,8 +488,11 @@ INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`) VAL
 (18, 'Acrylic', 2, 'Paint'),
 (19, 'Flat Paint', 2, 'Paint'),
 (20, 'Matte Finish', 2, 'Paint'),
-(21, 'Aluminum Paint', 10, 'Paint'),
-(22, 'Gloss', 10, 'Paint');
+(26, 'Paint Brush', 12, 'Tool'),
+(27, 'Spray Gun', 12, 'Tool'),
+(28, 'Gloss', 12, 'Paint'),
+(29, 'Gloss', 10, 'Paint'),
+(30, 'Latex Paint', 10, 'Paint');
 
 -- --------------------------------------------------------
 
@@ -681,6 +510,28 @@ CREATE TABLE `returnitems` (
   `product_name` varchar(255) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `return_payments`
+--
+
+CREATE TABLE `return_payments` (
+  `return_payment_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `return_status` text DEFAULT NULL,
+  `proof_of_payment` text DEFAULT NULL,
+  `amount_return` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `return_payments`
+--
+
+INSERT INTO `return_payments` (`return_payment_id`, `user_id`, `return_status`, `proof_of_payment`, `amount_return`) VALUES
+(6, 8, 'Returned', 'refund_1731140910_672f1d2e432fd_LAMP BLACK.jpeg', 100),
+(7, 8, 'Returned', 'refund_1731142230_672f225689324_LAMP BLACK.jpeg', 100);
 
 -- --------------------------------------------------------
 
@@ -704,7 +555,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`) VALUES
-(6, 'admin@email.com', 'admin', 'admin', 'r', 'r', '09123456778', 'Admin'),
+(6, 'admin@email.com', 'admin', 'admin', 'administrator', 'Ilocos Norte', '09123456778', 'Admin'),
 (8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer'),
 (17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier');
 
@@ -719,6 +570,13 @@ CREATE TABLE `wishlist` (
   `user_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `wishlist`
+--
+
+INSERT INTO `wishlist` (`wish_id`, `user_id`, `item_id`) VALUES
+(6, 0, 47);
 
 --
 -- Indexes for dumped tables
@@ -793,6 +651,12 @@ ALTER TABLE `returnitems`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `return_payments`
+--
+ALTER TABLE `return_payments`
+  ADD PRIMARY KEY (`return_payment_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -818,25 +682,25 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -848,7 +712,7 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
@@ -860,7 +724,7 @@ ALTER TABLE `payment_track`
 -- AUTO_INCREMENT for table `product_type`
 --
 ALTER TABLE `product_type`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `returnitems`
@@ -869,16 +733,22 @@ ALTER TABLE `returnitems`
   MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `return_payments`
+--
+ALTER TABLE `return_payments`
+  MODIFY `return_payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
