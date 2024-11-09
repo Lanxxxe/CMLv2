@@ -827,10 +827,10 @@ function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment
     function resetOrder(orderId, paymentType) {
         Swal.fire({
             title: 'Are you sure?',
-            text: "You are about to reject this order!",
+            text: "You are about to cancel this order!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, reset it!',
+            confirmButtonText: 'Yes, cancel it!',
             cancelButtonText: 'No, cancel!',
             reverseButtons: true
         }).then((result) => {
