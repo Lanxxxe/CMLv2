@@ -296,6 +296,25 @@ require_once 'config.php';
         height: 125px !important;
     }
 }
+
+
+    #loading {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(192, 192, 192, 0.5);
+      background-image: url("../ForgotPassword/images/loading.gif");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .hide {
+      display: none !important;
+    }
 </style>
 
 </head>
@@ -638,6 +657,11 @@ if (isset($_GET['delete_return_id'])) {
                                     </a>                                
                                     <a class="btn btn-warning" href="javascript:cancelOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Cancel Order</a>
                                     <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
+
+                                    <a class="btn btn-info" href="javascript:sendReminder('<?php echo htmlspecialchars($row['payment_id']); ?>');">
+                                        <span class='glyphicon glyphicon-envelope'></span> Send Reminder
+                                    </a>
+
                                 </td>
                             </tr>
                             <?php
@@ -712,6 +736,7 @@ if (isset($_GET['delete_return_id'])) {
         </div>
     </div>
 
+    <div id="loading" class="hide"></div>
 	<!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
@@ -854,6 +879,60 @@ function confirmOrder(orderId, paymentType, email, status, total, proofOfPayment
                 window.location.href = 'customers.php?delete_payment_id=' + orderId + '&payment_type=' + encodeURIComponent(paymentType);
             }
         });
+    }
+
+    const setVisible = (elementOrSelector, visible) => {
+      const element = document.querySelector(elementOrSelector);
+      if (visible) {
+        element.classList.remove("hide");
+      } else {
+        element.classList.add("hide");
+      }
+    };
+
+    function sendReminder(payment_id) {
+        const form = new FormData();
+        form.append('payment_id', payment_id);
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action will send payment reminder to customer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            setVisible("#loading", true);
+            if (result.isConfirmed) {
+                fetch('sent_reminder.php', {
+                    method: 'POST',
+                    body: form,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    setVisible("#loading", false);
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Email Successfully Sent',
+                            text: 'Payment reminder sent successfully!',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Email Failed To Sent',
+                            text: data.message,
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                        });
+                    }
+                });
+            }
+        });
+
     }
 </script>
 
