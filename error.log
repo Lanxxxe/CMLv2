@@ -2015,3 +2015,5 @@
 (2024-11-08 08:33:09) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
 (2024-11-08 08:33:09) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
 (2024-11-08 08:33:09) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-09 10:10:22) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-09 10:10:22) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70

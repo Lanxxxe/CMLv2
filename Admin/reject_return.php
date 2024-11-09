@@ -21,4 +21,5 @@ if (isset($_GET['return_id'])) {
 } else {
     echo json_encode(['success' => false, 'message' => 'No return ID provided.']);
 }
-?>
+
+

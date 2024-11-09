@@ -229,7 +229,7 @@ function isActivated($s) {
                             <td><?php echo htmlspecialchars($row['order_pick_place']); ?></td>
                             <td>&#8369; <?php echo htmlspecialchars($row['order_total']); ?></td>
                             <td style="cursor: pointer;" 
-                                <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification') 
+                                <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') 
                                     ? "onclick=\"changeStatus('" . htmlspecialchars($row['user_id']) . "', '" . htmlspecialchars($row['payment_id']) . "')\"" 
                                     : ''; 
                                 ?>>                                
@@ -251,7 +251,7 @@ function isActivated($s) {
                                         echo 'N/A';
                                     }
 
-                                    if (!$payment_id && $order_status != 'Pending' || $order_status != 'Verification') {
+                                    if ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') {
                                         echo ' <i class="fa fa-caret-square-o-down"></i>';
                                     }
                                 ?> 
@@ -383,8 +383,6 @@ function isActivated($s) {
                                 text: data.message || 'An error occurred while updating the order status.'
                             });
                         }
-                        console.log(data.success);
-                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error updating order status:', error);
