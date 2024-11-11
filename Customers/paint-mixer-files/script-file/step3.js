@@ -11,7 +11,6 @@ function clearPickedColors2() {
   }
 }
 
-
 function displayPickedColors2(visualizer, pickedColors) {
   if (!pickedColors || Object.keys(pickedColors).length <= 0 || typeof(pickedColors) !== 'object') {
     window.location.href = "color-change.php?step=2";

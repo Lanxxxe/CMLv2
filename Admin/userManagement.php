@@ -87,10 +87,10 @@ if(isset($_GET['brand_id'])) {
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['user_id']); ?></td>
                                         <td><?php echo htmlspecialchars($row['user_email']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_firstname']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_lastname']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_address']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_mobile']); ?></td>
+                                        <td>Null</td>
+                                        <td>Null</td>
+                                        <td>Null</td>
+                                        <td>Null</td>
                                         <td>
                                             <button class="btn btn-sm btn-warning" style="color: #fff !important;"
                                                 onclick="displayEditUser('<?php echo htmlspecialchars($row['user_id']) ?? ''; ?>', 
@@ -150,10 +150,10 @@ if(isset($_GET['brand_id'])) {
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['user_id']); ?></td>
                                         <td><?php echo htmlspecialchars($row['user_email']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_firstname']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_lastname']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_address']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['user_mobile']); ?></td>
+                                        <td>Null</td>
+                                        <td>Null</td>
+                                        <td>Null</td>
+                                        <td>Null</td>
                                         <td>
                                             <button class="btn btn-sm btn-warning" style="color: #fff !important;"
                                                 onclick="displayEditUser('<?php echo htmlspecialchars($row['user_id']) ?? ''; ?>', 

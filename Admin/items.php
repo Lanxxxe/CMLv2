@@ -135,7 +135,7 @@ if (isset($_GET['delete_id'])) {
 
 
                                         <a class="btn btn-info" href="javascript:void(0)" title="Edit Item" onclick="return confirmEdit('<?php echo $row['item_id']; ?>')">
-                                            <span class='glyphicon glyphicon-pencil'></span> Edit Item
+                                            <span class='glyphicon glyphicon-pencil'></span> Update
                                         </a>
 
                                         <a class="btn btn-danger" href="javascript:void(0)" title="Remove Item" onclick="return confirmDelete('<?php echo $row['item_id']; ?>')">

@@ -9,7 +9,7 @@ include_once 'config.php';
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h2 style="color:white" class="modal-title" id="myModalLabel">Upload Paint Products</h2>
+                <h2 style="color:white" class="modal-title" id="myModalLabel">Add Items</h2>
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data" method="post" id="uploadpaints">
@@ -116,7 +116,7 @@ include_once 'config.php';
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h2 style="color:white" class="modal-title" id="myModalLabel">Upload Items</h2>
+                <h2 style="color:white" class="modal-title" id="myModalLabel">Add Items</h2>
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data" method="post" id="uploadItemsForm">

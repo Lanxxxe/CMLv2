@@ -12,9 +12,9 @@
         <ul class="nav navbar-nav side-nav">
             <li id="nav_home"><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
             <li id="nav_dashboard"><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Dashboard</a></li>
-            <li id="nav_add_stock"><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Stock</a></li>
-            <li id="nav_add_tools"><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Tools Products</a></li>
-            <li id="nav_item_management"><a href="items.php"> &nbsp; &nbsp; &nbsp; Item Management</a></li>
+            <li id="nav_add_stock"><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
+            <li id="nav_add_tools"><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Paint Tools</a></li>
+            <li id="nav_item_management"><a href="items.php"> &nbsp; &nbsp; &nbsp; Inventory</a></li>
             <li id="nav_order_request"><a href="customers.php"> &nbsp; &nbsp; &nbsp; Order Request</a></li>
             <li id="nav_return_request"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Return Request</a></li>
             <li id="nav_sales_report"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>

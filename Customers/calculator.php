@@ -120,7 +120,7 @@ try {
 
                         <div class="form-group" style="font-size: 20px;">
                             <label class="form-label">Surface Area (m2): </label>
-                            <input class="form-control" id="surfaceArea" type="text">
+                            <input class="form-control" id="surfaceArea" type="text" readonly>
                         </div>
                         
                         <div class="row">
@@ -130,13 +130,13 @@ try {
                             </div>
                             <div class="form-group col-md-6" style="font-size: 20px;">
                                 <label class="form-label">Gallons in Total: </label>
-                                <input class="form-control" id="totalGallons" type="text">
+                                <input class="form-control" id="totalGallons" type="text" readonly>
                             </div>
                         </div>
 
                         <div class="form-group" style="font-size: 20px;">
                             <label class="form-label">Total Price: </label>
-                            <input class="form-control" id="totalPrice" value="0" type="text">
+                            <input class="form-control" id="totalPrice" value="0" min="1" type="text" readonly>
                         </div>
                     </div>
 

@@ -159,4 +159,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function calendarRestriction() {
+            // Get the current date
+            const today = new Date();
+    
+            // Set the date to tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+    
+            // Format the date to YYYY-MM-DDTHH:MM
+            const formattedTomorrow = tomorrow.toISOString().slice(0, 16);
+            
+            // Set the min attribute to tomorrow
+            const dateInput = document.getElementById('pickupDate');
+            dateInput.setAttribute('min', formattedTomorrow);
+            dateInput.value = formattedTomorrow; // Set default to tomorrow
+    
+            // Optional: Add an event listener to reset the date if clicked
+            dateInput.addEventListener('click', function () {
+                dateInput.value = formattedTomorrow; // Reset to tomorrow when clicked
+            });
+        }
+
+
+        calendarRestriction();
 </script>

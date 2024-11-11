@@ -644,11 +644,12 @@ if (isset($_GET['delete_return_id'])) {
 
                     if (count($data) > 0) {
                         foreach ($data as $row) {
+                            $displayType = ($row['payment_type'] === "Down Payment") ? "Partial Payment" : $row['payment_type'];
                             ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($row['payment_id']); ?></td>
                                 <td><?php echo htmlspecialchars($row['user_email']); ?></td>
-                                <td><?php echo htmlspecialchars($row['payment_type']); ?></td>
+                                <td><?php echo htmlspecialchars($displayType); ?></td>
                                 <td><?php echo htmlspecialchars($row['order_status']); ?></td>
                                 <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
                                 <td>
@@ -656,7 +657,7 @@ if (isset($_GET['delete_return_id'])) {
                                         <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order
                                     </a>                                
                                     <a class="btn btn-warning" href="javascript:cancelOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>');" title="click for reset"><span class='glyphicon glyphicon-ban-circle'></span> Cancel Order</a>
-                                    <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> Previous Items Ordered</a>
+                                    <a class="btn btn-primary" href="previous_orders.php?previous_id=<?php echo htmlspecialchars($row['payment_id']); ?>"><span class='glyphicon glyphicon-eye-open'></span> View Items Ordered</a>
 
                                     <a class="btn btn-info" href="javascript:sendReminder('<?php echo htmlspecialchars($row['payment_id']); ?>');">
                                         <span class='glyphicon glyphicon-envelope'></span> Send Reminder

@@ -283,13 +283,16 @@ extract($edit_row);
         const dateTime = new Date(dateTimeString);
         return dateTime.toLocaleString('en-US', options);
     }
+    
+    let currentUser = `'<?php echo $_SESSION['user_type'] ?>'`;
+    console.log(currentUser);
 
     function viewReceipt(orderId, paymentId) {
       // console.log('Function called with:', orderId, paymentId); // Debug log
       document.getElementById("receipt-error").style.display = "none";
       document.getElementById("receipt-body").style.display = "block";
       
-      fetch(`getOrderDetails.php?order_id=${orderId}&payment_id=${paymentId}`)
+      fetch(`getOrderDetails.php?order_id=${orderId}&payment_id=${paymentId}&userType=${currentUser}`)
           .then(response => {
               // console.log('Raw response:', response); // Debug log
               return response.json();

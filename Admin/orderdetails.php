@@ -192,8 +192,8 @@ function isActivated($s) {
                     <th>Pick Up Date</th>
                     <th>Pick Up Place</th>
                     <th>Total</th>
-                    <th>Status</th>
                     <th>Actions</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -228,6 +228,7 @@ function isActivated($s) {
                             <td><?php echo htmlspecialchars($formattedDate); ?></td>
                             <td><?php echo htmlspecialchars($row['order_pick_place']); ?></td>
                             <td>&#8369; <?php echo htmlspecialchars($row['order_total']); ?></td>
+							<td><?php echo htmlspecialchars($row['order_status']) ?></td>
                             <td style="cursor: pointer;" 
                                 <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') 
                                     ? "onclick=\"changeStatus('" . htmlspecialchars($row['user_id']) . "', '" . htmlspecialchars($row['payment_id']) . "')\"" 
@@ -238,7 +239,7 @@ function isActivated($s) {
                                     $due = (new DateTime($row['order_date'])) < (new DateTime());
                                     $payment_id = $row['payment_id'];
                                     if ($due && $order_status === 'Confirmed') {
-                                        echo 'Picked up';
+                                        echo 'To be picked up';
                                     } elseif (!$due && $order_status === 'Confirmed') {
                                         echo 'Waiting';
                                     } elseif ($order_status === 'Pending' || $order_status === 'Verification') {
@@ -256,7 +257,6 @@ function isActivated($s) {
                                     }
                                 ?> 
                             </td>
-							<td><?php echo htmlspecialchars($row['order_status']) ?></td>
                         </tr>
                         <?php
                         }
