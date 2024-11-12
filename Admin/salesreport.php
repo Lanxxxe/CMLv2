@@ -343,7 +343,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             <div class="sales-report-container">
                 <h1 class="pageTitle">Sales Report</h1>
 
-            <div id="analyticReports">
+            <div id="analyticReports" >
                 <div id="trpContainer">
                     <canvas id="topRequestedProduct"></canvas>
                 </div>
@@ -656,7 +656,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                         top: 0,
                         bottom: 10
                     }
-                }
+                },
             }
         });
 

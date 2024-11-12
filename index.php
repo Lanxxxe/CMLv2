@@ -351,6 +351,7 @@ session_start();
     </div>
     </div>
     <!-- COURSES SECTION END-->
+     
     <!-- Registration Modal -->
     <div class="modal fade" id="su" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
         <div class="modal-dialog modal-sm">
@@ -372,8 +373,20 @@ session_start();
                                     <input class="form-control" placeholder="Lastname" name="ruser_lastname" type="text"
                                         required>
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <input class="form-control" placeholder="Address" name="ruser_address" type="text"
+                                        required>
+                                </div> -->
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Brgy/Subdivision" name="ruser_brgy" type="text"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Municipality" name="ruser_municipality" type="text"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="City/Province" name="ruser_CProvince" type="text"
                                         required>
                                 </div>
                                 <div class="form-group">
@@ -382,7 +395,8 @@ session_start();
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Password" name="ruser_password" type="password"
-                                        required>
+                                        required onkeyup="checkPassword(this)">
+                                    <small id="passwordFeedback" class="form-text text-white"></small>
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control mobile-number-input" placeholder="Mobile Number" name="ruser_mobile" type="text" minlength="11" maxlength="11" pattern="09[0-9]{9}"
@@ -474,8 +488,6 @@ session_start();
 
 
                             <fieldset>
-
-
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Username" name="admin_username" type="text"
                                         required>
@@ -485,7 +497,6 @@ session_start();
                                     <input class="form-control" placeholder="Password" name="admin_password" type="password"
                                         required>
                                 </div>
-
                             </fieldset>
 
 
@@ -528,6 +539,28 @@ session_start();
 
 
     <script>
+        function checkPassword(input) {
+            // Get the password value
+            var password = input.value;
+
+            // Regular expression to check for at least one uppercase letter, one lowercase letter, and one number
+            var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+            
+            // Check if the password matches the regex
+            if (passwordRegex.test(password)) {
+                // Password is valid
+                input.classList.remove("is-invalid");
+                input.classList.add("is-valid");
+                document.getElementById("passwordFeedback").textContent = "Password is valid!";
+            } else {
+                // Password is invalid
+                input.classList.remove("is-valid");
+                input.classList.add("is-invalid");
+                document.getElementById("passwordFeedback").textContent = "* Password must contain at least one uppercase letter, one lowercase letter, and one number, and be at least 8 characters long.";
+            }
+        }
+
+
         document.querySelectorAll('.mobile-number-input').forEach(element => {
             element.addEventListener('input', event => {
                 let txt = "";
@@ -539,6 +572,7 @@ session_start();
                 element.value = txt;
             });
         });
+
 
     document.addEventListener('DOMContentLoaded', function () {
         const setVisible = (elementOrSelector, visible) => {
