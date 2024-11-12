@@ -11,8 +11,8 @@ try {
     if (isset($_GET['return_id'])) {
         $return_id = $_GET['return_id'];
 
-        // $stmt_confirmed = $DB_con->prepare('UPDATE returnitems SET status = "Confirmed" WHERE return_id = :return_id');
-        $stmt_confirmed = $DB_con->prepare('CALL ProcessReturnItems(:return_id)');
+        $stmt_confirmed = $DB_con->prepare('UPDATE returnitems SET status = "Confirmed" WHERE return_id = :return_id');
+        // $stmt_confirmed = $DB_con->prepare('CALL ProcessReturnItems(:return_id)');
         $stmt_confirmed->bindParam(':return_id', $return_id);
         
         if ($stmt_confirmed->execute()) {

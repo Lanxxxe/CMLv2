@@ -454,9 +454,9 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                         </a>
                     </div>
                     <div class="transactions-actions">
-                        <!-- <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary"> -->
-                        <!--     <i class="fa fa-file-pdf-o"></i> Save PDF -->
-                        <!-- </a> -->
+                        <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary">
+                            <i class="fa fa-file-pdf-o"></i> Save PDF
+                        </a>
                         <button type="button" class="action-btn btn btn-primary" onclick="printContent('page-wrapper')">
                             <i class="fa fa-print"></i> Print
                         </button>

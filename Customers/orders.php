@@ -76,7 +76,7 @@ extract($edit_row);
               <th>Quantity</th>
               <th>Pick Up Date</th>
               <th>Pick Up Place</th>
-              <th>Total</th>
+              <!-- <th>Total</th> -->
               <th>Order Status</th>
               <th>Action</th>
             </tr>
@@ -102,7 +102,7 @@ extract($edit_row);
                   <td><?php echo $order_quantity . " " . $gl; ?></td>
                   <td><?php echo $formattedDate; ?></td>
                   <td><?php echo $order_pick_place; ?></td>
-                  <td>&#8369; <?php echo $order_total; ?> </td>
+                  <!-- <td>&#8369; <?php echo $order_total; ?> </td> -->
                   <td><?php echo $order_status ?></td>
                   <td>
                     <button class="btn btn-primary" onclick="viewReceipt('<?php echo htmlspecialchars($order_id); ?>', '<?php echo htmlspecialchars($payment_id); ?>')">View Receipt</button>
