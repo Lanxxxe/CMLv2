@@ -23,6 +23,7 @@ try {
         $payment_id = $_POST['payment_id'] ?? null;
         $return_amount = $_POST['return_amount'] ?? null;
         $user_id = $_POST['user_id'] ?? null;
+        $o_quantity = $_POST['order_quantity'] ?? null;
         $return_image = $_FILES['return_image'] ?? null;
         $return_status = 'Returned';
 
@@ -81,9 +82,9 @@ try {
         }
 
         // Update the payment status to 'Refunded' and log the refund
-        $insertstmt = $DB_con->prepare("INSERT INTO return_payments (user_id, return_status, proof_of_payment, amount_return)
-            VALUES (?, ?, ?, ?)");
-        $insertstmt->execute([$user_id,  $return_status, $file_name, $return_amount]);
+        $insertstmt = $DB_con->prepare("INSERT INTO return_payments (user_id, return_status, proof_of_payment, amount_return, quantity)
+            VALUES (?, ?, ?, ?, ?)");
+        $insertstmt->execute([$user_id,  $return_status, $file_name, $return_amount, $o_quantity]);
 
         // Check if the update was successful
         if ($insertstmt->rowCount() > 0) {

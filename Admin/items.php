@@ -42,6 +42,8 @@ if (isset($_GET['delete_id'])) {
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/chart.umd.min.js"></script>
+
 
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
     <script src="js/datatables.min.js"></script>
@@ -241,19 +243,14 @@ if (isset($_GET['delete_id'])) {
     <div id="wrapper">
         <?php include("navigation.php"); ?>
 
-
         <div id="page-wrapper">
-
-
             <div class="alert alert-danger">
-
                 <center>
-                    <h3><strong>Item Management</strong> </h3>
+                    <h3><strong>Inventory</strong> </h3>
                 </center>
-
             </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive mt-5" style="margin-top: 50px;">
                     <div class="custom-btns">
                         <a href="generate_inventory_pdf.php" class="action-btn btn btn-primary">
                             <i class="fa fa-file-pdf-o"></i> Save PDF
@@ -262,6 +259,12 @@ if (isset($_GET['delete_id'])) {
                             <i class="fa fa-print"></i> Print
                         </button>
                     </div>
+                <br />
+
+                <div id="trpContainer">
+                    <canvas id="quantityChart" height="600px"></canvas>
+                </div>
+            
                 <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
                     <thead>
                         <tr>
@@ -332,40 +335,40 @@ if (isset($_GET['delete_id'])) {
                                         </a>
                                         <!-- <a class="btn btn-info" href="edititem.php?edit_id=<?php echo $row['item_id']; ?>" title="click for edit" onclick="return confirm('Are you sure edit this item?')"><span class='glyphicon glyphicon-pencil'></span> Edit Item</a> 
 				
-                  <a class="btn btn-danger" href="?delete_id=<?php echo $row['item_id']; ?>" title="click for delete" onclick="return confirm('Are you sure to remove this item?')"><span class='glyphicon glyphicon-trash'></span> Remove Item</a>
-				 -->
+                                        <a class="btn btn-danger" href="?delete_id=<?php echo $row['item_id']; ?>" title="click for delete" onclick="return confirm('Are you sure to remove this item?')"><span class='glyphicon glyphicon-trash'></span> Remove Item</a>
+                                        -->
                                     </td>
                                 </tr>
 
                             <?php
                             }
-                            echo "</tbody>";
-                            echo "</table>";
-                            echo "</div>";
-                            echo "<br />";
-                            echo '<div class="alert alert-default" style="background-color:#033c73;">
-                       <p style="color:white;text-align:center;">
-                       &copy 2024 CML Paint Trading Shop | All Rights Reserved 
+                    echo "</tbody>";
+                echo "</table>";
+            echo "</div>";
+            echo "<br />";
+                echo '<div class="alert alert-default" style="background-color:#033c73;">
+                <p style="color:white;text-align:center;">
+                &copy 2024 CML Paint Trading Shop | All Rights Reserved 
 
-						</p>
+                </p>
                         
+                 </div>
+	    </div>';
+
+    echo "</div>";
+                } else {
+                    ?>
+
+
+                    <div class="col-xs-12">
+                        <div class="alert alert-warning">
+                            <span class="glyphicon glyphicon-info-sign"></span> &nbsp; No Data Found ...
+                        </div>
                     </div>
-	</div>';
+                <?php
+                }
 
-                            echo "</div>";
-                        } else {
-                            ?>
-
-
-                            <div class="col-xs-12">
-                                <div class="alert alert-warning">
-                                    <span class="glyphicon glyphicon-info-sign"></span> &nbsp; No Data Found ...
-                                </div>
-                            </div>
-                        <?php
-                        }
-
-                        ?>
+                ?>
 
             </div>
         </div>
@@ -373,7 +376,7 @@ if (isset($_GET['delete_id'])) {
         <br />
         <br />
 
-    </div>
+        </div>
     </div>
 
 
@@ -386,10 +389,136 @@ if (isset($_GET['delete_id'])) {
     </div>
     <!-- /#wrapper -->
 
-
     <!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $('#example').dataTable();
+
+            // Define arrays to store data
+            const itemNames = [];
+            const itemQuantities = [];
+
+            // Fetch item data from the PHP loop
+            <?php
+            // Reset the statement to ensure we can fetch the data again
+            $getProduct = $DB_con->prepare('SELECT * FROM items');
+            $getProduct->execute();
+            while ($row = $getProduct->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                // Pass item names and quantities to JavaScript
+                ?>
+                itemNames.push("<?php echo $item_name . (($gl) ? " (" . $gl . ")" : "") ?>");
+                itemQuantities.push(<?php echo $quantity; ?>);
+                console.log("<?php echo $item_name . (($gl) ? " (" . $gl . ")" : "") ?>");
+            <?php } ?>
+
+            // Initialize Chart.js
+            const ctx = document.getElementById('quantityChart');
+            new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: itemNames,
+                datasets: [{
+                    label: 'Inventory Products',
+                    data: itemQuantities,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',  // Blue
+                        'rgba(16, 185, 129, 0.8)',  // Green
+                        'rgba(245, 158, 11, 0.8)',  // Orange
+                        'rgba(236, 72, 153, 0.8)',  // Pink
+                        'rgba(139, 92, 246, 0.8)'   // Purple
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(236, 72, 153, 1)',
+                        'rgba(139, 92, 246, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    maxBarThickness: 40
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 13,
+                                family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Inventory',
+                        font: {
+                            size: 16,
+                            weight: 'bold',
+                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Quantity'
+                        },
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: true,
+                            drawOnChartArea: true,
+                            drawTicks: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {title: {
+                            display: true,
+                            text: 'Item'
+                        },
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 20,
+                        right: 20,
+                        top: 0,
+                        bottom: 10
+                    }
+                },
+            }
+        });
+
+        });
+    </script>
 
     <script>
         document.querySelector("#nav_item_management").className = "active";
@@ -428,6 +557,7 @@ if (isset($_GET['delete_id'])) {
             return false; // Prevent default link behavior
         }
     </script>
+
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             const table = $('#example').dataTable();

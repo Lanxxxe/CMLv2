@@ -2544,3 +2544,43 @@
 2024-11-12 04:31:51 [42000] - SQLSTATE[42000]: Syntax error or access violation: 1305 PROCEDURE cml_paint_db.ProcessReturnItems does not exist in C:\xampp\htdocs\CMLv2\Admin\confirm_return.php:18
 (2024-11-12 04:39:31) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
 (2024-11-12 04:39:31) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-12 18:16:36) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:36) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:36) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-12 18:16:40) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:40) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:40) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-12 18:16:52) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:52) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-12 18:16:52) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-13 03:16:23) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:16:23) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:16:23) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:16:23) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:16) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-13 03:32:16) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-13 03:32:16) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-13 03:32:18) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:18) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:18) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:18) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:20) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:20) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:22) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:22) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:23) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:23) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-13 03:32:26) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-13 03:32:26) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-14 02:29:47) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-14 02:29:47) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-14 02:29:47) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-14 02:34:30) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-14 02:34:30) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-14 02:34:33) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-14 02:34:33) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-14 04:18:22) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-14 04:18:22) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-14 04:18:22) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-14 04:18:25) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-14 04:18:25) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70

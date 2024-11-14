@@ -518,21 +518,21 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             <div class="sales-report-container">
                 <h1 class="pageTitle hide-in-print">Sales Report</h1>
 
-            <div id="analyticReports" class="hide-in-print">
-                <div id="trpContainer">
-                    <canvas id="topRequestedProduct"></canvas>
-                </div>
+                <div id="analyticReports"  class="hide-in-print">
+                            <div id="trpContainer">
+                                <canvas id="topRequestedProduct" height="800px"></canvas>
+                            </div>
 
-                <div class="sales-report-content">
-                    <?php
-                        $order_type_str = '';
-                        if (isset($order_type)) {
-                            if($order_type === 'walk_in') {
-                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
-                            } else if($order_type === 'gcash') {
-                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                    <div class="sales-report-content">
+                        <?php
+                            $order_type_str = '';
+                            if (isset($order_type)) {
+                                if($order_type === 'walk_in') {
+                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                                } else if($order_type === 'gcash') {
+                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                                }
                             }
-                        }
 
                         $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
                         $stmt_dates->execute();
@@ -591,53 +591,53 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                         $monthlyEndDate = $end_date;
                     ?>
 
-                    <!-- Daily Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
-                            <p>Daily Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
+                        <!-- Daily Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
+                                <p>Daily Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
+                            </div>
+                            <img src="./local_image/daily.jpeg" alt="Daily Sales">
                         </div>
-                        <img src="./local_image/daily.jpeg" alt="Daily Sales">
-                    </div>
-                    
-                    <!-- Weekly Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#weeklySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
-                            <p>Weekly Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+                        
+                        <!-- Weekly Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#weeklySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
+                                <p>Weekly Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+                            </div>
+                            <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
                         </div>
-                        <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
+
+                        <!-- Monthly Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#monthlySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
+                                <p>Monthly Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
+                            </div>
+                            <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
+                        </div>
                     </div>
 
-                    <!-- Monthly Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#monthlySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
-                            <p>Monthly Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
-                        </div>
-                        <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
-                    </div>
                 </div>
 
-            </div>
+                <div class="sales-report-transactions">
 
-            <div class="sales-report-transactions">
-
-                <div class="transactions-header hide-in-print">
-                    <div class="transactions-tabs">
-                        <a href="./salesreport.php" class="tab-btn <?php echo (!$order_type ? 'active' : ''); ?>">
-                            All Transactions
-                        </a>
-                        <a href="./salesreport.php?order_type=walk_in" class="tab-btn <?php echo ($order_type === 'walk_in' ? 'active' : ''); ?>">
-                            Walk In Transactions
-                        </a>
-                        <a href="./salesreport.php?order_type=gcash" class="tab-btn <?php echo ($order_type === 'gcash' ? 'active' : ''); ?>">
-                            GCash Transactions
-                        </a>
-                    </div>
+                    <div class="transactions-header hide-in-print">
+                        <div class="transactions-tabs">
+                            <a href="./salesreport.php" class="tab-btn <?php echo (!$order_type ? 'active' : ''); ?>">
+                                All Transactions
+                            </a>
+                            <a href="./salesreport.php?order_type=walk_in" class="tab-btn <?php echo ($order_type === 'walk_in' ? 'active' : ''); ?>">
+                                Walk In Transactions
+                            </a>
+                            <a href="./salesreport.php?order_type=gcash" class="tab-btn <?php echo ($order_type === 'gcash' ? 'active' : ''); ?>">
+                                GCash Transactions
+                            </a>
+                        </div>
 
                     <form id="dateFilterForm" class="date-filter-form">
                         <?php if ($order_type): ?>
@@ -698,23 +698,23 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                     </div>
                 </div>
 
-                <div class="transactions-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Transaction Date</th>
-                                <th>Invoice No.</th>
-                                <th>Customer</th>
-                                <th>Products Ordered</th>
-                                <th>Quantity</th>
-                                <th>Total Amount</th>
-                                <th>Payment Method</th>
-                                <th>Order Status</th>
-                            </tr>
-                        </thead>    
-                        <tbody class="table-striped">
-                            <?php
-                            $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
+                    <div class="transactions-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction Date</th>
+                                    <th>Invoice No.</th>
+                                    <th>Customer</th>
+                                    <th>Products Ordered</th>
+                                    <th>Quantity</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Order Status</th>
+                                </tr>
+                            </thead>    
+                            <tbody class="table-striped">
+                                <?php
+                                $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
 
                             $stmt = $DB_con->prepare('
                                 SELECT 
@@ -733,37 +733,37 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                             $stmt->execute([$end_date]);
 
 
-                            if ($stmt->rowCount() > 0) {
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
-                                    $orderDate = date('M d, Y', strtotime($row['order_date']));
-                                    $statusClass = strtolower($row['order_status']) == 'completed' ? 'status-completed' : 
-                                                 (strtolower($row['order_status']) == 'cancelled' ? 'status-cancelled' : 'status-pending');
+                                if ($stmt->rowCount() > 0) {
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
+                                        $orderDate = date('M d, Y', strtotime($row['order_date']));
+                                        $statusClass = strtolower($row['order_status']) == 'completed' ? 'status-completed' : 
+                                                    (strtolower($row['order_status']) == 'cancelled' ? 'status-cancelled' : 'status-pending');
+                                        ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($orderDate); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_id']); ?></td>
+                                            <td><?php echo htmlspecialchars($customerName); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
+                                            <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
+                                            <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
+                                            <td><span class="order-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['order_status']); ?></span></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                } else {
                                     ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($orderDate); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($customerName); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
-                                        <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
-                                        <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
-                                        <td><span class="order-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['order_status']); ?></span></td>
+                                        <td colspan="8" style="text-align: center;">No transactions found.</td>
                                     </tr>
                                     <?php
                                 }
-                            } else {
                                 ?>
-                                <tr>
-                                    <td colspan="8" style="text-align: center;">No transactions found.</td>
-                                </tr>
-                                <?php
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
 
             </div>
@@ -891,7 +891,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                         top: 0,
                         bottom: 10
                     }
-                }
+                },
             }
         });
 

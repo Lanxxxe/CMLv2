@@ -266,7 +266,7 @@ if (isset($_GET['delete_return_id'])) {
 
     <div id="page-wrapper">
         <div class="alert alert-danger">
-            <center><h3><strong>Management Return Items</strong></h3></center>
+            <center><h3><strong>Return Request</strong></h3></center>
         </div>
         <div class="table-responsive">
             <table class="display table table-bordered" id="returnsTable" cellspacing="0" width="100%">

@@ -89,7 +89,7 @@ require_once 'config.php';
                         $cancel_payment_type = $_GET['payment_type'];
 
                         $getPaymentInformation = $DB_con->prepare("
-                            SELECT DISTINCT p.*, o.user_id 
+                            SELECT DISTINCT p.*, o.*
                             FROM paymentform p
                             JOIN orderdetails o ON p.id = o.payment_id
                             WHERE p.id = ?
@@ -109,7 +109,7 @@ require_once 'config.php';
                                     <p>Payment Type: <strong><?php echo htmlspecialchars($info['payment_type']); ?></strong></p>
                                     <p>Amount Paid: <strong>₱<?php echo htmlspecialchars($info['amount']); ?></strong></p>
                                     <p>Mobile Number: <strong><?php echo htmlspecialchars($info['mobile']); ?></strong></p>
-
+                                    
                                     <!-- Display Payment Proof Image -->
                                     <div class="pop-container">
                                         <label for="proof-of-payment">Proof of Payment:</label>
@@ -138,6 +138,7 @@ require_once 'config.php';
                                     <!-- Hidden inputs for passing payment ID and user ID -->
                                     <input type="hidden" name="payment_id" value="<?php echo htmlspecialchars($info['id']); ?>">
                                     <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($info['user_id']); ?>">
+                                    <input type="hidden" name="order_quantity" value="<?php echo htmlspecialchars($info['order_quantity']); ?>">
 
                                     <!-- Submit button -->
                                     <button type="submit" id="confirmRefundBtn" class="btn btn-primary process-button">Process Refund</button>

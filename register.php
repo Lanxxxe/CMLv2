@@ -138,8 +138,13 @@ try {
     $user_password = $_POST['ruser_password'];
     $user_firstname = $_POST['ruser_firstname'];
     $user_lastname = $_POST['ruser_lastname'];
-    $user_address = $_POST['ruser_address'];
+    // Address
+    $user_brgy = $_POST['ruser_brgy'];
+    $user_municipality = $_POST['ruser_municipality'];
+    $user_province = $_POST['ruser_CProvince'];
+    
     $user_mobile = $_POST['ruser_mobile'];
+    $user_address = $user_brgy . ', ' . $user_municipality . ', ' . $user_province ;
 
     $check_user = "SELECT * FROM users WHERE user_email='$user_email'";
     $run_query = mysqli_query($dbcon, $check_user);
