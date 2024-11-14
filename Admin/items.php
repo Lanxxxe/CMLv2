@@ -51,10 +51,193 @@ if (isset($_GET['delete_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+    <style>
+        .custom-btns {
+            display: flex;
+            justify-content: end;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            @page {
+                size: 800px auto;
+                margin: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body > *:not(#printable-inventory) {
+                display: none !important;
+            }
+            #printable-inventory {
+                display: block !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                z-index: 9999;
+                padding: 20px;
+            }
+
+            #printable-inventory .header {
+                text-align: right;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #333;
+                position: relative;
+            }
+            
+            #printable-inventory .company-name {
+                position: absolute;
+                left: 0;
+                top: 0;
+                font-size: 24px;
+                font-weight: bold;
+            }
+            
+            #printable-inventory .report-title {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            
+            #printable-inventory .report-info {
+                margin-top: 38px;
+                font-size: 12px;
+                text-align: right;
+                line-height: 13px;
+            }
+            
+            #printable-inventory table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 12px;
+            }
+            
+            #printable-inventory th {
+                background-color: #2c3e50 !important;
+                color: white !important;
+                padding: 10px;
+                text-align: left;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            #printable-inventory td {
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            #printable-inventory tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            #printable-inventory .status-low {
+                background-color: #df6540 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            #printable-inventory .status-medium {
+                background-color: #df9440 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            #printable-inventory .status-warning {
+                background-color: #d8df40 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            #printable-inventory .status-good {
+                background-color: #70df40 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #printable-inventory .page-number {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                font-size: 12px;
+                text-wrap: nowrap;
+            }
+
+            /* Hide all other elements when printing */
+            body > *:not(#printable-inventory) {
+                display: none !important;
+            }
+        }
+        </style>
+
 
 </head>
 
 <body>
+    <div id="printable-inventory" style="display: none;">
+        <div class="header">
+            <div class="company-name">CML Paint Trading</div>
+            <div class="report-info">
+                <div class="report-title">Inventory Report</div>
+                Date Printed: <?php echo date('F d, Y h:i A'); ?><br>
+                Printed by: <?php echo htmlspecialchars($_SESSION['admin_username']); ?>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name of Item</th>
+                    <th>Brand Name</th>
+                    <th>Product Type</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Expiration Date</th>
+                    <th>Date Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $stmt = $DB_con->prepare('SELECT * FROM items');
+                $stmt->execute();
+
+                if ($stmt->rowCount() > 0) {
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $date = new DateTime($row['item_date']);
+                        $date1 = new DateTime($row['expiration_date']);
+                        $formattedDate = $date->format('F j, Y');
+                        $formattedDate1 = $date1->format('F j, Y');
+                        
+                        ?>
+                        <tr>
+                            <td><?php echo $row['item_name'] . ($row['gl'] ? " (" . $row['gl'] . ")" : ""); ?></td>
+                            <td><?php echo htmlspecialchars($row['brand_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['type']); ?></td>
+                            <td>₱<?php echo number_format($row['item_price'], 2); ?></td>
+                            <td><?php echo $row['quantity'] . " " . $row['gl']; ?></td>
+                            <td><?php echo $formattedDate1; ?></td>
+                            <td><?php echo $formattedDate; ?></td>
+                        </tr>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No items found.</td>
+                    </tr>
+                    <?php
+                }
+                ?>
+            </tbody>
+        </table>
+        <div class="page-number"></div>
+    </div>
+
     <div id="wrapper">
         <?php include("navigation.php"); ?>
 
@@ -70,9 +253,15 @@ if (isset($_GET['delete_id'])) {
 
             </div>
 
-            <br />
-
             <div class="table-responsive">
+                    <div class="custom-btns">
+                        <a href="generate_inventory_pdf.php" class="action-btn btn btn-primary">
+                            <i class="fa fa-file-pdf-o"></i> Save PDF
+                        </a>
+                        <button type="button" class="action-btn btn btn-primary" onclick="printContent()">
+                            <i class="fa fa-print"></i> Print
+                        </button>
+                    </div>
                 <table class="display table table-bordered" id="example" cellspacing="0" width="100%">
                     <thead>
                         <tr>
@@ -84,7 +273,7 @@ if (isset($_GET['delete_id'])) {
                             <th>Quantity</th>
                             <th>Expiration Date</th>
                             <th>Date Added</th>
-                            <th>Actions</th>
+                            <th class="hide-in-print">Actions</th>
 
                         </tr>
                     </thead>
@@ -131,7 +320,7 @@ if (isset($_GET['delete_id'])) {
                                     <td><?php echo $formattedDate1 ?></td>
                                     <td><?php echo $formattedDate; ?></td>
 
-                                    <td>
+                                    <td class="hide-in-print">
 
 
                                         <a class="btn btn-info" href="javascript:void(0)" title="Edit Item" onclick="return confirmEdit('<?php echo $row['item_id']; ?>')">
@@ -241,7 +430,7 @@ if (isset($_GET['delete_id'])) {
     </script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            $('#example').dataTable();
+            const table = $('#example').dataTable();
         });
     </script>
 
@@ -264,6 +453,59 @@ if (isset($_GET['delete_id'])) {
 
             return true;
         }
+
+function printContent() {
+    window.print();
+}
+
+// Add this to handle page numbers
+window.onbeforeprint = function() {
+    let pageHeight = window.innerHeight;
+    let tableRows = document.querySelectorAll('#printable-inventory tbody tr');
+    let currentPage = 1;
+    let currentHeight = document.querySelector('#printable-inventory .header').offsetHeight;
+    
+    // Remove existing page number elements
+    document.querySelectorAll('.page-number').forEach(el => el.remove());
+    
+    let count = 0;
+    tableRows.forEach((row, index) => {
+        count += 1;
+        currentHeight += row.offsetHeight;
+        
+        if (currentHeight > pageHeight - 100) { // 100px buffer for page margins
+            // Add page number
+            let pageNum = document.createElement('div');
+            pageNum.className = 'page-number';
+            pageNum.textContent = `Page ${currentPage}`;
+
+            let totalpage = document.createElement('span');
+            totalpage.className = 'total-page';
+            pageNum.appendChild(totalpage);
+
+            row.parentNode.insertBefore(pageNum, row);
+            
+            currentHeight = row.offsetHeight;
+            currentPage++;
+        }
+        
+        if (index === tableRows.length - 1) {
+            // Add final page number
+            let pageNum = document.createElement('div');
+            pageNum.className = 'page-number';
+            pageNum.textContent = `Page ${currentPage}`;
+
+            let totalpage = document.createElement('span');
+            totalpage.className = 'total-page';
+            pageNum.appendChild(totalpage);
+
+            row.parentNode.appendChild(pageNum);
+        }
+    });
+            document.querySelectorAll('.total-page').forEach(element => {
+                element.textContent = ' of ' + count;
+            });
+};
     </script>
 </body>
 
