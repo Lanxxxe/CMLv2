@@ -16,6 +16,14 @@
 </style>
 <div class="modal fade" id="dailySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md" id="dailySalesContent">
+        <div class="print-header">
+            <h1 class="h-head-text">CML Paint Trading</h1>
+            <div class="reports-info">
+                <h2 class="h-label">Sales Report</h2>
+                <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
+                <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
+            </div>
+        </div>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -51,8 +59,8 @@
                                 FROM orderdetails
                                     INNER JOIN users ON users.user_id = orderdetails.user_id 
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                                WHERE DATE(CURDATE()) = DATE(orderdetails.order_date)' . $order_type_str);
-                            $stmt_daily->execute();
+                                WHERE DATE(orderdetails.order_date) = ?' . $order_type_str);
+                            $stmt_daily->execute([$end_date]);
                             if ($stmt_daily->rowCount() > 0) {
                                 while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
                                     $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
@@ -81,6 +89,9 @@
                 </div>
             </div>
             <div class="modal-footer hide-in-print">
+                <a class="btn btn-primary" href="reports/daily.php<?php echo $pdf_args ?>">
+                    <i class="fa fa-file-pdf-o"></i> Save PDF
+                </a>
                 <button type="button" class="btn btn-primary" onclick="printContent('dailySalesContent')">
                     <i class="fa fa-print"></i> Print
                 </button>
@@ -93,6 +104,14 @@
 <!-- Weekly Sales -->
 <div class="modal fade" id="weeklySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md" id="weeklySalesContent">
+        <div class="print-header">
+            <h1 class="h-head-text">CML Paint Trading</h1>
+            <div class="reports-info">
+                <h2 class="h-label">Sales Report</h2>
+                <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
+                <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
+            </div>
+        </div>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -124,17 +143,13 @@
                                     users.user_lastname, 
                                     users.user_address, 
                                     orderdetails.*,
-                                    paymentform.payment_method,
-                                    DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
-                                    DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
+                                    paymentform.payment_method
                             FROM orderdetails 
                                 INNER JOIN users ON users.user_id = orderdetails.user_id 
                                 LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                            WHERE DATE(orderdetails.order_date) BETWEEN 
-                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                                AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)' . $order_type_str
+                            WHERE DATE(orderdetails.order_date) BETWEEN ? AND ?' . $order_type_str
                             );
-                            $stmt_weekly->execute();
+                            $stmt_weekly->execute([$start_date_weekly, $end_date]);
                             if ($stmt_weekly->rowCount() > 0) {
                                 while ($row = $stmt_weekly->fetch(PDO::FETCH_ASSOC)) {
                                     $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
@@ -163,6 +178,9 @@
                 </div>
             </div>
             <div class="modal-footer hide-in-print">
+                <a class="btn btn-primary" href="reports/weekly.php<?php echo $pdf_args ?>">
+                    <i class="fa fa-file-pdf-o"></i> Save PDF
+                </a>
                 <button type="button" class="btn btn-primary" onclick="printContent('weeklySalesContent')">
                     <i class="fa fa-print"></i> Print
                 </button>
@@ -175,6 +193,14 @@
 <!-- Monthly Sales -->
 <div class="modal fade" id="monthlySales" tabindex="-1" role="dialog" aria-labelledby="myMediulModalLabel">
     <div class="modal-dialog modal-md" id="monthlySalesContent">
+        <div class="print-header">
+            <h1 class="h-head-text">CML Paint Trading</h1>
+            <div class="reports-info">
+                <h2 class="h-label">Sales Report</h2>
+                <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
+                <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
+            </div>
+        </div>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -206,17 +232,14 @@
                                     users.user_lastname, 
                                     users.user_address, 
                                     orderdetails.*,
-                                    paymentform.payment_method,
-                                    DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
-                                    LAST_DAY(CURDATE()) as end_date 
+                                    paymentform.payment_method
                             FROM orderdetails 
                                 INNER JOIN users ON users.user_id = orderdetails.user_id 
                                 LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
                             WHERE DATE(order_date) BETWEEN 
-                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                                AND LAST_DAY(CURDATE())' . $order_type_str
+                                ? AND ?' . $order_type_str
                             );
-                            $stmt_monthly->execute();
+                            $stmt_monthly->execute([$start_date, $end_date]);
                             if ($stmt_monthly->rowCount() > 0) {
                                 while ($row = $stmt_monthly->fetch(PDO::FETCH_ASSOC)) {
                                     $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
@@ -245,6 +268,9 @@
                 </div>
             </div>
             <div class="modal-footer hide-in-print">
+                <a class="btn btn-primary" href="reports/monthly.php<?php echo $pdf_args ?>">
+                    <i class="fa fa-file-pdf-o"></i> Save PDF
+                </a>
                 <button type="button" class="btn btn-primary" onclick="printContent('monthlySalesContent')">
                     <i class="fa fa-print"></i> Print
                 </button>

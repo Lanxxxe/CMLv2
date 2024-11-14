@@ -59,6 +59,142 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+.transactions-header {
+    padding: 0;
+    width: 100%;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.transactions-tabs {
+    display: flex;
+    flex: 1;
+    min-width: 300px;
+}
+
+.date-filter-form {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    gap: 10px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input-group input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 34px;
+}
+
+.date-separator {
+    color: #666;
+    font-weight: 500;
+}
+
+.transactions-actions {
+    display: flex;
+    padding-right: 15px;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+}
+
+.action-btn i {
+    font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+    .transactions-header {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+    
+    .transactions-tabs {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .date-filter-form {
+        padding: 10px 15px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .transactions-actions {
+        padding: 10px 15px;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .date-inputs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .date-input-group {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+.date-filter {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    width: 100%;
+}
+
+.date-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-filter input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.date-filter span {
+    color: #495057;
+    font-weight: 500;
+}
+
+.date-filter button {
+    padding: 6px 15px;
+    margin-left: 10px;
+}
+
+@media print {
+    .date-filter {
+        display: none !important;
+    }
+}
         #filterTab {
             display: flex;
             align-items: center;
@@ -99,85 +235,7 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
         .sales-report-container {
             height: auto;
         }
-        @media print {
-            @page {
-                size: 800px auto;
-                margin: 0;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
 
-            body * {
-                visibility: hidden !important;
-            }
-
-            .printable, .printable * {
-                visibility: visible !important;
-            }
-
-            .printable {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                padding: 0.75rem !important;
-                margin: 0 !important;
-            }
-
-            #page-wrapper:not(.printable) {
-                display: none !important;
-            }
-
-            /* Force background colors to print */
-            .sales-report-item {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            /* Apply specific background colors */
-            .sales-report-item:nth-child(1) {
-                background-color: #bfea91 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .sales-report-item:nth-child(2) {
-                background-color: #91d4ea !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .sales-report-item:nth-child(3) {
-                background-color: #cb91ea !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            /* Ensure text remains visible */
-            .sales-report-item h2,
-            .sales-report-item p {
-                color: black !important;
-            }
-            
-            .hide-in-print {
-                display: none !important;
-            }
-            .modal {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            .modal-dialog {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .close {
-                display: none !important;
-            }
-        }
 
         .sales-report-transactions {
             margin: 20px;
@@ -251,85 +309,194 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             color: #721c24;
         }
 
-.transactions-header {
-    padding: 0;
-    width: 100%;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    .transactions-header {
+        padding: 0;
+        width: 100%;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.transactions-tabs {
-    display: flex;
-    flex: 1;
-}
+    .transactions-tabs {
+        display: flex;
+        flex: 1;
+    }
 
-.tab-btn {
-    padding: 15px 25px;
-    color: #495057;
-    font-weight: 500;
-    text-decoration: none;
-    border: none;
-    border-right: 1px solid #dee2e6;
-    background: transparent;
-    transition: all 0.2s ease;
-}
+    .tab-btn {
+        padding: 15px 25px;
+        color: #495057;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        border-right: 1px solid #dee2e6;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
 
-.tab-btn:hover {
-    background: rgba(13, 110, 253, 0.05);
-    color: #0d6efd;
-}
+    .tab-btn:hover {
+        background: rgba(13, 110, 253, 0.05);
+        color: #0d6efd;
+    }
 
-.tab-btn.active {
-    background: #0d6efd;
-    color: white;
-}
+    .tab-btn.active {
+        background: #0d6efd;
+        color: white;
+    }
 
-.transactions-actions {
-    display: flex;
-    padding-right: 15px;
-    gap: 10px;
-}
+    .transactions-actions {
+        display: flex;
+        padding-right: 15px;
+        gap: 10px;
+    }
 
-.transactions-separator {
-    flex: 1;
-}
+    .transactions-separator {
+        flex: 1;
+    }
 
-.action-btn {
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
 
-.action-btn i {
-    font-size: 14px;
-}
+    .action-btn i {
+        font-size: 14px;
+    }
 
-.transactions-header .tab-btn:first-child {
-    border-top-left-radius: 8px;
-}
+    .transactions-header .tab-btn:first-child {
+        border-top-left-radius: 8px;
+    }
 
-.transactions-header .tab-btn.active {
-    background-color: #666;
-}
+    .transactions-header .tab-btn.active {
+        background-color: #666;
+    }
 
-.transactions-header .tab-btn:hover {
-    text-decoration: none;
-}
+    .transactions-header .tab-btn:hover {
+        text-decoration: none;
+    }
 
-.transactions-header .tab-btn:not(.active):hover {
-    color: inherit;
-}
+    .transactions-header .tab-btn:not(.active):hover {
+        color: inherit;
+    }
 
+    .print-header {
+        display: none;
+        margin: 20px;
+    }
+
+    .h-head-text, .h-label {
+        margin: 1px;
+        font-weight: bold;
+    }
+
+    .reports-info {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+    }
+
+    .reports-info > * {
+        margin: 1px;
+    }
+
+        @media print {
+            @page {
+                size: 800px auto;
+                margin: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            .printable, .printable * {
+                visibility: visible !important;
+            }
+
+            .printable {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                padding: 0.75rem !important;
+                margin: 0 !important;
+            }
+
+            #page-wrapper:not(.printable) {
+                display: none !important;
+            }
+
+            .printable tr * {
+                white-space: wrap !important;
+                overflow: wrap !important;
+                text-wrap: wrap !important;
+            }
+
+            /* Force background colors to print */
+            .sales-report-item {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Apply specific background colors */
+            .sales-report-item:nth-child(1) {
+                background-color: #bfea91 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .sales-report-item:nth-child(2) {
+                background-color: #91d4ea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .sales-report-item:nth-child(3) {
+                background-color: #cb91ea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Ensure text remains visible */
+            .sales-report-item h2,
+            .sales-report-item p {
+                color: black !important;
+            }
+            
+            .hide-in-print {
+                display: none !important;
+            }
+            .modal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .modal-dialog {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .close {
+                display: none !important;
+            }
+            .print-header {
+                display: flex !important;
+                justify-content: space-between;
+            }
+        }
 
     </style>
 
@@ -340,10 +507,18 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
         <?php include("navigation.php"); ?>
 
         <div id="page-wrapper" class="printable">
+            <div class="print-header">
+                <h1 class="h-head-text">CML Paint Trading</h1>
+                <div class="reports-info">
+                    <h2 class="h-label">Sales Report</h2>
+                    <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
+                    <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
+                </div>
+            </div>
             <div class="sales-report-container">
-                <h1 class="pageTitle">Sales Report</h1>
+                <h1 class="pageTitle hide-in-print">Sales Report</h1>
 
-            <div id="analyticReports">
+            <div id="analyticReports" class="hide-in-print">
                 <div id="trpContainer">
                     <canvas id="topRequestedProduct"></canvas>
                 </div>
@@ -359,51 +534,61 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                             }
                         }
 
-                    // Fetch daily sales
+                        $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
+                        $stmt_dates->execute();
+                        $date_range = $stmt_dates->fetch(PDO::FETCH_ASSOC);
+
+                        $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+                        $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('@0'));
+
+                        $start_date_weekly = date('Y-m-d', strtotime($end_date . '-7 days'));
+                        $start_date_monthly = date('Y-m-d', strtotime($end_date . '-1 months'));
+
+                        // Validate dates
+                        $min_date = $date_range['min_date'];
+                        $max_date = $date_range['max_date'];
+
+                        // Add date filter to existing order type string
+                        $date_filter = " AND (DATE(order_date) BETWEEN '{$start_date}' AND '{$end_date}')";
+
+
+                        // Fetch daily sales
                         $stmt_daily = $DB_con->prepare(
-                        'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
-                        FROM orderdetails
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                        WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
+                            'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                            FROM orderdetails
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE DATE(order_date) = ?' . $order_type_str . $date_filter
+                        );
+                        $stmt_daily->execute([$end_date]);
+                        $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
+                        $dailySales = $daily['daily_sales'] ?? 0;
+                        $dailyDate = $daily['date'] ?? date('Y-m-d');
 
-                    $stmt_daily->execute();
-                    $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
-                    $dailySales = $daily['daily_sales'] ?? 0;
-                    $dailyDate = $daily['date'] ?? date('Y-m-d');
+                        // Fetch weekly sales
+                        $stmt_weekly = $DB_con->prepare(
+                            'SELECT SUM(order_total) as weekly_sales
+                             FROM orderdetails 
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                             WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
+                        );
+                        $stmt_weekly->execute([$start_date_weekly, $end_date]);
+                        $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
+                        $weeklySales = $weekly['weekly_sales'] ?? 0;
+                        $weeklyStartDate = $start_date_weekly;
+                        $weeklyEndDate = $end_date;
 
-                    // Fetch weekly sales
-                    $stmt_weekly = $DB_con->prepare(
-                        'SELECT SUM(order_total) as weekly_sales, 
-                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
-                                DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
-                         FROM orderdetails 
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                         WHERE (DATE(order_date) BETWEEN 
-                               DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY))' . $order_type_str
-                    );
-                    $stmt_weekly->execute();
-                    $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
-                    $weeklySales = $weekly['weekly_sales'] ?? 0;
-                    $weeklyStartDate = $weekly['start_date'] ?? date('Y-m-d', strtotime('-7 days'));
-                    $weeklyEndDate = $weekly['end_date'] ?? date('Y-m-d');
-
-                    // Fetch monthly sales
-                    $stmt_monthly = $DB_con->prepare(
-                        'SELECT SUM(order_total) as monthly_sales, 
-                                DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
-                                LAST_DAY(CURDATE()) as end_date 
-                         FROM orderdetails 
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                         WHERE DATE(order_date) BETWEEN 
-                               DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                               AND LAST_DAY(CURDATE())' . $order_type_str
-                    );
-                    $stmt_monthly->execute();
-                    $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
-                    $monthlySales = $monthly['monthly_sales'] ?? 0;
-                    $monthlyStartDate = $monthly['start_date'] ?? date('Y-m-d', strtotime('-1 month'));
-                    $monthlyEndDate = $monthly['end_date'] ?? date('Y-m-d');
+                        // Fetch monthly sales
+                        $stmt_monthly = $DB_con->prepare(
+                            'SELECT SUM(order_total) as monthly_sales
+                             FROM orderdetails 
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                             WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
+                        );
+                        $stmt_monthly->execute([$start_date_monthly, $end_date]);
+                        $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
+                        $monthlySales = $monthly['monthly_sales'] ?? 0;
+                        $monthlyStartDate = $start_date_monthly;
+                        $monthlyEndDate = $end_date;
                     ?>
 
                     <!-- Daily Sales Container -->
@@ -453,8 +638,58 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                             GCash Transactions
                         </a>
                     </div>
+
+                    <form id="dateFilterForm" class="date-filter-form">
+                        <?php if ($order_type): ?>
+                            <input type="hidden" name="order_type" value="<?php echo htmlspecialchars($order_type); ?>">
+                        <?php endif; ?>
+                        <div class="date-inputs">
+                            <!-- <div class="date-input-group"> -->
+                            <!--     <input type="date"  -->
+                            <!--            id="start_date"  -->
+                            <!--            name="start_date"  -->
+                            <!--            min="<?php echo htmlspecialchars($min_date); ?>"  -->
+                            <!--            max="<?php echo date('Y-m-d'); ?>" -->
+                            <!--            value="<?php echo htmlspecialchars($start_date ?? ''); ?>" -->
+                            <!--            placeholder="Start Date"> -->
+                            <!-- </div> -->
+                            <!-- <div class="date-separator">-</div> -->
+                            <div class="date-input-group">
+                                <input type="date" 
+                                       id="end_date" 
+                                       name="end_date" 
+                                       min="<?php echo htmlspecialchars($min_date); ?>" 
+                                       max="<?php echo date('Y-m-d'); ?>"
+                                       value="<?php echo htmlspecialchars($end_date ?? ''); ?>"
+                                       placeholder="End Date">
+                            </div>
+                            <button type="submit" class="action-btn btn btn-secondary">
+                                <i class="fa fa-filter"></i> Filter
+                            </button>
+                            <?php 
+                                    $start_date_c = $_GET['start_date'] ?? null; 
+                                    $end_date_c = $_GET['end_date'] ?? null; 
+                                    if ($start_date_c || $end_date_c): ?>
+                                <a href="<?php echo $order_type ? "?order_type=" . urlencode($order_type) : "salesreport.php"; ?>" 
+                                   class="action-btn btn btn-secondary">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </form>
+
                     <div class="transactions-actions">
-                        <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary">
+                        <?php
+                            $pdf_args = '';
+                            if (isset($_GET['order_type']) && isset($_GET['end_date'])) {
+                                $pdf_args = "?order_type={$_GET['order_type']}&end_date={$_GET['end_date']}";
+                            } else if(isset($_GET['order_type'])) {
+                                $pdf_args = "?order_type={$_GET['order_type']}";
+                            } else if(isset($_GET['end_date'])) {
+                                $pdf_args = "?end_date={$_GET['end_date']}";
+                            }
+                        ?>
+                        <a href="generate_pdf.php<?php echo $pdf_args ?>" class="action-btn btn btn-primary">
                             <i class="fa fa-file-pdf-o"></i> Save PDF
                         </a>
                         <button type="button" class="action-btn btn btn-primary" onclick="printContent('page-wrapper')">
@@ -491,11 +726,11 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                     paymentform.payment_method
                                 FROM users 
                                 INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id '
-                                 . $order_type_str_r .
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id WHERE date(orderdetails.order_date) <= ?'
+                                 . $order_type_str .
                                 'ORDER BY orderdetails.order_date DESC
                             ');
-                            $stmt->execute();
+                            $stmt->execute([$end_date]);
 
 
                             if ($stmt->rowCount() > 0) {
