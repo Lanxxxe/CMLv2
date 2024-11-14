@@ -343,192 +343,192 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
             <div class="sales-report-container">
                 <h1 class="pageTitle">Sales Report</h1>
 
-            <div id="analyticReports" >
                 <div id="trpContainer">
-                    <canvas id="topRequestedProduct"></canvas>
+                    <canvas id="topRequestedProduct" height="800px"></canvas>
                 </div>
+                <div id="analyticReports" >
 
-                <div class="sales-report-content">
-                    <?php
-                        $order_type_str = '';
-                        if (isset($order_type)) {
-                            if($order_type === 'walk_in') {
-                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
-                            } else if($order_type === 'gcash') {
-                                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                    <div class="sales-report-content">
+                        <?php
+                            $order_type_str = '';
+                            if (isset($order_type)) {
+                                if($order_type === 'walk_in') {
+                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                                } else if($order_type === 'gcash') {
+                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                                }
                             }
-                        }
 
-                    // Fetch daily sales
-                        $stmt_daily = $DB_con->prepare(
-                        'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
-                        FROM orderdetails
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                        WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
+                        // Fetch daily sales
+                            $stmt_daily = $DB_con->prepare(
+                            'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                            FROM orderdetails
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE DATE(CURDATE()) = DATE(order_date)' . $order_type_str);
 
-                    $stmt_daily->execute();
-                    $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
-                    $dailySales = $daily['daily_sales'] ?? 0;
-                    $dailyDate = $daily['date'] ?? date('Y-m-d');
+                        $stmt_daily->execute();
+                        $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
+                        $dailySales = $daily['daily_sales'] ?? 0;
+                        $dailyDate = $daily['date'] ?? date('Y-m-d');
 
-                    // Fetch weekly sales
-                    $stmt_weekly = $DB_con->prepare(
-                        'SELECT SUM(order_total) as weekly_sales, 
-                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
-                                DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
-                         FROM orderdetails 
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                         WHERE (DATE(order_date) BETWEEN 
-                               DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-                               AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY))' . $order_type_str
-                    );
-                    $stmt_weekly->execute();
-                    $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
-                    $weeklySales = $weekly['weekly_sales'] ?? 0;
-                    $weeklyStartDate = $weekly['start_date'] ?? date('Y-m-d', strtotime('-7 days'));
-                    $weeklyEndDate = $weekly['end_date'] ?? date('Y-m-d');
+                        // Fetch weekly sales
+                        $stmt_weekly = $DB_con->prepare(
+                            'SELECT SUM(order_total) as weekly_sales, 
+                                    DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as start_date, 
+                                    DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) as end_date 
+                            FROM orderdetails 
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE (DATE(order_date) BETWEEN 
+                                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                                AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY))' . $order_type_str
+                        );
+                        $stmt_weekly->execute();
+                        $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
+                        $weeklySales = $weekly['weekly_sales'] ?? 0;
+                        $weeklyStartDate = $weekly['start_date'] ?? date('Y-m-d', strtotime('-7 days'));
+                        $weeklyEndDate = $weekly['end_date'] ?? date('Y-m-d');
 
-                    // Fetch monthly sales
-                    $stmt_monthly = $DB_con->prepare(
-                        'SELECT SUM(order_total) as monthly_sales, 
-                                DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
-                                LAST_DAY(CURDATE()) as end_date 
-                         FROM orderdetails 
-                            LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                         WHERE DATE(order_date) BETWEEN 
-                               DATE_FORMAT(CURDATE(), "%Y-%m-01") 
-                               AND LAST_DAY(CURDATE())' . $order_type_str
-                    );
-                    $stmt_monthly->execute();
-                    $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
-                    $monthlySales = $monthly['monthly_sales'] ?? 0;
-                    $monthlyStartDate = $monthly['start_date'] ?? date('Y-m-d', strtotime('-1 month'));
-                    $monthlyEndDate = $monthly['end_date'] ?? date('Y-m-d');
-                    ?>
+                        // Fetch monthly sales
+                        $stmt_monthly = $DB_con->prepare(
+                            'SELECT SUM(order_total) as monthly_sales, 
+                                    DATE_FORMAT(CURDATE(), "%Y-%m-01") as start_date, 
+                                    LAST_DAY(CURDATE()) as end_date 
+                            FROM orderdetails 
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                            WHERE DATE(order_date) BETWEEN 
+                                DATE_FORMAT(CURDATE(), "%Y-%m-01") 
+                                AND LAST_DAY(CURDATE())' . $order_type_str
+                        );
+                        $stmt_monthly->execute();
+                        $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
+                        $monthlySales = $monthly['monthly_sales'] ?? 0;
+                        $monthlyStartDate = $monthly['start_date'] ?? date('Y-m-d', strtotime('-1 month'));
+                        $monthlyEndDate = $monthly['end_date'] ?? date('Y-m-d');
+                        ?>
 
-                    <!-- Daily Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
-                            <p>Daily Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
+                        <!-- Daily Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($dailySales, 2); ?></h2>
+                                <p>Daily Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
+                            </div>
+                            <img src="./local_image/daily.jpeg" alt="Daily Sales">
                         </div>
-                        <img src="./local_image/daily.jpeg" alt="Daily Sales">
-                    </div>
-                    
-                    <!-- Weekly Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#weeklySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
-                            <p>Weekly Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+                        
+                        <!-- Weekly Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#weeklySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($weeklySales, 2); ?></h2>
+                                <p>Weekly Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+                            </div>
+                            <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
                         </div>
-                        <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
+
+                        <!-- Monthly Sales Container -->
+                        <div class="sales-report-item" data-toggle="modal" data-target="#monthlySales">
+                            <div>
+                                <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
+                                <p>Monthly Sales</p>
+                                <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
+                            </div>
+                            <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
+                        </div>
                     </div>
 
-                    <!-- Monthly Sales Container -->
-                    <div class="sales-report-item" data-toggle="modal" data-target="#monthlySales">
-                        <div>
-                            <h2>&#8369 <?php echo number_format($monthlySales, 2); ?></h2>
-                            <p>Monthly Sales</p>
-                            <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
-                        </div>
-                        <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
-                    </div>
                 </div>
 
-            </div>
+                <div class="sales-report-transactions">
 
-            <div class="sales-report-transactions">
-
-                <div class="transactions-header hide-in-print">
-                    <div class="transactions-tabs">
-                        <a href="./salesreport.php" class="tab-btn <?php echo (!$order_type ? 'active' : ''); ?>">
-                            All Transactions
-                        </a>
-                        <a href="./salesreport.php?order_type=walk_in" class="tab-btn <?php echo ($order_type === 'walk_in' ? 'active' : ''); ?>">
-                            Walk In Transactions
-                        </a>
-                        <a href="./salesreport.php?order_type=gcash" class="tab-btn <?php echo ($order_type === 'gcash' ? 'active' : ''); ?>">
-                            GCash Transactions
-                        </a>
+                    <div class="transactions-header hide-in-print">
+                        <div class="transactions-tabs">
+                            <a href="./salesreport.php" class="tab-btn <?php echo (!$order_type ? 'active' : ''); ?>">
+                                All Transactions
+                            </a>
+                            <a href="./salesreport.php?order_type=walk_in" class="tab-btn <?php echo ($order_type === 'walk_in' ? 'active' : ''); ?>">
+                                Walk In Transactions
+                            </a>
+                            <a href="./salesreport.php?order_type=gcash" class="tab-btn <?php echo ($order_type === 'gcash' ? 'active' : ''); ?>">
+                                GCash Transactions
+                            </a>
+                        </div>
+                        <div class="transactions-actions">
+                            <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary">
+                                <i class="fa fa-file-pdf-o"></i> Save PDF
+                            </a>
+                            <button type="button" class="action-btn btn btn-primary" onclick="printContent('page-wrapper')">
+                                <i class="fa fa-print"></i> Print
+                            </button>
+                        </div>
                     </div>
-                    <div class="transactions-actions">
-                        <a href="generate_pdf.php<?php echo ($order_type ? "?order_type=$order_type" : ''); ?>" class="action-btn btn btn-primary">
-                            <i class="fa fa-file-pdf-o"></i> Save PDF
-                        </a>
-                        <button type="button" class="action-btn btn btn-primary" onclick="printContent('page-wrapper')">
-                            <i class="fa fa-print"></i> Print
-                        </button>
-                    </div>
-                </div>
 
-                <div class="transactions-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Transaction Date</th>
-                                <th>Invoice No.</th>
-                                <th>Customer</th>
-                                <th>Products Ordered</th>
-                                <th>Quantity</th>
-                                <th>Total Amount</th>
-                                <th>Payment Method</th>
-                                <th>Order Status</th>
-                            </tr>
-                        </thead>    
-                        <tbody class="table-striped">
-                            <?php
-                            $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
+                    <div class="transactions-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction Date</th>
+                                    <th>Invoice No.</th>
+                                    <th>Customer</th>
+                                    <th>Products Ordered</th>
+                                    <th>Quantity</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Order Status</th>
+                                </tr>
+                            </thead>    
+                            <tbody class="table-striped">
+                                <?php
+                                $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
 
-                            $stmt = $DB_con->prepare('
-                                SELECT 
-                                    users.user_email, 
-                                    users.user_firstname, 
-                                    users.user_lastname, 
-                                    users.user_address, 
-                                    orderdetails.*,
-                                    paymentform.payment_method
-                                FROM users 
-                                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id '
-                                 . $order_type_str_r .
-                                'ORDER BY orderdetails.order_date DESC
-                            ');
-                            $stmt->execute();
+                                $stmt = $DB_con->prepare('
+                                    SELECT 
+                                        users.user_email, 
+                                        users.user_firstname, 
+                                        users.user_lastname, 
+                                        users.user_address, 
+                                        orderdetails.*,
+                                        paymentform.payment_method
+                                    FROM users 
+                                    INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
+                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id '
+                                    . $order_type_str_r .
+                                    'ORDER BY orderdetails.order_date DESC
+                                ');
+                                $stmt->execute();
 
 
-                            if ($stmt->rowCount() > 0) {
-                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                    $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
-                                    $orderDate = date('M d, Y', strtotime($row['order_date']));
-                                    $statusClass = strtolower($row['order_status']) == 'completed' ? 'status-completed' : 
-                                                 (strtolower($row['order_status']) == 'cancelled' ? 'status-cancelled' : 'status-pending');
+                                if ($stmt->rowCount() > 0) {
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $customerName = $row['user_firstname'] . ' ' . $row['user_lastname'];
+                                        $orderDate = date('M d, Y', strtotime($row['order_date']));
+                                        $statusClass = strtolower($row['order_status']) == 'completed' ? 'status-completed' : 
+                                                    (strtolower($row['order_status']) == 'cancelled' ? 'status-cancelled' : 'status-pending');
+                                        ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($orderDate); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_id']); ?></td>
+                                            <td><?php echo htmlspecialchars($customerName); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
+                                            <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
+                                            <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
+                                            <td><span class="order-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['order_status']); ?></span></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                } else {
                                     ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($orderDate); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($customerName); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
-                                        <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
-                                        <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
-                                        <td><span class="order-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['order_status']); ?></span></td>
+                                        <td colspan="8" style="text-align: center;">No transactions found.</td>
                                     </tr>
                                     <?php
                                 }
-                            } else {
                                 ?>
-                                <tr>
-                                    <td colspan="8" style="text-align: center;">No transactions found.</td>
-                                </tr>
-                                <?php
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
 
             </div>
