@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt_insert->bind_param('sssssssdss', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path, $stats);
                     } else {
-                        $order_stats = 'Verification';
+                        $order_stats = 'verification';
                         $stmt_insert = $conn->prepare("INSERT INTO paymentform (firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt_insert->bind_param('sssssssds', $firstName, $lastName, $email, $address, $mobile, $pay, $paymentType, $amount, $dest_path);
                     }
