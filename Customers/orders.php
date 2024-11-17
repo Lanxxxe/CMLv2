@@ -176,10 +176,17 @@ extract($edit_row);
                   <p><strong>Order Status:</strong> <span id="receiptOrderStatus"></span></p>
   
                   <!-- Payment Proof Image -->
-                  <div class="payment-proof mt-3">
+                   <?php 
+                   if  ($_SESSION['user_type'] == 'Customer') {
+                    ?>
+                      <div class="payment-proof mt-3">
                       <h5>Proof of Payment</h5>
                       <img id="paymentProofImage" src="" alt="Payment Proof" style="max-width: 30%; height: auto; border: 1px solid #ddd;">
                   </div>
+                    <?php
+                   }
+                   ?>
+                  
   
                   <!-- Order Items Table -->
                   <!-- <h5 class="mt-3">Order Items</h5> -->
@@ -324,13 +331,30 @@ extract($edit_row);
               }
               const orderItemsBody = document.getElementById("orderItems");
               if (orderItemsBody) {
-                  orderItemsBody.innerHTML = `
+                <?php if ($_SESSION['user_type'] == 'Customer') {
+                  ?>
+                    orderItemsBody.innerHTML = `
                       <tr>
                           <td>${orderDetails['order_name']} (${orderDetails['gl']})</td>
                           <td>₱ ${orderDetails['order_price']}</td>
                           <td>${orderDetails['order_quantity']} ${orderDetails['gl']}</td>
                       </tr>
                   `;
+                  <?php
+                } else {
+                  ?>
+                  orderItemsBody.innerHTML = `
+                      <tr>
+                          <td>${orderDetails['order_name']}</td>
+                          <td>₱ ${orderDetails['order_price']}</td>
+                          <td>${orderDetails['order_quantity']}</td>
+                      </tr>
+                  `;
+                  <?php
+                } 
+                
+                ?> 
+                  
               } else {
                   console.error('orderItems tbody not found!');
               }

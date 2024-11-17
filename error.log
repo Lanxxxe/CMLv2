@@ -2584,3 +2584,38 @@
 (2024-11-14 04:18:22) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
 (2024-11-14 04:18:25) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
 (2024-11-14 04:18:25) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 16:48:30) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:30:14) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:38:03) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-17 17:38:03) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CMLv2\Customers\paint-match\db-connect.php:14
+(2024-11-17 17:38:03) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CMLv2\Customers\paint-match\step1.php:13
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:46) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:51) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:55:53) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-11-17 17:57:10) Error: [2] Undefined variable $total - C:\xampp\htdocs\CMLv2\Customers\navigation.php:64
+(2024-11-17 17:57:10) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70

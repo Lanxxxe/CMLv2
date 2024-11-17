@@ -133,12 +133,18 @@ include_once 'config.php';
                         </div>
                     </div>
                 </form>
+                
+                <div class="d-flex" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <form method="GET" action="generate_refund_report.php" style="margin-top: 15px">
+                        <input type="hidden" name="filter_date" value="<?php echo htmlspecialchars($filter_date); ?>">
+                        <input type="hidden" name="filter_type" value="<?php echo htmlspecialchars($filter_type); ?>">
+                        <button type="submit" class="btn btn-success">Generate PDF</button>
+                    </form>
     
-                <form method="GET" action="generate_refund_report.php" style="margin-top: 15px">
-                    <input type="hidden" name="filter_date" value="<?php echo htmlspecialchars($filter_date); ?>">
-                    <input type="hidden" name="filter_type" value="<?php echo htmlspecialchars($filter_type); ?>">
-                    <button type="submit" class="btn btn-success">Generate PDF</button>
-                </form>
+                    <button type="button" class="btn btn-primary" style="margin-top: 15px" onclick="printContent()">
+                        <i class="fa fa-print"></i> Print
+                    </button>
+                </div>
             </div>
 
             <!-- Return Payments Table -->
@@ -226,6 +232,9 @@ include_once 'config.php';
     <?php include_once("insertBrandsModal.php"); ?>	
 
     <script>
+        function printContent() {
+            window.print();
+        }
         document.querySelector("#nav_invoice_report").className = "active";
                                     
 

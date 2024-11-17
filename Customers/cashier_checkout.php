@@ -116,7 +116,7 @@ try {
     $stmt_last_order_result= $conn->query("SELECT max(order_id) as last_order_id FROM orderdetails");
     $last_order_id = $stmt_last_order_result->fetch_array()[0];
 
-    $insertOrderDetailsSQL = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertOrderDetailsSQL = "INSERT INTO orderdetails (user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, product_id, payment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_insert_item = $conn->prepare($insertOrderDetailsSQL);
 
     foreach ($params as $param) {
@@ -131,6 +131,7 @@ try {
         $orderPickUp = $param['order_pick_up'] ?? '';
         $orderPickPlace = $param['order_pick_place'] ?? '';
         $gl = $param['gl'];
+        $paymentID = $payment_id;
         $productId = $param['product_id'] ?? '';
         if (empty($gl)) {
             $gl = null;
@@ -138,7 +139,7 @@ try {
 
         // Now bind the parameters
         if (!$stmt_insert_item->bind_param(
-            'issdissssss',
+            'issdissssssi',
             $userId,
             $orderName,
             $orderPrice,
@@ -149,7 +150,8 @@ try {
             $orderPickUp,
             $orderPickPlace,
             $gl,
-            $productId
+            $productId,
+            $paymentID
         )) {
             throw new Exception('Error binding parameters: ' . $stmt_insert_item->error);
         }
@@ -160,6 +162,17 @@ try {
     }
 
     $stmt_insert_item->close();
+
+    // Prepare the update query
+    $update_totalPrice = "UPDATE paymentform SET amount = ? WHERE id = ?";
+    $stmt_update = $conn->prepare($update_totalPrice);
+
+    // Bind the parameters (amount and item_id)
+    $stmt_update->bind_param('ii', $totalPrice, $payment_id);
+
+    // Execute the update statement
+    $stmt_update->execute();
+
 
     if (isset($token)) {
         if ($token !== $_SESSION['_token']) {
