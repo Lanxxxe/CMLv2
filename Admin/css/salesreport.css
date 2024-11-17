@@ -165,9 +165,9 @@ h1 {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    height: 400px;
     width: 100%;
     max-width: 800px;
+    max-height: 400px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -175,6 +175,7 @@ h1 {
 #trpContainer canvas {
     width: 100% !important;
     height: 100% !important;
+    min-height: 400px !important;
     background: white;
 }
 

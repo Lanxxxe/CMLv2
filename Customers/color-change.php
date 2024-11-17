@@ -82,7 +82,7 @@ if (isset($_GET['update_id'])) {
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
     
     <!-- Step 3 -> Object/Image -->
-    <script type="text/javascript" src="./paint-mixer-files/script-file/objects.js" defer></script>
+    <script type="text/javascript" src="./paint-mixer-files/script-file/objects.js"></script>
     
     <!-- step1 and step 2 -->
     <link rel="stylesheet" type="text/css" href="./paint-mixer-files/css-files/steps-styles.css">
@@ -482,15 +482,24 @@ if (isset($_GET['update_id'])) {
             return hex.length == 1 ? "0" + hex : hex;
         }
 
-        // Attach event listeners to width and height input fields
-        document.getElementById("width").addEventListener("input", updateSurfaceArea);
-        document.getElementById("height").addEventListener("input", updateSurfaceArea);
-        document.getElementById("coatsNumber").addEventListener("input", updateTotalLiters);
-        document.getElementById("paint").addEventListener("change", updateTotalLiters);
+        <?php if ($step != '3'): ?>
+            // Attach event listeners to width and height input fields
+            document.getElementById("width").addEventListener("input", updateSurfaceArea);
+            document.getElementById("height").addEventListener("input", updateSurfaceArea);
+            document.getElementById("coatsNumber").addEventListener("input", updateTotalLiters);
+            document.getElementById("paint").addEventListener("change", updateTotalLiters);
 
-        // Initialize color on page load
-        updateSurfaceArea();
-        updateTotalLiters();
+            // Initialize color on page load
+            updateSurfaceArea();
+            updateTotalLiters();
+        <?php endif ?>
+
+        document.addEventListener('click', event => {
+            const saveProjectBtn = event.target.closest('.save-project');
+            if (saveProjectBtn) {
+                saveProject();
+            }
+        });
     </script>
 </body>
 

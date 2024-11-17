@@ -49,6 +49,24 @@ require_once 'config.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        #loading {
+          display: flex;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(192, 192, 192, 0.5);
+          background-image: url("../ForgotPassword/images/loading.gif");
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+
+        .hide {
+          display: none !important;
+        }
+
         .return-form {
             display: flex;
             justify-content: center;
@@ -155,10 +173,20 @@ require_once 'config.php';
 
         </div>
 
+        <div id="loading" class="hide"></div>
 	<!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>	
 <script>
+    const setVisible = (elementOrSelector, visible) => {
+      const element = document.querySelector(elementOrSelector);
+      if (visible) {
+        element.classList.remove("hide");
+      } else {
+        element.classList.add("hide");
+      }
+    };
+
     document.getElementById('confirmRefundBtn').addEventListener('click', function (e) {
         e.preventDefault();
         const form = document.getElementById('refundForm');
@@ -173,12 +201,14 @@ require_once 'config.php';
             cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
+                setVisible('#loading', true);
                 fetch('return_payment.php', {
                     method: 'POST',
                     body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
+                    setVisible('#loading', false);
                     console.log(data);
                     if (data.success) {
                         Swal.fire({
@@ -195,6 +225,7 @@ require_once 'config.php';
                     }
                 })
                 .catch(error => {
+                    setVisible('#loading', false);
                     Swal.fire({
                         icon: 'error',
                         title: 'Request Failed',

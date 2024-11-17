@@ -67,13 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(err);
     });
 
-  const saveProjectButton = document.querySelector('.save-project');
-  saveProjectButton.addEventListener('click', saveProject);
-  const tryAgainButton = document.querySelector('.try-again');
-  tryAgainButton.addEventListener('click', () => {
-    localStorage.removeItem('room');
-    localStorage.removeItem('pickedColors');
-    localStorage.removeItem('editedRoom');
-    window.location.href = "color-change.php?step=1";
-  });
+  // const saveProjectButton = document.querySelector('.save-project');
+  // saveProjectButton.addEventListener('click', saveProject);
+  // const tryAgainButton = document.querySelector('.try-again');
+  // tryAgainButton.addEventListener('click', () => {
+  //   localStorage.removeItem('room');
+  //   localStorage.removeItem('pickedColors');
+  //   localStorage.removeItem('editedRoom');
+  //   window.location.href = "color-change.php?step=1";
+  // });
 });

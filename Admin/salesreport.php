@@ -519,9 +519,9 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                 <h1 class="pageTitle hide-in-print">Sales Report</h1>
 
                 <div id="analyticReports"  class="hide-in-print">
-                            <div id="trpContainer">
-                                <canvas id="topRequestedProduct" height="800px"></canvas>
-                            </div>
+                    <div id="trpContainer">
+                        <canvas id="topRequestedProduct" height="800px"></canvas>
+                    </div>
 
                     <div class="sales-report-content">
                         <?php
@@ -534,62 +534,62 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                 }
                             }
 
-                        $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
-                        $stmt_dates->execute();
-                        $date_range = $stmt_dates->fetch(PDO::FETCH_ASSOC);
+                            $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
+                            $stmt_dates->execute();
+                            $date_range = $stmt_dates->fetch(PDO::FETCH_ASSOC);
 
-                        $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
-                        $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('@0'));
+                            $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+                            $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('@0'));
 
-                        $start_date_weekly = date('Y-m-d', strtotime($end_date . '-7 days'));
-                        $start_date_monthly = date('Y-m-d', strtotime($end_date . '-1 months'));
+                            $start_date_weekly = date('Y-m-d', strtotime($end_date . '-7 days'));
+                            $start_date_monthly = date('Y-m-d', strtotime($end_date . '-1 months'));
 
-                        // Validate dates
-                        $min_date = $date_range['min_date'];
-                        $max_date = $date_range['max_date'];
+                            // Validate dates
+                            $min_date = $date_range['min_date'];
+                            $max_date = $date_range['max_date'];
 
-                        // Add date filter to existing order type string
-                        $date_filter = " AND (DATE(order_date) BETWEEN '{$start_date}' AND '{$end_date}')";
+                            // Add date filter to existing order type string
+                            $date_filter = " AND (DATE(order_date) BETWEEN '{$start_date}' AND '{$end_date}')";
 
 
-                        // Fetch daily sales
-                        $stmt_daily = $DB_con->prepare(
-                            'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
-                            FROM orderdetails
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                            WHERE DATE(order_date) = ?' . $order_type_str . $date_filter
-                        );
-                        $stmt_daily->execute([$end_date]);
-                        $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
-                        $dailySales = $daily['daily_sales'] ?? 0;
-                        $dailyDate = $daily['date'] ?? date('Y-m-d');
+                            // Fetch daily sales
+                            $stmt_daily = $DB_con->prepare(
+                                'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                                FROM orderdetails
+                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                                WHERE DATE(order_date) = ?' . $order_type_str . $date_filter
+                            );
+                            $stmt_daily->execute([$end_date]);
+                            $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
+                            $dailySales = $daily['daily_sales'] ?? 0;
+                            $dailyDate = $daily['date'] ?? date('Y-m-d');
 
-                        // Fetch weekly sales
-                        $stmt_weekly = $DB_con->prepare(
-                            'SELECT SUM(order_total) as weekly_sales
-                             FROM orderdetails 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                             WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
-                        );
-                        $stmt_weekly->execute([$start_date_weekly, $end_date]);
-                        $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
-                        $weeklySales = $weekly['weekly_sales'] ?? 0;
-                        $weeklyStartDate = $start_date_weekly;
-                        $weeklyEndDate = $end_date;
+                            // Fetch weekly sales
+                            $stmt_weekly = $DB_con->prepare(
+                                'SELECT SUM(order_total) as weekly_sales
+                                 FROM orderdetails 
+                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                                 WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
+                            );
+                            $stmt_weekly->execute([$start_date_weekly, $end_date]);
+                            $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
+                            $weeklySales = $weekly['weekly_sales'] ?? 0;
+                            $weeklyStartDate = $start_date_weekly;
+                            $weeklyEndDate = $end_date;
 
-                        // Fetch monthly sales
-                        $stmt_monthly = $DB_con->prepare(
-                            'SELECT SUM(order_total) as monthly_sales
-                             FROM orderdetails 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                             WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
-                        );
-                        $stmt_monthly->execute([$start_date_monthly, $end_date]);
-                        $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
-                        $monthlySales = $monthly['monthly_sales'] ?? 0;
-                        $monthlyStartDate = $start_date_monthly;
-                        $monthlyEndDate = $end_date;
-                    ?>
+                            // Fetch monthly sales
+                            $stmt_monthly = $DB_con->prepare(
+                                'SELECT SUM(order_total) as monthly_sales
+                                 FROM orderdetails 
+                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
+                                 WHERE (DATE(order_date) BETWEEN ? AND ?)' . $order_type_str . $date_filter
+                            );
+                            $stmt_monthly->execute([$start_date_monthly, $end_date]);
+                            $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
+                            $monthlySales = $monthly['monthly_sales'] ?? 0;
+                            $monthlyStartDate = $start_date_monthly;
+                            $monthlyEndDate = $end_date;
+                        ?>
 
                         <!-- Daily Sales Container -->
                         <div class="sales-report-item" data-toggle="modal" data-target="#dailySales">

@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<div class=\"input_group\">";
                             $receipt .= "<div class=\"input_box\">";
                             $receipt .= "<button style=\"margin: 10px auto;\" onclick=\"window.print()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Print</button>";
-                            $receipt .= "<button onclick=\"saveAsPDF()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Save as PDF</button>";
+                            $receipt .= "<button style=\"margin-bottom: 10px;\"  onclick=\"saveAsPDF()\" type=\"button\" href=\"shop.php\" class=\"w-100 btn btn-primary\">Save as PDF</button>";
                             $receipt .= "<a href=\"shop.php\" class=\"w-100 btn btn-primary\">Shop</a>";
                             $receipt .= "</div>";
                             $receipt .= "</div>";

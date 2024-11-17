@@ -1,6 +1,15 @@
 <?php
 session_start();
+
+require '../vendor/autoload.php';
+use Dotenv\Dotenv;
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+define('HOST', $_ENV['MAILER_HOST']);
+define('EMAIL_ADDRESS', $_ENV['MAILER_EMAIL']);
+define('EMAIL_PASSWORD', $_ENV['MAILER_PASS']);
 include 'config.php'; // Include your database connection file
+include 'cancellation_email.php';
 
 // Set headers to ensure JSON response
 header('Content-Type: application/json');
@@ -95,6 +104,11 @@ try {
             $updatePaymentForm = $DB_con->prepare("UPDATE paymentform
                 SET payment_status = 'Returned' WHERE id = ?");
             $updatePaymentForm->execute([$payment_id]);
+
+            $orderDetails = $DB_con->prepare('SELECT orderdetails.*, users.user_email, users.user_firstname, users.user_lastname, users.user_mobile FROM orderdetails JOIN users ON orderdetails.user_id = users.user_id WHERE orderdetails.payment_id = :payment_id');
+            $orderDetails->execute([':payment_id' => $payment_id]);
+            $orders = $orderDetails->fetchAll(PDO::FETCH_ASSOC);
+            sendCancellationEmail($orders);
 
             echo json_encode([
                 'success' => true,

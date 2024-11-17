@@ -294,6 +294,7 @@ require_once 'config.php';
     #cmlReciept img {
         width: 125px !important;
         height: 125px !important;
+        object-fit: contain;
     }
 }
 

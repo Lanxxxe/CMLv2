@@ -93,6 +93,24 @@ function isActivated($s) {
     <link rel="stylesheet" type="text/css" href="css/local.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
     <style>
+        #loading {
+          display: flex;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(192, 192, 192, 0.5);
+          background-image: url("../ForgotPassword/images/loading.gif");
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+
+        .hide {
+          display: none !important;
+        }
+
         .dashboard-circle {
             width: 170px;
             height: 90px;
@@ -231,7 +249,7 @@ function isActivated($s) {
 							<td><?php echo htmlspecialchars($row['order_status']) ?></td>
                             <td style="cursor: pointer;" 
                                 <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') 
-                                    ? "onclick=\"changeStatus('" . htmlspecialchars($row['user_id']) . "', '" . htmlspecialchars($row['payment_id']) . "')\"" 
+                                    ? "onclick=\"changeStatus('" . htmlspecialchars($row['user_id']) . "', '" . htmlspecialchars($row['order_id']) . "')\"" 
                                     : ''; 
                                 ?>>                                
                                 <?php
@@ -279,10 +297,20 @@ function isActivated($s) {
     </div>
 </div>
 
+<div id="loading" class="hide"></div>
 <?php include_once("uploadItems.php") ?>
 <?php include_once("insertBrandsModal.php"); ?>
 
 <script>
+    const setVisible = (elementOrSelector, visible) => {
+      const element = document.querySelector(elementOrSelector);
+      if (visible) {
+        element.classList.remove("hide");
+      } else {
+        element.classList.add("hide");
+      }
+    };
+
     document.querySelector("#nav_dashboard").className = "active";
 
     $(document).ready(function () {
@@ -315,8 +343,8 @@ function isActivated($s) {
         return true;
     }
 
-    function changeStatus(userID, payment_id) {
-        if (payment_id){
+    function changeStatus(userID, order_id) {
+        if (order_id){
             Swal.fire({
                 title: 'Edit Product',
                 html: `
@@ -341,22 +369,23 @@ function isActivated($s) {
                         return false;
                     }
 
-                    if (!payment_id) {
+                    if (!order_id) {
                         Swal.showValidationMessage('The order is unpaid. Please contact the customer.');
                         return false;
                     }
 
-                    return { userID, payment_id, selectedStatus };
+                    return { userID, order_id, selectedStatus };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    setVisible('#loading', true);
                     const formData = new FormData();
                     formData.append('action', 'update_status');
                     formData.append('user_id', result.value.userID);
-                    formData.append('payment_id', result.value.payment_id);
+                    formData.append('order_id', result.value.order_id);
                     formData.append('status', result.value.selectedStatus);
                     console.log(result.value.userID);
-                    console.log(result.value.payment_id);
+                    console.log(result.value.order_id);
                     console.log(result.value.selectedStatus);
                     // console.log(result);
                     fetch('updateStatus.php', {
@@ -365,6 +394,7 @@ function isActivated($s) {
                     })
                     .then(response => response.json())
                     .then(data => {
+                        setVisible('#loading', false);
                         // data_obj = JSON.json_encode(data);
                         console.log(typeof(data));
                         if (data.success) {
@@ -376,6 +406,13 @@ function isActivated($s) {
                                 // Optionally, reload the page or update the UI
                                 location.reload();
                             });
+                        } else if (data?.type === 'info'){
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'No changes were made!',
+                                text: data.message || 'A warning occurred while updating the order status.'
+                            });
+
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -385,6 +422,7 @@ function isActivated($s) {
                         }
                     })
                     .catch(error => {
+                        setVisible('#loading', false);
                         console.error('Error updating order status:', error);
                         Swal.fire({
                             icon: 'error',

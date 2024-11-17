@@ -1,3 +1,22 @@
+<style>
+#notificationBadge {
+    background-color: #ff0000 !important; /* Bright red color */
+    color: white !important;
+    border-radius: 50% !important;
+    font-size: 8px !important; /* Smaller font size */
+    font-weight: bold !important;
+    position: absolute !important; /* Position it relative to the parent */
+    top: 14px !important; /* Align to the top */
+    left: 8px !important; /* Align to the left */
+    height: 12px !important;
+    width: 12px !important;
+    text-align: center !important;
+    line-height: 14px !important;
+}
+#notificationButton {
+    position: relative !important; /* Make the parent element positioned */
+}
+</style>
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -24,6 +43,22 @@
             <li id="nav_logout"><a href="javascript:confirmLogout()"> &nbsp; &nbsp; &nbsp; Logout</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-user">
+            <?php
+
+                $stmt = $DB_con->prepare('SELECT COUNT(id) as notifications_count FROM admin_notifications_views WHERE status = "unread"');
+                $stmt->execute();
+                $unreadCount = $stmt->fetch(PDO::FETCH_NUM)[0];
+            ?>
+                <li class="dropdown messages-dropdown" id="notificationButton">
+                    <a href="./notifications.php">
+                        <i class="fa fa-bell"></i>
+                        Notifications
+                        <span id="notificationBadge" style="display: <?php echo ($unreadCount > 0) ? 'inline-block' : 'none'; ?>;">
+                            <?php echo $unreadCount; ?>
+                        </span>
+                    </a>
+                </li>
+
             <li class="dropdown messages-dropdown">
                 <a href="#"><i class="fa fa-calendar"></i>  <?php
                 $Today=date('y:m:d');

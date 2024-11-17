@@ -30,7 +30,7 @@ if(isset($_GET['brand_id'])) {
     echo json_encode($types);
     exit;
 }
-
+include_once 'config.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
