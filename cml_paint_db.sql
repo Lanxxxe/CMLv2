@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2024 at 04:22 AM
+-- Generation Time: Nov 17, 2024 at 07:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -279,7 +279,7 @@ CREATE TABLE `items` (
   `expiration_date` varchar(255) DEFAULT NULL,
   `item_price` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `quantity` int(11) NOT NULL,
+  `quantity` decimal(10,2) DEFAULT NULL,
   `gl` varchar(255) NOT NULL,
   `pallet_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
@@ -289,12 +289,12 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`) VALUES
-(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 18, 'Gallon', 9),
-(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 10, 'Gallon', 3),
-(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 96, 'Gallon', 12),
-(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 85, 'Gallon', 17),
-(50, 'Boysen Paint', 'Boysen', '80066.jpeg', '2024-11-04 00:00:00.000000', '2026-11-03', '120', 'Flat Paint', 95, 'Gallon', 16),
-(51, 'Latex Paint', 'Boysen', '512213.jpeg', '2024-11-07 00:00:00.000000', '2026-11-20', '100', 'Latex Paint', 82, 'Gallon', 1);
+(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 18.00, 'Gallon', 9),
+(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 7.00, 'Gallon', 3),
+(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 93.00, 'Gallon', 12),
+(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 85.00, 'Gallon', 17),
+(50, 'Boysen Paint', 'Boysen', '80066.jpeg', '2024-11-04 00:00:00.000000', '2026-11-03', '120', 'Flat Paint', 95.00, 'Gallon', 16),
+(51, 'Latex Paint', 'Boysen', '512213.jpeg', '2024-11-07 00:00:00.000000', '2026-11-20', '100', 'Latex Paint', 82.00, 'Gallon', 1);
 
 -- --------------------------------------------------------
 
@@ -334,7 +334,11 @@ INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, 
 (124, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-09', '2024-11-10 05:19:00.000000', 'Caloocan', 'Gallon', 59, 47),
 (125, 8, 'Boysen Paint', 120, 13, 1560, 'Returned', '2024-11-14', '2024-11-15 01:32:00.000000', 'Caloocan', 'Gallon', 62, 49),
 (126, 8, 'Latex Paint', 100, 15, 1500, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 63, 51),
-(127, 8, 'Boysen Paint', 120, 3, 360, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 64, 50);
+(127, 8, 'Boysen Paint', 120, 3, 360, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 64, 50),
+(134, 8, 'Boysen Gloss', 100, 1, 100, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 47),
+(135, 8, 'Boysen Paint', 200, 1, 200, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 48),
+(138, 17, 'Boysen Gloss', 100, 1, 100, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 47),
+(139, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 48);
 
 -- --------------------------------------------------------
 
@@ -636,7 +640,9 @@ INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `m
 (61, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/ORIENT GOLD.jpeg', '2024-11-09 05:39:01', NULL, 'Returned', 0),
 (62, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1560.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-11-14 01:33:54', NULL, 'Returned', 0),
 (63, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1500.00, './uploaded_images/Black.jpg', '2024-11-14 01:34:11', NULL, 'Returned', 0),
-(64, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 360.00, './uploaded_images/Brands.png', '2024-11-14 01:34:24', NULL, 'Returned', 0);
+(64, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 360.00, './uploaded_images/Brands.png', '2024-11-14 01:34:24', NULL, 'Returned', 0),
+(66, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 300.00, './uploaded_images/LAMP BLACK.jpeg', '2024-11-17 16:38:27', NULL, 'verification', 0),
+(67, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 300.00, '', '2024-11-17 16:55:50', NULL, 'Confirmed', 0);
 
 -- --------------------------------------------------------
 
@@ -900,13 +906,13 @@ ALTER TABLE `cartitems`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -918,7 +924,7 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
