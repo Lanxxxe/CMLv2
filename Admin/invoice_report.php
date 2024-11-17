@@ -138,7 +138,7 @@ include_once 'config.php';
                     <form method="GET" action="generate_refund_report.php" style="margin-top: 15px">
                         <input type="hidden" name="filter_date" value="<?php echo htmlspecialchars($filter_date); ?>">
                         <input type="hidden" name="filter_type" value="<?php echo htmlspecialchars($filter_type); ?>">
-                        <button type="submit" class="btn btn-success">Generate PDF</button>
+                        <button type="submit" class="btn btn-success">Save as PDF</button>
                     </form>
     
                     <button type="button" class="btn btn-primary" style="margin-top: 15px" onclick="printContent()">
