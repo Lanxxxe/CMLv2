@@ -10,7 +10,7 @@
     </div>
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav side-nav">
-            <li><a href="index.php"> &nbsp; <span class='glyphicon glyphicon-home'></span> Home</a></li>
+            <li><a href="index.php"> &nbsp; <span class='glyphicon glyphicon-home'></span> Home <?php echo $_SESSION['current_branch'] ? '(' . $_SESSION['current_branch'] . ')' : ''; ?></a></li>
             <li><a href="shop.php?id=1"> &nbsp; <span class='glyphicon glyphicon-shopping-cart'></span> Shop Now</a></li>
             <?php 
                 if ($_SESSION['user_type'] != 'Cashier'){

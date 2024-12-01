@@ -19,6 +19,11 @@ try {
         $user_lastname = $row['user_lastname'];
         $user_address = $row['user_address'];
         $user_mobile = $row['user_mobile'];
+        try {
+            $assignedBranch = $row['assigned_branch'];
+        } catch(Exception $e) {
+            $assignedBranch = '';
+        }
 
         $_SESSION['user_id'] = $userid;    
         $_SESSION['user_email'] = $user_email;
@@ -28,6 +33,9 @@ try {
         $_SESSION['user_address'] = $user_address;
         $_SESSION['user_mobile'] = $user_mobile;
         $_SESSION['user_type'] = $user_type;
+        if ($assignedBranch) {
+            $_SESSION['current_branch'] = $assignedBranch;
+        }
     } else {
         throw new Exception('Email or password is incorrect!');
     }

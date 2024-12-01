@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 17, 2024 at 07:25 PM
+-- Generation Time: Dec 01, 2024 at 12:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -232,6 +232,40 @@ INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `admin_notifications`
+--
+
+CREATE TABLE `admin_notifications` (
+  `id` int(11) NOT NULL,
+  `user_email` varchar(255) NOT NULL,
+  `head_msg` varchar(255) NOT NULL,
+  `ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted') NOT NULL,
+  `payment_id` int(11) DEFAULT NULL,
+  `return_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `status` enum('read','unread') NOT NULL DEFAULT 'unread',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `admin_notifications_views`
+-- (See below for the actual view)
+--
+CREATE TABLE `admin_notifications_views` (
+`id` int(11)
+,`user_email` varchar(255)
+,`status` enum('read','unread')
+,`ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted')
+,`head_msg` varchar(255)
+,`created_at` timestamp
+,`message` mediumtext
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `brands`
 --
 
@@ -339,6 +373,49 @@ INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, 
 (135, 8, 'Boysen Paint', 200, 1, 200, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 48),
 (138, 17, 'Boysen Gloss', 100, 1, 100, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 47),
 (139, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 48);
+
+--
+-- Triggers `orderdetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trigger_change_order_status_notif` AFTER UPDATE ON `orderdetails` FOR EACH ROW BEGIN
+    DECLARE user_email VARCHAR(255);
+
+    SELECT email INTO user_email
+    FROM paymentform 
+    WHERE id = NEW.payment_id
+    LIMIT 1;
+
+    IF NEW.order_status = 'Confirmed' AND OLD.order_status != 'Confirmed' 
+       AND OLD.order_status != 'verification' THEN 
+        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.order_id,
+            'confirmed', 
+            user_email, 
+            'Order Confirmed'
+        );
+    ELSEIF NEW.order_status = 'Rejected' AND OLD.order_status != 'Rejected' 
+           AND OLD.order_status != 'verification' THEN
+        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.order_id,
+            'cancelled', 
+            user_email, 
+            'Order Cancelled'
+        );
+    ELSEIF NEW.order_status = 'Returned' AND OLD.order_status != 'Returned' THEN
+        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.order_id,
+            'returned', 
+            user_email, 
+            'Order Returned'
+        );
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -644,6 +721,54 @@ INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `m
 (66, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 300.00, './uploaded_images/LAMP BLACK.jpeg', '2024-11-17 16:38:27', NULL, 'verification', 0),
 (67, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 300.00, '', '2024-11-17 16:55:50', NULL, 'Confirmed', 0);
 
+--
+-- Triggers `paymentform`
+--
+DELIMITER $$
+CREATE TRIGGER `trigger_order_notif` AFTER INSERT ON `paymentform` FOR EACH ROW BEGIN
+    IF NEW.payment_type = 'Full Payment' THEN 
+        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.id,
+            'ordered', 
+            NEW.email, 
+            'New Order Placed'
+        );
+    ELSEIF NEW.payment_type IN ('Installment', 'Down Payment') THEN
+        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.id,
+            'requested', 
+            NEW.email, 
+            'Payment Approval Required'
+        );
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trigger_update_order_notif` AFTER UPDATE ON `paymentform` FOR EACH ROW BEGIN
+    IF NEW.payment_status = 'Confirmed' AND OLD.payment_status != 'Confirmed' THEN 
+        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.id,
+            'confirmed', 
+            NEW.email, 
+            'Payment Confirmed'  -- Fixed typo
+        );
+    ELSEIF NEW.payment_status = 'Failed' AND OLD.payment_status != 'Failed' THEN
+        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.id,
+            'cancelled', 
+            NEW.email, 
+            'Payment Cancelled'
+        );
+    END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -657,6 +782,31 @@ CREATE TABLE `payment_track` (
   `amount` decimal(10,2) NOT NULL,
   `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Triggers `payment_track`
+--
+DELIMITER $$
+CREATE TRIGGER `trigger_partial_payment_notif` AFTER INSERT ON `payment_track` FOR EACH ROW BEGIN
+    DECLARE user_email VARCHAR(255);
+    
+    IF NEW.status = 'Requested' THEN
+        SELECT email INTO user_email
+        FROM paymentform 
+        WHERE id = NEW.payment_id
+        LIMIT 1;
+        
+        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.payment_id,
+            'requested', 
+            user_email, 
+            'Payment Installment Request'
+        );
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -719,6 +869,74 @@ CREATE TABLE `returnitems` (
 INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `product_image`, `receipt_image`, `product_name`, `status`) VALUES
 (4, 8, 'Incorrect Item', 2, 'returnItems/MAHOGANY BROWN.jpeg', 'returnItems/ORIENT GOLD.jpeg', 'Boysen Paint', 'Confirmed');
 
+--
+-- Triggers `returnitems`
+--
+DELIMITER $$
+CREATE TRIGGER `trigger_delete_return_request` BEFORE DELETE ON `returnitems` FOR EACH ROW BEGIN
+    DECLARE user_email VARCHAR(255);
+
+    SELECT email INTO user_email
+    FROM users 
+    WHERE id = OLD.user_id;  -- Fixed NEW to OLD since this is a DELETE trigger
+    
+    INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
+    VALUES (
+        OLD.return_id,
+        'return deleted', 
+        user_email, 
+        'Return Request Deleted'
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trigger_insert_return_request` AFTER INSERT ON `returnitems` FOR EACH ROW BEGIN
+    DECLARE user_email VARCHAR(255);
+    
+    SELECT email INTO user_email
+    FROM users 
+    WHERE id = NEW.user_id;
+    
+    INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
+    VALUES (
+        NEW.return_id,
+        'return request', 
+        user_email, 
+        'New Return Request'  -- Updated message
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trigger_update_return_request` AFTER UPDATE ON `returnitems` FOR EACH ROW BEGIN
+    DECLARE user_email VARCHAR(255);
+
+    SELECT email INTO user_email
+    FROM users 
+    WHERE id = NEW.user_id;
+    
+    IF NEW.status = 'Confirmed' AND OLD.status != 'Confirmed' THEN 
+        INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.return_id,
+            'returned', 
+            user_email, 
+            'Return Confirmed'
+        );
+    ELSEIF NEW.status = 'Rejected' AND OLD.status != 'Rejected' THEN 
+        INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
+        VALUES (
+            NEW.return_id,
+            'return rejected', 
+            user_email, 
+            'Return Request Rejected'
+        );
+    END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -759,17 +977,19 @@ CREATE TABLE `users` (
   `user_lastname` varchar(1000) NOT NULL,
   `user_address` varchar(1000) NOT NULL,
   `user_mobile` varchar(255) NOT NULL,
-  `type` enum('Admin','Customer','Cashier') DEFAULT NULL
+  `type` enum('Admin','Customer','Cashier') DEFAULT NULL,
+  `assigned_branch` enum('Caloocan','San Jose Del Monte, Bulacan','Quezon City','Valenzuela City') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`) VALUES
-(6, 'admin@email.com', 'admin', 'admin', 'administrator', 'Ilocos Norte', '09123456778', 'Admin'),
-(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer'),
-(17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier');
+INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`, `assigned_branch`) VALUES
+(6, 'admin@email.com', 'admin', 'admin', 'administrator', 'Ilocos Norte', '09123456778', 'Admin', 'Caloocan'),
+(8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer', NULL),
+(17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier', 'Caloocan'),
+(24, 'as', 'asd', 'asda', 'asd', 'asd', 'asd', 'Admin', 'San Jose Del Monte, Bulacan');
 
 -- --------------------------------------------------------
 
@@ -788,7 +1008,17 @@ CREATE TABLE `wishlist` (
 --
 
 INSERT INTO `wishlist` (`wish_id`, `user_id`, `item_id`) VALUES
-(6, 0, 47);
+(6, 0, 47),
+(8, 8, 47);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `admin_notifications_views`
+--
+DROP TABLE IF EXISTS `admin_notifications_views`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `admin_notifications_views`  AS SELECT `a`.`id` AS `id`, `a`.`user_email` AS `user_email`, `a`.`status` AS `status`, `a`.`ntype` AS `ntype`, `a`.`head_msg` AS `head_msg`, `a`.`created_at` AS `created_at`, CASE WHEN `a`.`payment_id` is null AND `a`.`order_id` is not null THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',`o`.`order_name`,'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',`o`.`order_name`,'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') end from `orderdetails` `o` where `o`.`order_id` = `a`.`order_id`) WHEN `a`.`ntype` in ('ordered','requested','confirmed','cancelled') THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') end from `orderdetails` `o` where `o`.`payment_id` = `a`.`payment_id` group by `a`.`payment_id`) WHEN `a`.`ntype` in ('returned','return request','return rejected','return deleted') THEN (select case `a`.`ntype` when 'returned' then concat(`a`.`user_email`,' has returned ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return request' then concat(`a`.`user_email`,' has requested to return ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return rejected' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been rejected') when 'return deleted' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been deleted') end from `returnitems` `r` where `r`.`return_id` = `a`.`return_id`) END AS `message` FROM `admin_notifications` AS `a` ;
 
 --
 -- Indexes for dumped tables
@@ -799,6 +1029,12 @@ INSERT INTO `wishlist` (`wish_id`, `user_id`, `item_id`) VALUES
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`admin_id`);
+
+--
+-- Indexes for table `admin_notifications`
+--
+ALTER TABLE `admin_notifications`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `brands`
@@ -891,6 +1127,12 @@ ALTER TABLE `admin`
   MODIFY `admin_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `admin_notifications`
+--
+ALTER TABLE `admin_notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
@@ -954,13 +1196,13 @@ ALTER TABLE `return_payments`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -989,279 +1231,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-
-DROP TABLE IF EXISTS admin_notifications;
-DROP VIEW IF EXISTS admin_notifications_views;
-DROP TRIGGER IF EXISTS trigger_order_notif;
-DROP TRIGGER IF EXISTS trigger_partial_payment_notif;
-DROP TRIGGER IF EXISTS trigger_update_order_notif;
-DROP TRIGGER IF EXISTS trigger_update_return_request;
-DROP TRIGGER IF EXISTS trigger_insert_return_request;
-DROP TRIGGER IF EXISTS trigger_delete_return_request;  -- Added this missing trigger
-DROP TRIGGER IF EXISTS trigger_change_order_status_notif;
-
--- Create the notifications table
-CREATE TABLE admin_notifications (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    user_email VARCHAR(255) NOT NULL,
-    head_msg VARCHAR(255) NOT NULL,
-    ntype ENUM('ordered', 'returned', 'confirmed', 'requested', 'cancelled', 'return request', 'return rejected', 'return deleted') NOT NULL,
-    payment_id INT,
-    return_id INT,
-    order_id INT,
-    status ENUM('read', 'unread') NOT NULL DEFAULT 'unread',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Added timestamp for better tracking
-);
-
--- View for notifications
-CREATE VIEW admin_notifications_views AS
-SELECT 
-    a.id,
-    a.user_email, 
-    a.status,
-    a.ntype,
-    a.head_msg,
-    a.created_at,  -- Added timestamp to view
-    CASE 
-        WHEN a.payment_id IS NULL AND a.order_id IS NOT NULL THEN
-            (SELECT 
-                CASE a.ntype
-                    WHEN 'ordered' 
-                        THEN CONCAT(a.user_email, ' has placed a new order for ', o.order_name, '.')
-                    WHEN 'requested'
-                        THEN CONCAT(a.user_email, ' has requested payment approval for ', o.order_name, '.')
-                    WHEN 'confirmed'
-                        THEN CONCAT('Payment confirmed for ', a.user_email, '''s order of ', o.order_name, '.')
-                    WHEN 'cancelled'
-                        THEN CONCAT('Payment cancelled for ', a.user_email, '''s order of ', o.order_name, '.')
-                    WHEN 'returned'
-                        THEN CONCAT('Item refund for ', a.user_email, '''s order of ', o.order_name, '.')
-                END
-            FROM orderdetails o 
-            WHERE o.order_id = a.order_id)
-        WHEN a.ntype IN ('ordered', 'requested', 'confirmed', 'cancelled')  THEN
-            (SELECT 
-                CASE a.ntype
-                    WHEN 'ordered' 
-                        THEN CONCAT(a.user_email, ' has placed a new order for ', 
-                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
-                    WHEN 'requested'
-                        THEN CONCAT(a.user_email, ' has requested payment approval for ', 
-                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
-                    WHEN 'confirmed'
-                        THEN CONCAT('Payment confirmed for ', a.user_email, '''s order of ', 
-                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
-                    WHEN 'cancelled'
-                        THEN CONCAT('Payment cancelled for ', a.user_email, '''s order of ',
-                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
-                    WHEN 'returned'
-                        THEN CONCAT('Item refund for ', a.user_email, '''s order of ',
-                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
-                END
-            FROM orderdetails o 
-            WHERE o.payment_id = a.payment_id
-            GROUP BY a.payment_id)
-        WHEN a.ntype IN ('returned', 'return request', 'return rejected', 'return deleted') THEN
-            (SELECT 
-                CASE a.ntype
-                    WHEN 'returned' 
-                        THEN CONCAT(a.user_email, ' has returned ', r.quantity, ' ', r.product_name, 
-                              '. Reason: ', r.reason)
-                    WHEN 'return request'
-                        THEN CONCAT(a.user_email, ' has requested to return ', r.quantity, ' ', r.product_name,
-                              '. Reason: ', r.reason)
-                    WHEN 'return rejected'
-                        THEN CONCAT('Return request for ', r.quantity, ' ', r.product_name, 
-                              ' has been rejected')
-                    WHEN 'return deleted'
-                        THEN CONCAT('Return request for ', r.quantity, ' ', r.product_name, 
-                              ' has been deleted')
-                END
-            FROM returnitems r 
-            WHERE r.return_id = a.return_id)
-    END AS message
-FROM admin_notifications a;
-
-DELIMITER $$
-
--- Triggers for order notifications
-CREATE TRIGGER trigger_order_notif
-AFTER INSERT ON paymentform 
-FOR EACH ROW
-BEGIN
-    IF NEW.payment_type = 'Full Payment' THEN 
-        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.id,
-            'ordered', 
-            NEW.email, 
-            'New Order Placed'
-        );
-    ELSEIF NEW.payment_type IN ('Installment', 'Down Payment') THEN
-        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.id,
-            'requested', 
-            NEW.email, 
-            'Payment Approval Required'
-        );
-    END IF;
-END $$
-
--- Fixed trigger for partial payments
-CREATE TRIGGER trigger_partial_payment_notif
-AFTER INSERT ON payment_track
-FOR EACH ROW
-BEGIN
-    DECLARE user_email VARCHAR(255);
-    
-    IF NEW.status = 'Requested' THEN
-        SELECT email INTO user_email
-        FROM paymentform 
-        WHERE id = NEW.payment_id
-        LIMIT 1;
-        
-        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.payment_id,
-            'requested', 
-            user_email, 
-            'Payment Installment Request'
-        );
-    END IF;
-END $$
-
-CREATE TRIGGER trigger_update_order_notif
-AFTER UPDATE ON paymentform 
-FOR EACH ROW
-BEGIN
-    IF NEW.payment_status = 'Confirmed' AND OLD.payment_status != 'Confirmed' THEN 
-        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.id,
-            'confirmed', 
-            NEW.email, 
-            'Payment Confirmed'  -- Fixed typo
-        );
-    ELSEIF NEW.payment_status = 'Failed' AND OLD.payment_status != 'Failed' THEN
-        INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.id,
-            'cancelled', 
-            NEW.email, 
-            'Payment Cancelled'
-        );
-    END IF;
-END $$
-
--- Fixed return request triggers
-CREATE TRIGGER trigger_insert_return_request
-AFTER INSERT ON returnitems  -- Changed from UPDATE to INSERT
-FOR EACH ROW
-BEGIN
-    DECLARE user_email VARCHAR(255);
-    
-    SELECT email INTO user_email
-    FROM users 
-    WHERE id = NEW.user_id;
-    
-    INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
-    VALUES (
-        NEW.return_id,
-        'return request', 
-        user_email, 
-        'New Return Request'  -- Updated message
-    );
-END $$
-
-CREATE TRIGGER trigger_delete_return_request
-BEFORE DELETE ON returnitems 
-FOR EACH ROW
-BEGIN
-    DECLARE user_email VARCHAR(255);
-
-    SELECT email INTO user_email
-    FROM users 
-    WHERE id = OLD.user_id;  -- Fixed NEW to OLD since this is a DELETE trigger
-    
-    INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
-    VALUES (
-        OLD.return_id,
-        'return deleted', 
-        user_email, 
-        'Return Request Deleted'
-    );
-END $$
-
-CREATE TRIGGER trigger_update_return_request
-AFTER UPDATE ON returnitems 
-FOR EACH ROW
-BEGIN
-    DECLARE user_email VARCHAR(255);
-
-    SELECT email INTO user_email
-    FROM users 
-    WHERE id = NEW.user_id;
-    
-    IF NEW.status = 'Confirmed' AND OLD.status != 'Confirmed' THEN 
-        INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.return_id,
-            'returned', 
-            user_email, 
-            'Return Confirmed'
-        );
-    ELSEIF NEW.status = 'Rejected' AND OLD.status != 'Rejected' THEN 
-        INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.return_id,
-            'return rejected', 
-            user_email, 
-            'Return Request Rejected'
-        );
-    END IF;
-END $$
-
-CREATE TRIGGER trigger_change_order_status_notif
-AFTER UPDATE ON orderdetails 
-FOR EACH ROW
-BEGIN
-    DECLARE user_email VARCHAR(255);
-
-    SELECT email INTO user_email
-    FROM paymentform 
-    WHERE id = NEW.payment_id
-    LIMIT 1;
-
-    IF NEW.order_status = 'Confirmed' AND OLD.order_status != 'Confirmed' 
-       AND OLD.order_status != 'verification' THEN 
-        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.order_id,
-            'confirmed', 
-            user_email, 
-            'Order Confirmed'
-        );
-    ELSEIF NEW.order_status = 'Rejected' AND OLD.order_status != 'Rejected' 
-           AND OLD.order_status != 'verification' THEN
-        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.order_id,
-            'cancelled', 
-            user_email, 
-            'Order Cancelled'
-        );
-    ELSEIF NEW.order_status = 'Returned' AND OLD.order_status != 'Returned' THEN
-        INSERT INTO admin_notifications (order_id, ntype, user_email, head_msg)
-        VALUES (
-            NEW.order_id,
-            'returned', 
-            user_email, 
-            'Order Returned'
-        );
-    END IF;
-END $$
-
-DELIMITER ;

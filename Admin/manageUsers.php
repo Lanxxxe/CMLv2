@@ -18,6 +18,7 @@ try {
             $userLastName = trim($_POST['user_lastName']);
             $userAddress = trim($_POST['user_address']);
             $userMobile = trim($_POST['user_mobile']);
+            $branch = trim($_POST['assigned_branch']);
 
             // Prepare SQL query with placeholders
             $edituser = $DB_con->prepare("UPDATE users SET 
@@ -26,7 +27,8 @@ try {
             user_firstname = :first_name, 
             user_lastname = :last_name, 
             user_address = :address, 
-            user_mobile = :mobile 
+            user_mobile = :mobile, 
+            assigned_branch = :branch
             WHERE user_id = :id");
 
             // Bind parameters to the placeholders
@@ -36,6 +38,7 @@ try {
             $edituser->bindParam(':last_name', $userLastName);
             $edituser->bindParam(':address', $userAddress);
             $edituser->bindParam(':mobile', $userMobile);
+            $edituser->bindParam(':branch', $branch);
             $edituser->bindParam(':id', $userId);
 
             // Execute the query and check if it was successful
@@ -53,12 +56,17 @@ try {
             $userLastName = trim($_POST['user_lastName']);
             $userAddress = trim($_POST['user_address']);
             $userMobile = trim($_POST['user_mobile']);
-            $type = 'Cashier';
+            $assigedBranch = trim($_POST['assigned_branch']);
+            if ($_POST['user_type'] == 'Cashier') {
+                $type = 'Cashier';
+            } else if ($_POST['user_type'] == 'Admin') {
+                $type = 'Admin';
+            }
             // Prepare SQL query with placeholders
             $addUser = $DB_con->prepare("INSERT INTO users (
-                user_email, user_password, user_firstname, user_lastname, user_address, user_mobile, type
+                user_email, user_password, user_firstname, user_lastname, user_address, user_mobile, type, assigned_branch
             ) VALUES (
-                :email, :password, :first_name, :last_name, :address, :mobile, :type
+                :email, :password, :first_name, :last_name, :address, :mobile, :type, :branch
             )");
     
             // Bind parameters to the placeholders
@@ -69,6 +77,7 @@ try {
             $addUser->bindParam(':address', $userAddress);
             $addUser->bindParam(':mobile', $userMobile);
             $addUser->bindParam(':type', $type);
+            $addUser->bindParam(':branch', $assigedBranch);
             
             // Execute the query and check if it was successful
             if ($addUser->execute()) {

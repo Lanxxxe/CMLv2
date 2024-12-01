@@ -29,7 +29,7 @@
     </div>
     <div class="collapse navbar-collapse navbar-ex1-collapse">
         <ul class="nav navbar-nav side-nav">
-            <li id="nav_home"><a href="index.php"> &nbsp; &nbsp; &nbsp; Home</a></li>
+            <li id="nav_home"><a href="index.php"> &nbsp; &nbsp; &nbsp; Home (<?php echo $_SESSION['current_branch'] ? $_SESSION['current_branch'] : '' ?>) </a></li>
             <li id="nav_dashboard"><a href="orderdetails.php"> &nbsp; &nbsp; &nbsp; Dashboard</a></li>
             <li id="nav_add_stock"><a data-toggle="modal" data-target="#uploadModal"> &nbsp; &nbsp; &nbsp; Add Paint Products</a></li>
             <li id="nav_add_tools"><a data-toggle="modal" data-target="#uploadItems"> &nbsp; &nbsp; &nbsp; Add Paint Tools</a></li>

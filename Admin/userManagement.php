@@ -63,7 +63,13 @@ if(isset($_GET['brand_id'])) {
 
             <div class="users-container" width="100%">
                 <div class="admin-container">
-                    <h3>Admin</h3>
+                    <div style="display: flex; align-items: center; justify-content: start; gap: 7px;">
+                        <h3>Admin</h3>
+                        <button type="button" class="btn btn-sm add-account" onclick="displayAddAccount('Admin')";>
+                            Add Account
+                        </button>
+                    </div>  
+                    
                     <table class="users-table">
                         <thead>
                             <tr>
@@ -100,7 +106,8 @@ if(isset($_GET['brand_id'])) {
                                                 '<?php echo htmlspecialchars($row['user_lastname']) ?? ''; ?>',
                                                 '<?php echo htmlspecialchars($row['user_address']) ?? ''; ?>',
                                                 '<?php echo htmlspecialchars($row['user_mobile']) ?? ''; ?>',
-                                                '<?php echo htmlspecialchars($row['type']) ?? ''; ?>');">
+                                                '<?php echo htmlspecialchars($row['type']) ?? ''; ?>',
+                                                '<?php echo htmlspecialchars($row['assigned_branch']) ?? ''; ?>');">
                                                 Edit
                                             </button>                                    
                                         </td>
@@ -122,7 +129,7 @@ if(isset($_GET['brand_id'])) {
                 <div class="cashier-table">
                     <div style="display: flex; align-items: center; justify-content: start; gap: 7px;">
                         <h3>Cashier</h3>
-                        <button type="button" class="btn btn-sm add-account" onclick="displayAddAccount()";>
+                        <button type="button" class="btn btn-sm add-account" onclick="displayAddAccount('Cashier')";>
                             Add Account
                         </button>
                     </div>    
@@ -163,7 +170,8 @@ if(isset($_GET['brand_id'])) {
                                                 '<?php echo htmlspecialchars($row['user_lastname']) ?? ''; ?>',
                                                 '<?php echo htmlspecialchars($row['user_address']) ?? ''; ?>',
                                                 '<?php echo htmlspecialchars($row['user_mobile']) ?? ''; ?>',
-                                                '<?php echo htmlspecialchars($row['type']) ?? ''; ?>');">
+                                                '<?php echo htmlspecialchars($row['type']) ?? ''; ?>',
+                                                '<?php echo htmlspecialchars($row['assigned_branch']) ?? ''; ?>');">
                                                 Edit
                                             </button>      
                                             <button class="btn btn-danger" onclick="deleteAccount('<?php echo htmlspecialchars($row['user_id']) ?? ''; ?>');">Delete</button>   
@@ -268,28 +276,37 @@ if(isset($_GET['brand_id'])) {
     }    
 
 
-    const displayEditUser = (userID, email, password, firstName, lastName, address, mobile, type) => {
+    const displayEditUser = (userID, email, password, firstName, lastName, address, mobile, type, branch) => {
         Swal.fire({
             title: `Edit ${type} Information`,
             html: `
                 <div class="${formControlStyle}">
-                    <label class="form-label ${labelStyle}" for="editBrandName">Email</label>
+                    <label class="form-label ${labelStyle}" for="editUserEmail">Email</label>
                     <input type="text" id="editUserEmail" class="swal2-input ${inputStyle}" value="${email}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandName">Password</label>
+                    <label class="form-label ${labelStyle}" for="editUserPassword">Password</label>
                     <input type="password" id="editUserPassword" class="swal2-input ${inputStyle}" value="${password}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandName">First Name</label>
+                    <label class="form-label ${labelStyle}" for="editUserFirstName">First Name</label>
                     <input type="text" id="editUserFirstName" class="swal2-input ${inputStyle}" value="${firstName}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandName">Last Name</label>
+                    <label class="form-label ${labelStyle}" for="editUserLastName">Last Name</label>
                     <input type="text" id="editUserLastName" class="swal2-input ${inputStyle}" value="${lastName}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandName">Address</label>
+                    <label class="form-label ${labelStyle}" for="editUserAddress">Address</label>
                     <input type="text" id="editUserAddress" class="swal2-input ${inputStyle}" value="${address}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandName">Mobile Number</label>
+                    <label class="form-label ${labelStyle}" for="editUserMobile">Mobile Number</label>
                     <input type="text" id="editUserMobile" class="swal2-input ${inputStyle}" value="${mobile}">
+
+                    <label class="form-label ${labelStyle}" for="assignedBranch">Branch Assign</label>
+                    <select class="form-select ${labelStyle}" id="assignedBranch" aria-label="Assigned Branch">
+                        <option selected>Current: ${branch}</option>
+                        <option value="Caloocan">Caloocan (Main)</option>
+                        <option value="San Jose Del Monte, Bulacan">San Jose Del Monte, Bulacan</option>
+                        <option value="Quezon City">Quezon City</option>
+                        <option value="Valenzuela City">Valenzuela City</option>
+                    </select>
                 </div>
                 
             `,
@@ -303,13 +320,14 @@ if(isset($_GET['brand_id'])) {
                 const userLastName = document.querySelector('#editUserLastName').value;
                 const userAddress = document.querySelector('#editUserAddress').value;
                 const userMobile = document.querySelector('#editUserMobile').value;
+                const assignedBranch = document.querySelector('#assignedBranch').value;
                 
-                if (!userEmail || !userPassword || !userFirstName || !userLastName || !userAddress || !userMobile) {
+                if (!userEmail || !userPassword || !userFirstName || !userLastName || !userAddress || !userMobile || !assignedBranch) {
                     Swal.showValidationMessage('Please fill up all the information.');
                     return false;
                 }
                 
-                return { userEmail, userPassword, userFirstName, userLastName, userAddress, userMobile };
+                return { userEmail, userPassword, userFirstName, userLastName, userAddress, userMobile, assignedBranch };
             }
         }).then(( result ) => {
             if (result.isConfirmed) {
@@ -322,8 +340,9 @@ if(isset($_GET['brand_id'])) {
                 formData.append('user_lastName', result.value.userLastName);
                 formData.append('user_address', result.value.userAddress);
                 formData.append('user_mobile', result.value.userMobile);
-
-
+                formData.append('assigned_branch', result.value.assignedBranch);
+                console.log(result.value.assignedBranch);
+            
                 fetch('manageUsers.php', {
                     method: 'POST',
                     body: formData,
@@ -347,7 +366,7 @@ if(isset($_GET['brand_id'])) {
         });
     }
 
-    const displayAddAccount = () => {
+    const displayAddAccount = (account_Type) => {
         Swal.fire({
             title: 'Add New Account',
             html: `
@@ -369,6 +388,16 @@ if(isset($_GET['brand_id'])) {
 
                     <label class="form-label ${labelStyle}" for="newUserMobile">Mobile Number</label>
                     <input type="text" id="newUserMobile" class="swal2-input ${inputStyle}">
+
+                    <label class="form-label ${labelStyle}" for="assignBranch">Branch Assign</label>
+                    <select class="form-select ${labelStyle}" id="assignBranch" aria-label="Assigned Branch">
+                        <option selected>Select Branch</option>
+                        <option value="Caloocan">Caloocan (Main)</option>
+                        <option value="San Jose Del Monte, Bulacan">San Jose Del Monte, Bulacan</option>
+                        <option value="Quezon City">Quezon City</option>
+                        <option value="Valenzuela City">Valenzuela City</option>
+                    </select>
+
                 </div>
             `,
             showCancelButton: true,
@@ -381,24 +410,27 @@ if(isset($_GET['brand_id'])) {
                 const userLastName = document.querySelector('#newUserLastName').value;
                 const userAddress = document.querySelector('#newUserAddress').value;
                 const userMobile = document.querySelector('#newUserMobile').value;
+                const assignedBranch = document.querySelector('#assignBranch').value;
 
-                if (!userEmail || !userPassword || !userFirstName || !userLastName || !userAddress || !userMobile) {
+                if (!userEmail || !userPassword || !userFirstName || !userLastName || !userAddress || !userMobile || !assignedBranch) {
                     Swal.showValidationMessage('Please fill up all the information.');
                     return false;
                 }
 
-                return { userEmail, userPassword, userFirstName, userLastName, userAddress, userMobile };
+                return { userEmail, userPassword, userFirstName, userLastName, userAddress, userMobile, assignedBranch };
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 const formData = new FormData();
                 formData.append('action', 'add_user');
+                formData.append('user_type', account_Type);
                 formData.append('user_email', result.value.userEmail);
                 formData.append('user_password', result.value.userPassword);
                 formData.append('user_firstName', result.value.userFirstName);
                 formData.append('user_lastName', result.value.userLastName);
                 formData.append('user_address', result.value.userAddress);
                 formData.append('user_mobile', result.value.userMobile);
+                formData.append('assigned_branch', result.value.assignedBranch);
 
                 fetch('manageUsers.php', {
                     method: 'POST',
