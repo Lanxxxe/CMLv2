@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 01, 2024 at 12:02 PM
+-- Generation Time: Dec 02, 2024 at 09:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -247,6 +247,13 @@ CREATE TABLE `admin_notifications` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `admin_notifications`
+--
+
+INSERT INTO `admin_notifications` (`id`, `user_email`, `head_msg`, `ntype`, `payment_id`, `return_id`, `order_id`, `status`, `created_at`) VALUES
+(2, 'cashier@gmail.com', 'New Order Placed', 'ordered', 68, NULL, NULL, 'read', '2024-12-02 07:39:09');
+
 -- --------------------------------------------------------
 
 --
@@ -266,24 +273,46 @@ CREATE TABLE `admin_notifications_views` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `branch`
+--
+
+CREATE TABLE `branch` (
+  `branch_id` int(11) NOT NULL,
+  `branch_location` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `branch`
+--
+
+INSERT INTO `branch` (`branch_id`, `branch_location`) VALUES
+(1, 'Caloocan'),
+(2, 'San Jose Del Monte, Bulacan'),
+(3, 'Quezon City'),
+(4, 'Valenzuela City');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `brands`
 --
 
 CREATE TABLE `brands` (
   `brand_id` int(11) NOT NULL,
   `brand_name` varchar(255) NOT NULL,
-  `brand_img` text DEFAULT NULL
+  `brand_img` text DEFAULT NULL,
+  `branch_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brands`
 --
 
-INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`) VALUES
-(2, 'Boysen', 'local_image/1730109970_boysen.jpg'),
-(9, 'Rain or Shine', 'local_image/1730110516_rain-or-shine.png'),
-(10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg'),
-(12, 'Hippo', 'local_image/1730651776_hippo.png');
+INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`) VALUES
+(2, 'Boysen', 'local_image/1730109970_boysen.jpg', NULL),
+(9, 'Rain or Shine', 'local_image/1730110516_rain-or-shine.png', NULL),
+(10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg', NULL),
+(12, 'Hippo', 'local_image/1730651776_hippo.png', NULL);
 
 -- --------------------------------------------------------
 
@@ -325,7 +354,7 @@ CREATE TABLE `items` (
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`) VALUES
 (46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 18.00, 'Gallon', 9),
 (47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 7.00, 'Gallon', 3),
-(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 93.00, 'Gallon', 12),
+(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 92.00, 'Gallon', 12),
 (49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 85.00, 'Gallon', 17),
 (50, 'Boysen Paint', 'Boysen', '80066.jpeg', '2024-11-04 00:00:00.000000', '2026-11-03', '120', 'Flat Paint', 95.00, 'Gallon', 16),
 (51, 'Latex Paint', 'Boysen', '512213.jpeg', '2024-11-07 00:00:00.000000', '2026-11-20', '100', 'Latex Paint', 82.00, 'Gallon', 1);
@@ -349,30 +378,32 @@ CREATE TABLE `orderdetails` (
   `order_pick_place` enum('Quezon City','Caloocan','Valenzuela','San Jose de Monte') DEFAULT NULL,
   `gl` enum('Gallon','Liter') DEFAULT NULL,
   `payment_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL
+  `product_id` int(11) DEFAULT NULL,
+  `branch_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `orderdetails`
 --
 
-INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
-(108, 8, 'Boysen Paint', 100, 1, 100, 'Returned', '2024-11-04', '2024-11-04 19:06:00.000000', 'Caloocan', 'Gallon', 53, 46),
-(109, 8, 'Boysen Gloss', 100, 1, 100, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 47),
-(110, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 50),
-(111, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 49),
-(120, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:32:00.000000', 'Caloocan', 'Gallon', 57, 50),
-(121, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:33:00.000000', 'Caloocan', 'Gallon', 58, 49),
-(122, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 60, 47),
-(123, 8, 'Latex Paint', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 61, 51),
-(124, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-09', '2024-11-10 05:19:00.000000', 'Caloocan', 'Gallon', 59, 47),
-(125, 8, 'Boysen Paint', 120, 13, 1560, 'Returned', '2024-11-14', '2024-11-15 01:32:00.000000', 'Caloocan', 'Gallon', 62, 49),
-(126, 8, 'Latex Paint', 100, 15, 1500, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 63, 51),
-(127, 8, 'Boysen Paint', 120, 3, 360, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 64, 50),
-(134, 8, 'Boysen Gloss', 100, 1, 100, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 47),
-(135, 8, 'Boysen Paint', 200, 1, 200, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 48),
-(138, 17, 'Boysen Gloss', 100, 1, 100, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 47),
-(139, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 48);
+INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`, `branch_id`) VALUES
+(108, 8, 'Boysen Paint', 100, 1, 100, 'Returned', '2024-11-04', '2024-11-04 19:06:00.000000', 'Caloocan', 'Gallon', 53, 46, 1),
+(109, 8, 'Boysen Gloss', 100, 1, 100, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 47, 1),
+(110, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 50, 1),
+(111, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 49, 2),
+(120, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:32:00.000000', 'Caloocan', 'Gallon', 57, 50, 2),
+(121, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:33:00.000000', 'Caloocan', 'Gallon', 58, 49, 2),
+(122, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 60, 47, 3),
+(123, 8, 'Latex Paint', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 61, 51, 3),
+(124, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-09', '2024-11-10 05:19:00.000000', 'Caloocan', 'Gallon', 59, 47, 4),
+(125, 8, 'Boysen Paint', 120, 13, 1560, 'Returned', '2024-11-14', '2024-11-15 01:32:00.000000', 'Caloocan', 'Gallon', 62, 49, 4),
+(126, 8, 'Latex Paint', 100, 15, 1500, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 63, 51, 1),
+(127, 8, 'Boysen Paint', 120, 3, 360, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 64, 50, 1),
+(134, 8, 'Boysen Gloss', 100, 1, 100, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 47, 3),
+(135, 8, 'Boysen Paint', 200, 1, 200, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 48, 4),
+(138, 17, 'Boysen Gloss', 100, 1, 100, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 47, 2),
+(139, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 48, 2),
+(141, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-02', '2024-12-02 08:39:09.000000', 'Caloocan', NULL, 68, 48, 4);
 
 --
 -- Triggers `orderdetails`
@@ -719,7 +750,8 @@ INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `m
 (63, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1500.00, './uploaded_images/Black.jpg', '2024-11-14 01:34:11', NULL, 'Returned', 0),
 (64, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 360.00, './uploaded_images/Brands.png', '2024-11-14 01:34:24', NULL, 'Returned', 0),
 (66, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 300.00, './uploaded_images/LAMP BLACK.jpeg', '2024-11-17 16:38:27', NULL, 'verification', 0),
-(67, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 300.00, '', '2024-11-17 16:55:50', NULL, 'Confirmed', 0);
+(67, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 300.00, '', '2024-11-17 16:55:50', NULL, 'Confirmed', 0),
+(68, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-12-02 07:39:09', NULL, 'Confirmed', 0);
 
 --
 -- Triggers `paymentform`
@@ -989,7 +1021,12 @@ INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`,
 (6, 'admin@email.com', 'admin', 'admin', 'administrator', 'Ilocos Norte', '09123456778', 'Admin', 'Caloocan'),
 (8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer', NULL),
 (17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier', 'Caloocan'),
-(24, 'as', 'asd', 'asda', 'asd', 'asd', 'asd', 'Admin', 'San Jose Del Monte, Bulacan');
+(25, 'bulancanadmin@email.com', 'admin', 'bulacan', 'admin', 'bulacan', '90193192738', 'Admin', 'San Jose Del Monte, Bulacan'),
+(26, 'qcadmin@email.com', 'admin', 'quezon city', 'admin', 'Quezon City', '09123619823', 'Admin', 'Quezon City'),
+(27, 'valenzuelaadmin@email.com', 'admin', 'valenzuela', 'admin', 'Valenzuela City', '0923724971', 'Admin', 'Valenzuela City'),
+(28, 'bulacancashier@email.com', 'cash', 'bulacan', 'cashier', 'Bulacan', '029187492131', 'Cashier', 'San Jose Del Monte, Bulacan'),
+(29, 'qccashier@email.com', 'admin', 'quezon city', 'cashier', 'Quezon City', '092391823', 'Cashier', 'Quezon City'),
+(30, 'valenzuelacashier@email.com', 'cash', 'valenzuela', 'cashier', 'Valenzuela City', '0923917941', 'Cashier', 'Valenzuela City');
 
 -- --------------------------------------------------------
 
@@ -1035,6 +1072,12 @@ ALTER TABLE `admin`
 --
 ALTER TABLE `admin_notifications`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `branch`
+--
+ALTER TABLE `branch`
+  ADD PRIMARY KEY (`branch_id`);
 
 --
 -- Indexes for table `brands`
@@ -1130,7 +1173,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `branch`
+--
+ALTER TABLE `branch`
+  MODIFY `branch_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `brands`
@@ -1154,7 +1203,7 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -1166,7 +1215,7 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
@@ -1196,7 +1245,7 @@ ALTER TABLE `return_payments`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `wishlist`

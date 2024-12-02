@@ -2635,3 +2635,17 @@
 (2024-11-29 11:11:01) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CMLv2\Customers\navigation.php:70
 (2024-12-01 11:59:56) Error: [2] Undefined array key "current_branch" - C:\xampp\htdocs\CMLv2\Customers\navigation.php:13
 (2024-12-01 12:01:16) Error: [2] Undefined array key "current_branch" - C:\xampp\htdocs\CMLv2\Customers\navigation.php:13
+(2024-12-02 07:45:20) Error: [2] Undefined array key "current_branch" - C:\xampp\htdocs\CMLv2\Customers\navigation.php:13
+(2024-12-02 07:45:21) Error: [2] Undefined array key "current_branch" - C:\xampp\htdocs\CMLv2\Customers\navigation.php:13
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:36:19) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241
+(2024-12-02 08:39:10) Error: [2] Undefined array key "type" - C:\xampp\htdocs\CMLv2\Customers\cashier_shop.php:241

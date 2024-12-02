@@ -30,6 +30,7 @@ $address = $_SESSION['user_address'] ?? '';
 $paymentType = 'Full Payment';
 $pay = 'Walk In';
 $token = $_POST['_token'] ?? null;
+$assign_branch = $_SESSION['current_branch'];
 
 $item_ids = null;
 $qtys = null;
@@ -107,7 +108,7 @@ try {
             'order_date' => date('Y-m-d H:i:s'),
             'order_pick_up' =>  date('Y-m-d H:i:s'), // Add appropriate values if needed
             'order_pick_place' =>  'Caloocan', // Add appropriate values if needed
-            'gl' => empty($item['gl'])? $item['gl'] : null,
+            'gl' => empty($item['gl']) ? $item['gl'] : null,
             'product_id' => $item['item_id'] // Assuming you have this in your fetched data
         ];
     }
