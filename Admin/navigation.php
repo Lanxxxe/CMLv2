@@ -38,8 +38,19 @@
             <li id="nav_return_request"><a href="manage_return.php"> &nbsp; &nbsp; &nbsp; Return Request</a></li>
             <li id="nav_sales_report"><a href="salesreport.php"> &nbsp; &nbsp; &nbsp; Sales Report</a></li>
             <li id="nav_invoice_report"><a href="invoice_report.php"> &nbsp; &nbsp; &nbsp; Invoice Report</a></li>
-            <li id="nav_maintenance"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
-            <li id="nav_user_management"><a href="userManagement.php"> &nbsp; &nbsp; &nbsp; User Management</a></li>
+            <?php 
+                if ($_SESSION['current_branch'] == 'Caloocan'){
+            ?>
+                <li id="nav_maintenance"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
+                <li id="nav_user_management"><a href="userManagement.php"> &nbsp; &nbsp; &nbsp; User Management</a></li>
+                <li id="nav_request_stock"><a href="stockRequests.php"> &nbsp; &nbsp; &nbsp; Stock Requests</a></li>
+            <?php
+                } else {
+            ?>
+                <li id="nav_request_stock"><a href="stockRequests.php"> &nbsp; &nbsp; &nbsp; Request Stock</a></li>
+            <?php
+                }
+            ?>
             <li id="nav_logout"><a href="javascript:confirmLogout()"> &nbsp; &nbsp; &nbsp; Logout</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-user">

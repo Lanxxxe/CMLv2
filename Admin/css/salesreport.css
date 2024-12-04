@@ -87,7 +87,9 @@ h1 {
     /* border: 1px solid #008CBA; */
 }
 
-.transactions-table table, .users-container div table {
+.transactions-table table, 
+.users-container div table,
+.request-stock-container table {
     border: 1px solid #dee2e6;
     width: 100%;
     /* border: 2px solid #008CBA; */
@@ -99,7 +101,8 @@ h1 {
 }
 
 .transactions-table table tr, 
-.users-container div table tr {
+.users-container div table tr,
+.request-stock-container table tr {
     /* border: 1px solid #008CBA; */
     height: 50px; 
 }
@@ -107,9 +110,11 @@ h1 {
 .transactions-table table tr td, 
 .users-container div table tr td,
 .transactions-table table tr th, 
-.users-container div table tr th {
+.users-container div table tr th,
+.request-stock-container table tr th, 
+.request-stock-container table tr td {
     /* border: 1px solid #008CBA; */
-    border-left: 1px solid #dee2e6;
+    border: 1px solid #dee2e6;
     text-align: start;
     white-space: nowrap; 
     overflow: hidden; 

@@ -117,7 +117,7 @@ if(isset($_GET['brand_id'])) {
                             } else {
                                 ?>
                                 <tr>
-                                    <td colspan="3">No transactions found.</td>
+                                    <td colspan="3">No user found.</td>
                                 </tr>
                                 <?php
                             }
@@ -182,7 +182,7 @@ if(isset($_GET['brand_id'])) {
                             } else {
                                 ?>
                                 <tr>
-                                    <td colspan="3">No transactions found.</td>
+                                    <td colspan="3">No user found.</td>
                                 </tr>
                                 <?php
                             }
@@ -225,7 +225,7 @@ if(isset($_GET['brand_id'])) {
                             } else {
                                 ?>
                                 <tr>
-                                    <td colspan="3">No transactions found.</td>
+                                    <td colspan="3">No user found.</td>
                                 </tr>
                                 <?php
                             }

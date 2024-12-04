@@ -962,12 +962,12 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
 </script>
 
 <?php
-// Add this at the end of your PHP processing files (add_brand.php, edit_brand.php, etc.)
-if ($success) {
-    echo "<script>showMessage('success', 'Operation completed successfully!');</script>";
-} else if (isset($error)) {
-    echo "<script>showMessage('error', '" . htmlspecialchars($error) . "');</script>";
-}
+    // Add this at the end of your PHP processing files (add_brand.php, edit_brand.php, etc.)
+    // if ($success) {
+    //     echo "<script>showMessage('success', 'Operation completed successfully!');</script>";
+    // } else if (isset($error)) {
+    //     echo "<script>showMessage('error', '" . $error . "');</script>";
+    // }
 ?>
 </body>
 </html>

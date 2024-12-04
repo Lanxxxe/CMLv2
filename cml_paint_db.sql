@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2024 at 09:41 AM
+-- Generation Time: Dec 04, 2024 at 01:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -843,6 +843,45 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `product_requests`
+--
+
+CREATE TABLE `product_requests` (
+  `request_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_brand` varchar(255) DEFAULT NULL,
+  `quantity` int(11) NOT NULL,
+  `requesting_branch` varchar(255) NOT NULL,
+  `status` enum('Pending','Declined','Confirmed') DEFAULT NULL,
+  `requested_at` datetime DEFAULT current_timestamp(),
+  `approved_date` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_requests`
+--
+
+INSERT INTO `product_requests` (`request_id`, `product_name`, `product_brand`, `quantity`, `requesting_branch`, `status`, `requested_at`, `approved_date`) VALUES
+(1, 'Paint', 'Boysen', 10, 'Quezon City', 'Confirmed', '2024-12-04 07:54:17', '2024-12-04 07:54:39'),
+(2, 'Paint Brush', 'Ecomax', 5, 'Quezon City', 'Declined', '2024-12-04 07:54:24', '2024-12-04 07:54:50'),
+(3, 'Gloss Paint', 'Boysen', 20, 'Quezon City', 'Pending', '2024-12-04 08:07:30', NULL);
+
+--
+-- Triggers `product_requests`
+--
+DELIMITER $$
+CREATE TRIGGER `update_approved_date` BEFORE UPDATE ON `product_requests` FOR EACH ROW BEGIN
+    -- Check if the status is being changed to 'Confirmed' or 'Declined'
+    IF NEW.status IN ('Confirmed', 'Declined') AND OLD.status != NEW.status THEN
+        SET NEW.approved_date = NOW();
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `product_type`
 --
 
@@ -1128,6 +1167,12 @@ ALTER TABLE `payment_track`
   ADD KEY `paymentform_track_fk` (`payment_id`);
 
 --
+-- Indexes for table `product_requests`
+--
+ALTER TABLE `product_requests`
+  ADD PRIMARY KEY (`request_id`);
+
+--
 -- Indexes for table `product_type`
 --
 ALTER TABLE `product_type`
@@ -1222,6 +1267,12 @@ ALTER TABLE `paymentform`
 --
 ALTER TABLE `payment_track`
   MODIFY `track_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `product_requests`
+--
+ALTER TABLE `product_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `product_type`
