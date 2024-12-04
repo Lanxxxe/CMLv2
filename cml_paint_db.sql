@@ -254,23 +254,6 @@ CREATE TABLE `admin_notifications` (
 INSERT INTO `admin_notifications` (`id`, `user_email`, `head_msg`, `ntype`, `payment_id`, `return_id`, `order_id`, `status`, `created_at`) VALUES
 (2, 'cashier@gmail.com', 'New Order Placed', 'ordered', 68, NULL, NULL, 'read', '2024-12-02 07:39:09');
 
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `admin_notifications_views`
--- (See below for the actual view)
---
-CREATE TABLE `admin_notifications_views` (
-`id` int(11)
-,`user_email` varchar(255)
-,`status` enum('read','unread')
-,`ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted')
-,`head_msg` varchar(255)
-,`created_at` timestamp
-,`message` mediumtext
-);
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `branch`
@@ -1331,3 +1314,75 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- View for notifications
+CREATE VIEW admin_notifications_views AS
+SELECT 
+    a.id,
+    a.user_email, 
+    a.status,
+    a.ntype,
+    a.head_msg,
+    a.created_at,  -- Added timestamp to view
+    CASE 
+        WHEN a.payment_id IS NULL AND a.order_id IS NOT NULL THEN
+            (SELECT 
+                CASE a.ntype
+                    WHEN 'ordered' 
+                        THEN CONCAT(a.user_email, ' has placed a new order for ', o.order_name, '.')
+                    WHEN 'requested'
+                        THEN CONCAT(a.user_email, ' has requested payment approval for ', o.order_name, '.')
+                    WHEN 'confirmed'
+                        THEN CONCAT('Payment confirmed for ', a.user_email, '''s order of ', o.order_name, '.')
+                    WHEN 'cancelled'
+                        THEN CONCAT('Payment cancelled for ', a.user_email, '''s order of ', o.order_name, '.')
+                    WHEN 'returned'
+                        THEN CONCAT('Item refund for ', a.user_email, '''s order of ', o.order_name, '.')
+                END
+            FROM orderdetails o 
+            WHERE o.order_id = a.order_id)
+        WHEN a.ntype IN ('ordered', 'requested', 'confirmed', 'cancelled')  THEN
+            (SELECT 
+                CASE a.ntype
+                    WHEN 'ordered' 
+                        THEN CONCAT(a.user_email, ' has placed a new order for ', 
+                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
+                    WHEN 'requested'
+                        THEN CONCAT(a.user_email, ' has requested payment approval for ', 
+                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
+                    WHEN 'confirmed'
+                        THEN CONCAT('Payment confirmed for ', a.user_email, '''s order of ', 
+                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
+                    WHEN 'cancelled'
+                        THEN CONCAT('Payment cancelled for ', a.user_email, '''s order of ',
+                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
+                    WHEN 'returned'
+                        THEN CONCAT('Item refund for ', a.user_email, '''s order of ',
+                            GROUP_CONCAT(o.order_name ORDER BY o.order_name SEPARATOR ', '), '.')
+                END
+            FROM orderdetails o 
+            WHERE o.payment_id = a.payment_id
+            GROUP BY a.payment_id)
+        WHEN a.ntype IN ('returned', 'return request', 'return rejected', 'return deleted') THEN
+            (SELECT 
+                CASE a.ntype
+                    WHEN 'returned' 
+                        THEN CONCAT(a.user_email, ' has returned ', r.quantity, ' ', r.product_name, 
+                              '. Reason: ', r.reason)
+                    WHEN 'return request'
+                        THEN CONCAT(a.user_email, ' has requested to return ', r.quantity, ' ', r.product_name,
+                              '. Reason: ', r.reason)
+                    WHEN 'return rejected'
+                        THEN CONCAT('Return request for ', r.quantity, ' ', r.product_name, 
+                              ' has been rejected')
+                    WHEN 'return deleted'
+                        THEN CONCAT('Return request for ', r.quantity, ' ', r.product_name, 
+                              ' has been deleted')
+                END
+            FROM returnitems r 
+            WHERE r.return_id = a.return_id)
+    END AS message
+FROM admin_notifications a;
+
+DELIMITER $$
