@@ -92,7 +92,12 @@ try {
     $pdf->SetFont('helvetica', '', 8);
     $pdf->Cell(0, 3, 'Receipt No: ' . str_pad($payment_id, 8, '0', STR_PAD_LEFT), 0, 1);
     $pdf->Cell(0, 3, 'Date: ' . date('Y-m-d H:i:s'), 0, 1);
-    // $pdf->Cell(0, 3, 'Cashier: ' . $_SESSION['user_lastname'] . ', '.  $_SESSION['user_firstname'], 0, 1);
+    if (isset($_SESSION['customer_name'])) {
+        $pdf->Cell(0, 3, 'Customer Name: ' . $_SESSION['customer_name'], 0, 1);
+    }
+    if (isset($_SESSION['customer_contact_no'])) {
+        $pdf->Cell(0, 3, 'Contact No.: ' . $_SESSION['customer_contact_no'], 0, 1);
+    }
 
     // Add separator line
     $pdf->Cell(0, 2, '', 0, 1);

@@ -31,6 +31,8 @@ $paymentType = 'Full Payment';
 $pay = 'Walk In';
 $token = $_POST['_token'] ?? null;
 $assign_branch = $_SESSION['current_branch'];
+$customer_name = $_POST['customer_name'] ?? null;
+$customer_contact_no = $_POST['customer_contact_no'] ?? null;
 
 $item_ids = null;
 $qtys = null;
@@ -41,6 +43,17 @@ if (isset($token)) {
 } else {
     $item_ids = $_POST['item_ids'] ?? [];
     $qtys = $_POST['qtys'] ?? [];
+}
+
+unset($_SESSION['customer_name']);
+unset($_SESSION['customer_contact_no']);
+
+if (!empty($customer_name)) {
+    $_SESSION['customer_name'] = $customer_name;
+}
+
+if (!empty($customer_contact_no)) {
+    $_SESSION['customer_contact_no'] = $customer_contact_no;
 }
 
 // Process only if user type is Cashier and payment type is fullpayment

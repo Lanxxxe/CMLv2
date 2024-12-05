@@ -154,6 +154,12 @@ extract($edit_row);
             });
         });
     </script>
+
+    <style>
+        #customerContact:invalid {
+            border-color: red !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -312,6 +318,14 @@ extract($edit_row);
             <div class="cart-total">
                 <strong>Total: ₱</strong>
                 <span id="cart-total-amount">0.00</span>
+            </div>
+            <div class="form-group">
+                <label for="customerName" class="form-label">Customer name (optional):</label>
+                <input id="customerName" class="form-control" placeholder="Enter customer name" type="text" name="customer_name">
+            </div>
+            <div class="form-group">
+                <label for="customerContact" class="form-label">Customer contact no. (optional):</label>
+                <input id="customerContact" class="form-control" placeholder="Enter customer contact no." type="text" name="customer_contact_no" pattern="^(0|\+63)[0-9]{10}$">
             </div>
             <button class="btn btn-success btn-block" onclick="checkout()">Checkout</button>
             <button class="btn btn-danger btn-block" onclick="clearItems()">Clear</button>
@@ -706,11 +720,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkout() {
     const items = new FormData();
+    const customer_name = document.getElementById('customerName').value;
+    const customer_contact_no = document.getElementById('customerContact').value;
+
     for (const [key, val] of cart.entries()) {
         const qty = JSON.parse(val).quantity;
         items.append('qtys[]', qty);
         items.append('item_ids[]', key);
     }
+    items.append('customer_name', customer_name);
+    items.append('customer_contact_no', customer_contact_no);
 
     fetch('./cashier_checkout.php', {
         method: 'POST',

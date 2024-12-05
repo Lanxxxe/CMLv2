@@ -17,6 +17,11 @@ $preview = '<div class="receipt-preview">
         <p>Date: <span id="receiptDate">' . date('Y-m-d H:i:s') . '</span></p>
     </div>
 
+    <div>
+        <p>Customer Name: ' . ($_SESSION['customer_name'] ?? '') . '</p>
+        <p>Customer Contact No.: ' . ($_SESSION['customer_contact_no'] ?? '') . '</p>
+    </div>
+
     <div class="separator"></div>
 
     <table class="item-table">
