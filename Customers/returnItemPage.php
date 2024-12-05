@@ -93,6 +93,16 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
               <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
             </div>
             <div class="form-group">
+              <label for="branch">Branch:</label>
+              <select name="branch" id="branch" class="form-control" required>
+                  <option value="" selected disabled>Select from what branch bought the product</option>
+                  <option value="Caloocan">Caloocan</option>
+                  <option value="Valenzuela City">Valenzuela</option>
+                  <option value="Quezon City">Quezon City</option>
+                  <option value="San Jose Del Monte, Bulacan">San Jose de Monte, Bulacan</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label for="image1">Product Image:</label>
               <input type="file" class="form-control" id="productImage" name="productImage" required>
             </div>

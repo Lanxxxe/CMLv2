@@ -40,8 +40,7 @@ $branch_location = $_SESSION['current_branch'];
 $stmt_total_orders = $DB_con->prepare(
     'SELECT COUNT(*) AS total 
      FROM orderdetails 
-     INNER JOIN branch ON orderdetails.branch_id = branch.branch_id 
-     WHERE order_status <> "Pending" AND branch.branch_location = :branch_location'
+     WHERE order_status <> "Pending" AND order_pick_place = :branch_location'
 );
 $stmt_total_orders->bindParam(':branch_location', $branch_location, PDO::PARAM_STR);
 $stmt_total_orders->execute();
@@ -51,8 +50,7 @@ $total_orders = $stmt_total_orders->fetch(PDO::FETCH_ASSOC)['total'];
 $stmt_confirmed = $DB_con->prepare(
     'SELECT COUNT(*) AS total, SUM(order_total) AS total_sum 
      FROM orderdetails 
-     INNER JOIN branch ON orderdetails.branch_id = branch.branch_id 
-     WHERE order_status = "Confirmed" AND branch.branch_location = :branch_location'
+     WHERE order_status = "Confirmed" AND order_pick_place = :branch_location'
 );
 $stmt_confirmed->bindParam(':branch_location', $branch_location, PDO::PARAM_STR);
 $stmt_confirmed->execute();
@@ -64,8 +62,7 @@ $total_sum_confirmed = $row_confirmed['total_sum'];
 $stmt_verification = $DB_con->prepare(
     'SELECT COUNT(*) AS total 
      FROM orderdetails 
-     INNER JOIN branch ON orderdetails.branch_id = branch.branch_id 
-     WHERE order_status = "Verification" AND branch.branch_location = :branch_location'
+     WHERE order_status = "Verification" AND order_pick_place = :branch_location'
 );
 $stmt_verification->bindParam(':branch_location', $branch_location, PDO::PARAM_STR);
 $stmt_verification->execute();
@@ -75,8 +72,7 @@ $total_verification = $stmt_verification->fetch(PDO::FETCH_ASSOC)['total'];
 $stmt_return = $DB_con->prepare(
     'SELECT COUNT(*) AS total 
      FROM orderdetails 
-     INNER JOIN branch ON orderdetails.branch_id = branch.branch_id 
-     WHERE order_status = "Returned" AND branch.branch_location = :branch_location'
+     WHERE order_status = "Returned" AND order_pick_place = :branch_location'
 );
 $stmt_return->bindParam(':branch_location', $branch_location, PDO::PARAM_STR);
 $stmt_return->execute();
@@ -86,8 +82,7 @@ $returnItems = $stmt_return->fetch(PDO::FETCH_ASSOC)['total'];
 $stmt_rejected = $DB_con->prepare(
     'SELECT COUNT(*) AS total 
      FROM orderdetails 
-     INNER JOIN branch ON orderdetails.branch_id = branch.branch_id 
-     WHERE order_status = "Rejected" AND branch.branch_location = :branch_location'
+     WHERE order_status = "Rejected" AND order_pick_place = :branch_location'
 );
 $stmt_rejected->bindParam(':branch_location', $branch_location, PDO::PARAM_STR);
 $stmt_rejected->execute();
@@ -263,11 +258,10 @@ function isActivated($s) {
                             users.user_lastname,
                             users.user_address,
                             orderdetails.*,
-                            branch.branch_location
+                            order_pick_place
                         FROM users
                             INNER JOIN orderdetails ON users.user_id = orderdetails.user_id
-                            INNER JOIN branch ON orderdetails.branch_id = branch.branch_id
-                        WHERE $sql_cmd AND branch.branch_location = :branch_location
+                        WHERE $sql_cmd AND order_pick_place = :branch_location
                         ORDER BY orderdetails.order_date DESC"
                     );
 			   

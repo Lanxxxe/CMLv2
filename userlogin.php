@@ -35,6 +35,8 @@ try {
         $_SESSION['user_type'] = $user_type;
         if ($assignedBranch) {
             $_SESSION['current_branch'] = $assignedBranch;
+        } else {
+            $_SESSION['current_branch'] = '';
         }
     } else {
         throw new Exception('Email or password is incorrect!');

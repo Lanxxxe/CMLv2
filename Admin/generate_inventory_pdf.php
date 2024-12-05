@@ -125,7 +125,9 @@ ob_start();
         </thead>
         <tbody>
             <?php
-            $stmt = $DB_con->prepare('SELECT * FROM items');
+            $branch = $_SESSION['current_branch'];
+            $stmt = $DB_con->prepare('SELECT * FROM items WHERE branch = :branch');
+            $stmt->bindParam(':branch', $branch);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {

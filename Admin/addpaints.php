@@ -20,6 +20,7 @@ include("db_conection.php");
     $type = $_POST['paint_type_id'];
     $gl = $_POST['gl'];
     $pallet_id = $_POST['pallet'];
+    $branch = $_SESSION['current_branch'];
 
 
     // Fetch brand name
@@ -30,7 +31,7 @@ include("db_conection.php");
 
 
 
-    $check_item = "SELECT * FROM items WHERE item_name='$item_name' AND brand_name='$brand_name' AND type='$type' AND pallet_id='$pallet_id' AND gl='$gl'";
+    $check_item = "SELECT * FROM items WHERE item_name='$item_name' AND brand_name='$brand_name' AND type='$type' AND pallet_id='$pallet_id' AND gl='$gl' AND branch='$branch'";
     $run_query = mysqli_query($dbcon, $check_item);
 
     if(mysqli_num_rows($run_query) > 0) {
@@ -56,8 +57,8 @@ include("db_conection.php");
                 $type_name = $type_row['type_name'];
 
 
-                $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, expiration_date, item_price, type, quantity, gl, pallet_id)
-                            VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$expiration_date', '$item_price', '$type_name', '$quantity', '$gl', '$pallet_id')";
+                $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, expiration_date, item_price, type, quantity, gl, pallet_id, branch)
+                            VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$expiration_date', '$item_price', '$type_name', '$quantity', '$gl', '$pallet_id', '$branch')";
                 mysqli_query($dbcon, $saveitem);
                 
                 $response['status'] = 'success';

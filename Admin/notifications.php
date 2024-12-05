@@ -532,6 +532,10 @@ $notifications = getNotifications($DB_con, $activeTab !== 'all' ? $activeTab : n
         </div>
     </div>
 
+
+    <!-- Mediul Modal -->
+    <?php include_once("uploadItems.php"); ?>
+    <?php include_once("insertBrandsModal.php"); ?>
     <script>
     $(document).ready(function() {
         // Handle notification card click

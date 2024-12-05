@@ -18,8 +18,9 @@ $item_price = $_POST['item_price'];
 $quantity = $_POST['quantity'];
 $type = $_POST['type_id'];
 $brand = $_POST['brand_id'];
+$branch = $_SESSION['current_branch'];
 
-$check_item = "SELECT * FROM items WHERE item_name='$item_name'";
+$check_item = "SELECT * FROM items WHERE item_name='$item_name' and brand_name = '$brand'";
 $run_query = mysqli_query($dbcon, $check_item);
 
 if(mysqli_num_rows($run_query) > 0) {
@@ -50,8 +51,8 @@ if(mysqli_num_rows($run_query) > 0) {
             $type_name = $type_row['type_name'];
 
             // Insert the item into the database
-            $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, item_price, type, quantity, gl)
-                        VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$item_price', '$type_name', '$quantity', '')";
+            $saveitem = "INSERT INTO items (item_name, brand_name, item_image, item_date, item_price, type, quantity, gl, branch)
+                        VALUES ('$item_name', '$brand_name', '$itempic', CURDATE(), '$item_price', '$type_name', '$quantity', '', '$branch')";
             mysqli_query($dbcon, $saveitem);
             
             $response['status'] = 'success';

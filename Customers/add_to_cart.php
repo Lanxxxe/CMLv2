@@ -130,9 +130,9 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                         <td>
                             <select name="order_pick_place" id="order_pick_place" class="form-control" required>
                                 <option value="Caloocan">Caloocan</option>
-                                <option value="Valenzuela">Valenzuela</option>
+                                <option value="Valenzuela City">Valenzuela</option>
                                 <option value="Quezon City">Quezon City</option>
-                                <option value="San Jose de Monte">San Jose de Monte</option>
+                                <option value="San Jose Del Monte, Bulacan">San Jose de Monte, Bulacan</option>
                             </select>
                         </td>
                     </tr>

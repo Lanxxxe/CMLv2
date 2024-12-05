@@ -115,7 +115,7 @@ if (isset($_GET['update_id'])) {
 
 <body>
     <div id="wrapper">
-        <?php require_once "navigation.php" ?>
+        <?php require "navigation.php" ?>
         <div id="page-wrapper">
             <div class="alert alert-default" style="color:white;background-color:#008CBA">
                 <center>

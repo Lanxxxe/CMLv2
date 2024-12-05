@@ -581,66 +581,70 @@ if (isset($_GET['delete_return_id'])) {
                     </thead>
                     <tbody>
                     <?php
+                    $branch = $_SESSION['current_branch'];
                     // $stmt = $DB_con->prepare('SELECT users.user_email, users.user_firstname, users.user_lastname, users.user_address, orderdetails.* FROM users
                     // INNER JOIN orderdetails ON users.user_id = orderdetails.user_id WHERE orderdetails.order_status NOT IN ("Confirmed", "Returned", "rejected")');
                     $stmt = $DB_con->prepare("
-                        SELECT 
-                            u.user_email,
-                            u.user_firstname,
-                            u.user_lastname,
-                            u.user_address,
-                            pf.id AS order_id,
-                            pf.id AS payment_id,
-                            if(pf.payment_type IN ('Down Payment', 'Installment') AND pf.payment_status = 'verification', 'Requested', pf.payment_status) AS order_status,
-                            pf.payment_type,
-                            pf.payment_image_path,
-                            SUM(od.order_total) AS order_total
-                        FROM 
-                            users u
-                            INNER JOIN orderdetails od ON u.user_id = od.user_id
-                            INNER JOIN paymentform pf ON od.payment_id = pf.id
-                        WHERE 
-                            (pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed')) AND (pf.payment_type NOT IN ('Down Payment', 'Installment') OR pf.payment_status = 'verification')
-                        GROUP BY 
-                            u.user_email,
-                            u.user_firstname,
-                            u.user_lastname,
-                            u.user_address,
-                            pf.id,
-                            pf.payment_status;
-                    ");
-                    $stmt->execute();
-                    $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            SELECT 
+                                u.user_email,
+                                u.user_firstname,
+                                u.user_lastname,
+                                u.user_address,
+                                pf.id AS order_id,
+                                pf.id AS payment_id,
+                                IF(pf.payment_type IN ('Down Payment', 'Installment') AND pf.payment_status = 'verification', 'Requested', pf.payment_status) AS order_status,
+                                pf.payment_type,
+                                pf.payment_image_path,
+                                SUM(od.order_total) AS order_total
+                            FROM 
+                                users u
+                                INNER JOIN orderdetails od ON u.user_id = od.user_id
+                                INNER JOIN paymentform pf ON od.payment_id = pf.id
+                            WHERE 
+                                od.order_pick_place = :branch AND 
+                                pf.payment_status NOT IN ('Confirmed', 'Returned', 'failed') AND 
+                                (pf.payment_type NOT IN ('Down Payment', 'Installment') OR pf.payment_status = 'verification')
+                            GROUP BY 
+                                u.user_email,
+                                u.user_firstname,
+                                u.user_lastname,
+                                u.user_address,
+                                pf.id,
+                                pf.payment_status;
+                        ");
+                            $stmt->execute(['branch' => $branch]);
+                            $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    $stmt = $DB_con->prepare("
-                        SELECT 
-                            u.user_email,
-                            u.user_firstname,
-                            u.user_lastname,
-                            u.user_address,
-                            pt.track_id AS order_id,
-                            pt.status AS order_status,
-                            pf.payment_type,
-                            pf.payment_image_path,
-                            pf.id as payment_id,
-                            pt.amount AS order_total
-                        FROM 
-                            users u
-                            INNER JOIN orderdetails od ON u.user_id = od.user_id
-                            INNER JOIN paymentform pf ON od.payment_id = pf.id
-                            LEFT JOIN payment_track pt ON pt.payment_id = pf.id
-                        WHERE 
-                        pt.status = 'Requested'
-                        GROUP BY 
-                            u.user_email,
-                            u.user_firstname,
-                            u.user_lastname,
-                            u.user_address,
-                            pf.id,
-                            pf.payment_status;
-                    ");
-                    $stmt->execute();
-                    $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            $stmt = $DB_con->prepare("
+                            SELECT 
+                                u.user_email,
+                                u.user_firstname,
+                                u.user_lastname,
+                                u.user_address,
+                                pt.track_id AS order_id,
+                                pt.status AS order_status,
+                                pf.payment_type,
+                                pf.payment_image_path,
+                                pf.id as payment_id,
+                                pt.amount AS order_total
+                            FROM 
+                                users u
+                                INNER JOIN orderdetails od ON u.user_id = od.user_id
+                                INNER JOIN paymentform pf ON od.payment_id = pf.id
+                                LEFT JOIN payment_track pt ON pt.payment_id = pf.id
+                            WHERE 
+                                od.order_pick_place = :branch AND 
+                                pt.status = 'Requested'
+                            GROUP BY 
+                                u.user_email,
+                                u.user_firstname,
+                                u.user_lastname,
+                                u.user_address,
+                                pf.id,
+                                pf.payment_status;
+                        ");
+                        $stmt->execute(['branch' => $branch]);
+                        $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $data = array_merge($payments, $tracks);
 
                     if (count($data) > 0) {
