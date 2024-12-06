@@ -551,7 +551,7 @@ $branch = $_SESSION['current_branch']
                             $max_date = $date_range['max_date'];
 
                             // Add date filter to existing order type string
-                            $date_filter = " AND (DATE(order_date) BETWEEN '{$start_date}' AND '{$end_date}')";
+                            $date_filter = " AND (DATE(order_date) BETWEEN '{$start_date}' AND '{$end_date}') and order_pick_place = '$branch'";
 
 
                             // Fetch daily sales
@@ -718,22 +718,26 @@ $branch = $_SESSION['current_branch']
                                 <?php
                                 $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
 
-                            $stmt = $DB_con->prepare('
-                                SELECT 
-                                    users.user_email, 
-                                    users.user_firstname, 
-                                    users.user_lastname, 
-                                    users.user_address, 
-                                    orderdetails.*,
-                                    paymentform.payment_method
-                                FROM users 
-                                INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id 
-                                WHERE orderdetails.order_pick_place = :branch  AND date(orderdetails.order_date) <= ?'
-                                 . $order_type_str .
-                                'ORDER BY orderdetails.order_date DESC
-                            ');
-                            $stmt->execute([$end_date, $branch]);
+                                $stmt = $DB_con->prepare('
+                                    SELECT 
+                                        users.user_email, 
+                                        users.user_firstname, 
+                                        users.user_lastname, 
+                                        users.user_address, 
+                                        orderdetails.*,
+                                        paymentform.payment_method
+                                    FROM users 
+                                    INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
+                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id 
+                                    WHERE orderdetails.order_pick_place = :branch 
+                                    AND date(orderdetails.order_date) <= :end_date ' 
+                                    . $order_type_str . 
+                                    'ORDER BY orderdetails.order_date DESC
+                                ');
+                                $stmt->execute([
+                                    ':branch' => $branch,
+                                    ':end_date' => $end_date
+                                ]);
 
 
                                 if ($stmt->rowCount() > 0) {
@@ -747,7 +751,7 @@ $branch = $_SESSION['current_branch']
                                             <td><?php echo htmlspecialchars($orderDate); ?></td>
                                             <td><?php echo htmlspecialchars($row['order_id']); ?></td>
                                             <td><?php echo htmlspecialchars($customerName); ?></td>
-                                            <td><?php echo htmlspecialchars($row['order_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_name']) . $order_type_str_r; ?></td>
                                             <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
                                             <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
                                             <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>
@@ -786,10 +790,15 @@ $branch = $_SESSION['current_branch']
     <?php require_once "salesReportModal.php"; ?>
 
     <?php
-        $sumqty_stmt = $DB_con->prepare('SELECT order_name, SUM(order_quantity) as sum_qty
-        FROM orderdetails LEFT JOIN paymentform ON paymentform.id = orderdetails.payment_id ' . $order_type_str_r . ' GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5');
-    $sumqty_stmt->execute();
-    $sum_qty = $sumqty_stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($order_type_str_r) {
+            $sumqty_stmt = $DB_con->prepare('SELECT order_name, SUM(order_quantity) as sum_qty
+            FROM orderdetails LEFT JOIN paymentform ON paymentform.id = orderdetails.payment_id ' . $order_type_str_r . "AND order_pick_place = '$branch' GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5");
+        } else {
+            $sumqty_stmt = $DB_con->prepare("SELECT order_name, SUM(order_quantity) as sum_qty
+            FROM orderdetails LEFT JOIN paymentform ON paymentform.id = orderdetails.payment_id WHERE order_pick_place = '$branch' GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5");
+        }
+        $sumqty_stmt->execute();
+        $sum_qty = $sumqty_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
     $top_requested_product = [];

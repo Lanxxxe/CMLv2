@@ -240,7 +240,8 @@ extract($edit_row);
                 $start = ($id - 1) * $limit;
             }
 
-            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price, quantity as item_quantity FROM items LIMIT $start, $limit");
+            $branch = $_SESSION['current_branch'];
+            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price, quantity as item_quantity FROM items WHERE branch = '$branch' LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 ?>

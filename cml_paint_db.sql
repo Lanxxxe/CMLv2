@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2024 at 05:54 PM
+-- Generation Time: Dec 06, 2024 at 06:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -208,26 +208,123 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `request_payment` (IN `p_payment_id`
     END IF;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand` (IN `p_delete_id` INT)   BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+
+    -- Retrieve archived brand data
+    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
+    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
+    FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the brand back into the original table
+    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+    -- Delete the brand from the archive after restoration
+    DELETE FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand_including_product_type` (IN `p_delete_id` INT)   BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+
+    -- Retrieve archived brand data
+    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
+    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
+    FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the brand back into the original table
+    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+    -- Insert the associated product types back into the original table
+    INSERT INTO `prod_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    SELECT pa.`type_id`, pa.`type_name`, pa.`brand_id`, pa.`prod_type`
+    FROM `product_type_archive` pa
+    WHERE pa.`deleted_brand_id` = v_brand_id;
+
+    -- Delete the brand from the archive after restoration
+    DELETE FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Delete the product types from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `deleted_brand_id` = v_brand_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_product_type` (IN `p_delete_id` INT)   BEGIN
+    DECLARE v_deleted_brand_id INT;
+    DECLARE v_type_id INT;
+    DECLARE v_type_name TEXT;
+    DECLARE v_brand_id INT;
+    DECLARE v_prod_type TEXT;
+
+    -- Retrieve archived product data
+    SELECT `deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`
+    INTO v_deleted_brand_id, v_type_id, v_type_name, v_brand_id, v_prod_type
+    FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the product back into the original table
+    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
+
+    -- Delete the product type from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_product_with_brand` (IN `p_delete_id` INT)   BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+    DECLARE v_type_id INT;
+    DECLARE v_type_name TEXT;
+    DECLARE v_prod_type TEXT;
+
+    -- Retrieve archived product type data
+    SELECT `type_id`, `type_name`, `prod_type`, `deleted_brand_id`
+    INTO v_type_id, v_type_name, v_prod_type, v_brand_id
+    FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Check if the brand exists in the brands_archive, and if not, insert it back
+    IF v_brand_id IS NOT NULL THEN
+        -- Retrieve archived brand data
+        SELECT `brand_name`, `brand_img`, `branch_id`
+        INTO v_brand_name, v_brand_img, v_branch_id
+        FROM `brands_archive`
+        WHERE `brand_id` = v_brand_id;
+
+        -- Insert the brand back into the original table if not already restored
+        INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+        VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+        -- Delete the brand from the archive after restoration
+        DELETE FROM `brands_archive`
+        WHERE `brand_id` = v_brand_id;
+    END IF;
+
+    -- Insert the associated product type back into the original table
+    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
+
+    -- Delete the product type from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+END$$
+
 DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin`
---
-
-CREATE TABLE `admin` (
-  `admin_id` int(10) UNSIGNED NOT NULL,
-  `admin_username` varchar(500) NOT NULL DEFAULT '',
-  `admin_password` varchar(500) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `admin`
---
-
-INSERT INTO `admin` (`admin_id`, `admin_username`, `admin_password`) VALUES
-(1, 'admin', 'admin');
 
 -- --------------------------------------------------------
 
@@ -252,11 +349,14 @@ CREATE TABLE `admin_notifications` (
 --
 
 INSERT INTO `admin_notifications` (`id`, `user_email`, `head_msg`, `ntype`, `payment_id`, `return_id`, `order_id`, `status`, `created_at`) VALUES
-(2, 'cashier@gmail.com', 'New Order Placed', 'ordered', 68, NULL, NULL, 'read', '2024-12-02 07:39:09'),
-(3, 'kate@email.com', 'New Order Placed', 'ordered', 69, NULL, NULL, 'unread', '2024-12-05 15:13:19'),
-(4, 'kate@email.com', 'New Order Placed', 'ordered', 70, NULL, NULL, 'unread', '2024-12-05 15:42:53'),
-(5, 'kate@email.com', 'New Order Placed', 'ordered', 71, NULL, NULL, 'unread', '2024-12-05 15:43:03'),
-(6, 'kate@email.com', 'New Order Placed', 'ordered', 72, NULL, NULL, 'unread', '2024-12-05 15:43:15');
+(9, 'kate@email.com', 'Return Request Deleted', 'return deleted', NULL, 4, NULL, 'unread', '2024-12-06 09:12:20'),
+(10, 'kate@email.com', 'Return Request Deleted', 'return deleted', NULL, 13, NULL, 'unread', '2024-12-06 09:12:20'),
+(12, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 73, NULL, NULL, 'unread', '2024-12-06 15:54:39'),
+(14, 'qccashier@email.com', 'New Order Placed', 'ordered', 74, NULL, NULL, 'unread', '2024-12-06 15:57:45'),
+(16, 'qccashier@email.com', 'New Order Placed', 'ordered', 75, NULL, NULL, 'unread', '2024-12-06 15:59:34'),
+(18, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 76, NULL, NULL, 'unread', '2024-12-06 16:03:04'),
+(20, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 77, NULL, NULL, 'unread', '2024-12-06 16:05:28'),
+(22, 'qccashier@email.com', 'New Order Placed', 'ordered', 78, NULL, NULL, 'unread', '2024-12-06 16:31:41');
 
 -- --------------------------------------------------------
 
@@ -318,6 +418,39 @@ INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`) VALUES
 (10, 'Ecomax', 'local_image/1730110526_ecomax.jpeg', NULL),
 (12, 'Hippo', 'local_image/1730651776_hippo.png', NULL);
 
+--
+-- Triggers `brands`
+--
+DELIMITER $$
+CREATE TRIGGER `before_delete_brand` BEFORE DELETE ON `brands` FOR EACH ROW BEGIN
+    -- Archive the brand data
+    INSERT INTO `brands_archive` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (OLD.brand_id, OLD.brand_name, OLD.brand_img, OLD.branch_id);
+    
+    -- Archive related product types
+    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
+    SELECT OLD.brand_id, pt.`type_id`, pt.`type_name`, pt.`brand_id`, pt.`prod_type`
+    FROM `product_type` pt
+    WHERE pt.`brand_id` = OLD.brand_id;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `brands_archive`
+--
+
+CREATE TABLE `brands_archive` (
+  `delete_id` int(11) NOT NULL,
+  `brand_id` int(11) NOT NULL,
+  `brand_name` varchar(255) NOT NULL,
+  `brand_img` text DEFAULT NULL,
+  `branch_id` int(11) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -357,16 +490,20 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`, `branch`) VALUES
-(46, 'Boysen Paint', 'Boysen', '387590.jpeg', '2024-10-30 00:00:00.000000', '2024-11-02', '100', 'Aluminum Paint', 18.00, 'Gallon', 9, NULL),
-(47, 'Boysen Gloss', 'Boysen', '777138.jpg', '2024-11-01 00:00:00.000000', '2024-11-30', '100', 'Gloss', 6.00, 'Gallon', 3, NULL),
-(48, 'Boysen Paint', 'Boysen', '283333.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '200', 'Gloss', 90.00, 'Gallon', 12, NULL),
-(49, 'Boysen Paint', 'Boysen', '205967.jpeg', '2024-11-01 00:00:00.000000', '2024-12-07', '120', 'Flat Paint', 85.00, 'Gallon', 17, NULL),
-(50, 'Boysen Paint', 'Boysen', '80066.jpeg', '2024-11-04 00:00:00.000000', '2026-11-03', '120', 'Flat Paint', 95.00, 'Gallon', 16, NULL),
-(51, 'Latex Paint', 'Boysen', '512213.jpeg', '2024-11-07 00:00:00.000000', '2026-11-20', '100', 'Latex Paint', 81.00, 'Gallon', 1, NULL),
 (53, 'Latex Paint', 'Ecomax', '95392.jpg', '2024-12-05 00:00:00.000000', '2026-12-16', '200', 'Latex Paint', 497.00, 'Gallon', 10, NULL),
 (54, 'Latex Patin', 'Ecomax', '659045.jpg', '2024-12-05 00:00:00.000000', '2026-12-17', '200', 'Gloss', 230.00, 'Gallon', 16, 'Caloocan'),
-(55, 'Boysen Paint', 'Boysen', '553060.jpg', '2024-12-05 00:00:00.000000', '2026-12-24', '200', 'Semi Gloss Paint', 123.00, 'Gallon', 17, 'Quezon City'),
-(57, 'Paint Brush', 'Hippo', '756276.jpg', '2024-12-05 00:00:00.000000', NULL, '100', 'Paint Brush', 100.00, '', NULL, 'Quezon City');
+(55, 'Boysen Paint', 'Boysen', '553060.jpg', '2024-12-05 00:00:00.000000', '2026-12-24', '200', 'Semi Gloss Paint', 122.00, 'Gallon', 17, 'Quezon City'),
+(57, 'Paint Brush', 'Hippo', '756276.jpg', '2024-12-05 00:00:00.000000', NULL, '100', 'Paint Brush', 100.00, '', NULL, 'Quezon City'),
+(58, 'Latex Paint', 'Boysen', '69601.png', '2024-12-06 00:00:00.000000', '2026-12-29', '200', 'Latex Paint', 200.00, 'Gallon', 16, 'Caloocan'),
+(59, 'Boysen Paint', 'Boysen', '469207.jpg', '2024-12-06 00:00:00.000000', '2026-12-23', '100', 'Semi Gloss Paint', 200.00, 'Gallon', 18, 'Caloocan'),
+(60, 'Latex Patin', 'Boysen', '155924.jpeg', '2024-12-06 00:00:00.000000', '2026-12-22', '200', 'Aluminum Paint', 200.00, 'Gallon', 13, 'Caloocan'),
+(61, 'Sample Paint', 'Boysen', '648211.jpeg', '2024-12-06 00:00:00.000000', '2026-12-16', '200', 'Interior Paint', 200.00, 'Gallon', 15, 'Caloocan'),
+(62, 'Latex Paint', 'Boysen', '116734.jpeg', '2024-12-06 00:00:00.000000', '2026-12-08', '100', 'Gloss', 198.00, 'Gallon', 14, 'Quezon City'),
+(63, 'Boysen Paint', 'Boysen', '647240.jpeg', '2024-12-06 00:00:00.000000', '2026-12-08', '200', 'Latex Paint', 200.00, 'Gallon', 16, 'Quezon City'),
+(64, 'Boysen Paint', 'Boysen', '888878.jpeg', '2024-12-06 00:00:00.000000', '2026-12-16', '200', 'Latex Paint', 199.00, 'Gallon', 16, 'Valenzuela City'),
+(65, 'Latex Paint', 'Boysen', '638221.jpeg', '2024-12-06 00:00:00.000000', '2026-12-15', '100', 'Oil Paint', 197.00, 'Gallon', 17, 'Valenzuela City'),
+(66, 'Latex Patin', 'Boysen', '600730.jpeg', '2024-12-06 00:00:00.000000', '2026-12-09', '200', 'Exterior Paint', 200.00, 'Gallon', 17, 'Valenzuela City'),
+(67, 'Sample Paint', 'Boysen', '556557.jpeg', '2024-12-06 00:00:00.000000', '2026-12-24', '100', 'Flat Paint', 200.00, 'Gallon', 18, 'Valenzuela City');
 
 -- --------------------------------------------------------
 
@@ -395,26 +532,13 @@ CREATE TABLE `orderdetails` (
 --
 
 INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
-(108, 8, 'Boysen Paint', 100, 1, 100, 'Returned', '2024-11-04', '2024-11-04 19:06:00.000000', 'Caloocan', 'Gallon', 53, 46),
-(109, 8, 'Boysen Gloss', 100, 1, 100, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 47),
-(110, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 50),
-(111, 8, 'Boysen Paint', 120, 1, 120, 'Rejected', '2024-11-04', '2024-11-04 19:28:00.000000', 'Caloocan', 'Gallon', 54, 49),
-(120, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:32:00.000000', 'Caloocan', 'Gallon', 57, 50),
-(121, 8, 'Boysen Paint', 120, 1, 120, 'Confirmed', '2024-11-08', '2024-11-09 07:33:00.000000', 'Caloocan', 'Gallon', 58, 49),
-(122, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 60, 47),
-(123, 8, 'Latex Paint', 100, 1, 100, 'Returned', '2024-11-08', '2024-11-09 13:06:00.000000', 'Caloocan', 'Gallon', 61, 51),
-(124, 8, 'Boysen Gloss', 100, 1, 100, 'Returned', '2024-11-09', '2024-11-10 05:19:00.000000', 'Caloocan', 'Gallon', 59, 47),
-(125, 8, 'Boysen Paint', 120, 13, 1560, 'Returned', '2024-11-14', '2024-11-15 01:32:00.000000', 'Caloocan', 'Gallon', 62, 49),
-(126, 8, 'Latex Paint', 100, 15, 1500, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 63, 51),
-(127, 8, 'Boysen Paint', 120, 3, 360, 'Returned', '2024-11-14', '2024-11-15 01:33:00.000000', 'Caloocan', 'Gallon', 64, 50),
-(134, 8, 'Boysen Gloss', 100, 1, 100, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 47),
-(135, 8, 'Boysen Paint', 200, 1, 200, 'Verification', '2024-11-18', '2024-11-18 16:38:00.000000', 'Caloocan', 'Gallon', 66, 48),
-(138, 17, 'Boysen Gloss', 100, 1, 100, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 47),
-(139, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-11-17', '2024-11-17 17:55:50.000000', 'Caloocan', NULL, 67, 48),
-(141, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-02', '2024-12-02 08:39:09.000000', 'Caloocan', NULL, 68, 48),
-(149, 8, 'Boysen Paint', 200, 1, 200, 'verification', '2024-12-05', '2024-12-06 15:41:00.000000', 'Valenzuela City', 'Gallon', 70, 48),
-(150, 8, 'Latex Patin', 200, 1, 200, 'verification', '2024-12-05', '2024-12-06 15:41:00.000000', 'Quezon City', 'Gallon', 71, 54),
-(151, 8, 'Latex Patin', 200, 1, 200, 'verification', '2024-12-05', '2024-12-06 15:41:00.000000', 'San Jose Del Monte, Bulacan', 'Gallon', 72, 54);
+(153, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 16:54:39.000000', 'Caloocan', NULL, 73, 65),
+(155, 29, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 16:57:45.000000', 'Caloocan', NULL, 74, 62),
+(157, 29, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-06', '2024-12-06 16:59:34.000000', 'Caloocan', NULL, 75, 55),
+(160, 30, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-06', '2024-12-06 17:03:04.000000', 'Valenzuela City', NULL, 76, 64),
+(161, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:03:04.000000', 'Valenzuela City', NULL, 76, 65),
+(163, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:05:28.000000', 'Valenzuela City', NULL, 77, 65),
+(165, 29, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:31:41.000000', 'Quezon City', NULL, 78, 62);
 
 --
 -- Triggers `orderdetails`
@@ -749,23 +873,12 @@ CREATE TABLE `paymentform` (
 --
 
 INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`, `months_paid`) VALUES
-(53, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 50.00, './uploaded_images/person-1.jpg', '2024-11-03 19:17:09', NULL, 'Confirmed', 0),
-(54, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 340.00, './uploaded_images/person-4.jpg', '2024-11-03 19:29:17', NULL, 'failed', 0),
-(56, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 900.00, './uploaded_images/THALO GREEN acrylic.jpeg', '2024-11-08 07:42:56', NULL, 'failed', 0),
-(57, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 60.00, './uploaded_images/TOULIDINE RED.jpeg', '2024-11-08 07:43:15', NULL, 'Confirmed', 0),
-(58, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 120.00, './uploaded_images/BURNT UMBER.jpeg', '2024-11-08 07:43:34', NULL, 'Confirmed', 0),
-(59, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/BURNT UMBER.jpeg', '2024-11-09 05:20:23', NULL, 'Returned', 0),
-(60, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/MAHOGANY BROWN.jpeg', '2024-11-09 05:38:41', NULL, 'Returned', 0),
-(61, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 100.00, './uploaded_images/ORIENT GOLD.jpeg', '2024-11-09 05:39:01', NULL, 'Returned', 0),
-(62, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1560.00, './uploaded_images/BOYSEN FLAT LATEX.jpg', '2024-11-14 01:33:54', NULL, 'Returned', 0),
-(63, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 1500.00, './uploaded_images/Black.jpg', '2024-11-14 01:34:11', NULL, 'Returned', 0),
-(64, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 360.00, './uploaded_images/Brands.png', '2024-11-14 01:34:24', NULL, 'Returned', 0),
-(66, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 300.00, './uploaded_images/LAMP BLACK.jpeg', '2024-11-17 16:38:27', NULL, 'verification', 0),
-(67, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 300.00, '', '2024-11-17 16:55:50', NULL, 'Confirmed', 0),
-(68, 'cashier firstname', 'cashier lastname', 'cashier@gmail.com', 'cashier address', '091238141', 'Walk In', 'Full Payment', 200.00, '', '2024-12-02 07:39:09', NULL, 'Confirmed', 0),
-(70, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/55584.jpg', '2024-12-05 15:42:53', NULL, 'verification', 0),
-(71, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/55584.jpg', '2024-12-05 15:43:03', NULL, 'verification', 0),
-(72, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/54808.jpeg', '2024-12-05 15:43:15', NULL, 'verification', 0);
+(73, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 15:54:39', NULL, 'Confirmed', 0),
+(74, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 15:57:45', NULL, 'Confirmed', 0),
+(75, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 200.00, '', '2024-12-06 15:59:34', NULL, 'Confirmed', 0),
+(76, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 300.00, '', '2024-12-06 16:03:04', NULL, 'Confirmed', 0),
+(77, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 16:05:28', NULL, 'Confirmed', 0),
+(78, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 16:31:41', NULL, 'Confirmed', 0);
 
 --
 -- Triggers `paymentform`
@@ -930,6 +1043,34 @@ INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`) VAL
 (29, 'Gloss', 10, 'Paint'),
 (30, 'Latex Paint', 10, 'Paint');
 
+--
+-- Triggers `product_type`
+--
+DELIMITER $$
+CREATE TRIGGER `before_delete_product_type` BEFORE DELETE ON `product_type` FOR EACH ROW BEGIN
+    -- Archive the product type data
+    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (NULL, OLD.type_id, OLD.type_name, OLD.brand_id, OLD.prod_type);
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_type_archive`
+--
+
+CREATE TABLE `product_type_archive` (
+  `delete_id` int(11) NOT NULL,
+  `deleted_brand_id` int(11) DEFAULT NULL,
+  `type_id` int(11) NOT NULL,
+  `type_name` text NOT NULL,
+  `brand_id` int(11) NOT NULL,
+  `prod_type` text NOT NULL,
+  `deleted_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -947,13 +1088,6 @@ CREATE TABLE `returnitems` (
   `status` varchar(255) DEFAULT NULL,
   `branch` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `returnitems`
---
-
-INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `product_image`, `receipt_image`, `product_name`, `status`, `branch`) VALUES
-(4, 8, 'Incorrect Item', 2, 'returnItems/MAHOGANY BROWN.jpeg', 'returnItems/ORIENT GOLD.jpeg', 'Boysen Paint', 'Confirmed', NULL);
 
 --
 -- Triggers `returnitems`
@@ -1036,18 +1170,9 @@ CREATE TABLE `return_payments` (
   `proof_of_payment` text DEFAULT NULL,
   `amount_return` int(11) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `date` datetime DEFAULT current_timestamp()
+  `date` datetime DEFAULT current_timestamp(),
+  `branch` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `return_payments`
---
-
-INSERT INTO `return_payments` (`return_payment_id`, `user_id`, `return_status`, `proof_of_payment`, `amount_return`, `quantity`, `date`) VALUES
-(8, 8, 'Returned', 'refund_1731548110_673553ce11218_Black.jpg', 100, 1, '2024-11-14 09:35:10'),
-(9, 8, 'Returned', 'refund_1731548152_673553f81bcba_CHOCOLATE BROWN.jpeg', 1560, 13, '2024-11-14 09:35:52'),
-(10, 8, 'Returned', 'refund_1731554094_67356b2ea417a_GLOSS.jpg', 1500, 15, '2024-11-14 11:14:54'),
-(11, 8, 'Returned', 'refund_1731554128_67356b501effa_ORIENT GOLD.jpeg', 360, 3, '2024-11-14 11:15:28');
 
 -- --------------------------------------------------------
 
@@ -1115,12 +1240,6 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`admin_id`);
-
---
 -- Indexes for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
@@ -1138,6 +1257,12 @@ ALTER TABLE `branch`
 ALTER TABLE `brands`
   ADD PRIMARY KEY (`brand_id`),
   ADD UNIQUE KEY `brand_id` (`brand_id`);
+
+--
+-- Indexes for table `brands_archive`
+--
+ALTER TABLE `brands_archive`
+  ADD PRIMARY KEY (`delete_id`);
 
 --
 -- Indexes for table `cartitems`
@@ -1194,6 +1319,12 @@ ALTER TABLE `product_type`
   ADD KEY `fk_brand` (`brand_id`);
 
 --
+-- Indexes for table `product_type_archive`
+--
+ALTER TABLE `product_type_archive`
+  ADD PRIMARY KEY (`delete_id`);
+
+--
 -- Indexes for table `returnitems`
 --
 ALTER TABLE `returnitems`
@@ -1223,16 +1354,10 @@ ALTER TABLE `wishlist`
 --
 
 --
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `admin_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `branch`
@@ -1247,6 +1372,12 @@ ALTER TABLE `brands`
   MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT for table `brands_archive`
+--
+ALTER TABLE `brands_archive`
+  MODIFY `delete_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
@@ -1256,13 +1387,13 @@ ALTER TABLE `cartitems`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -1274,7 +1405,7 @@ ALTER TABLE `pallets`
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
@@ -1295,10 +1426,16 @@ ALTER TABLE `product_type`
   MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
+-- AUTO_INCREMENT for table `product_type_archive`
+--
+ALTER TABLE `product_type_archive`
+  MODIFY `delete_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `returnitems`
 --
 ALTER TABLE `returnitems`
-  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `return_payments`
@@ -1341,6 +1478,9 @@ ALTER TABLE `paymentform`
 ALTER TABLE `payment_track`
   ADD CONSTRAINT `paymentform_track_fk` FOREIGN KEY (`payment_id`) REFERENCES `paymentform` (`id`) ON DELETE CASCADE;
 
+--
+-- Constraints for table `product_type`
+--
 ALTER TABLE `product_type`
   ADD CONSTRAINT `brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`brand_id`) ON DELETE CASCADE;
 COMMIT;
@@ -1348,205 +1488,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-
-
-
--- Create the 'brands_archive' table to store archived brands when they are deleted
-CREATE TABLE `brands_archive` (
-  `delete_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `brand_id` INT NOT NULL,
-  `brand_name` VARCHAR(255) NOT NULL,
-  `brand_img` TEXT DEFAULT NULL,
-  `branch_id` INT DEFAULT NULL,
-  `deleted_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Create the 'product_type_archive' table to store archived product types when they are deleted
-CREATE TABLE `product_type_archive` (
-  `delete_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `deleted_brand_id` INT,
-  `type_id` INT(11) NOT NULL,
-  `type_name` TEXT NOT NULL,
-  `brand_id` INT(11) NOT NULL,
-  `prod_type` TEXT NOT NULL,
-  `deleted_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Trigger to archive brand data before deleting a brand
-DELIMITER $$
-
-CREATE TRIGGER before_delete_brand
-BEFORE DELETE ON `brands`
-FOR EACH ROW
-BEGIN
-    -- Archive the brand data
-    INSERT INTO `brands_archive` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
-    VALUES (OLD.brand_id, OLD.brand_name, OLD.brand_img, OLD.branch_id);
-    
-    -- Archive related product types
-    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
-    SELECT OLD.brand_id, pt.`type_id`, pt.`type_name`, pt.`brand_id`, pt.`prod_type`
-    FROM `product_type` pt
-    WHERE pt.`brand_id` = OLD.brand_id;
-END $$
-
-DELIMITER ;
-
--- Trigger to archive product data before deleting a product type
-DELIMITER $$
-
-CREATE TRIGGER before_delete_product_type
-BEFORE DELETE ON `product_type`
-FOR EACH ROW
-BEGIN
-    -- Archive the product type data
-    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
-    VALUES (NULL, OLD.type_id, OLD.type_name, OLD.brand_id, OLD.prod_type);
-END $$
-
-DELIMITER ;
-
-
--- Procedure to restore a deleted brand from the archive
-DELIMITER $$
-
-CREATE PROCEDURE restore_brand(IN p_delete_id INT)
-BEGIN
-    DECLARE v_brand_id INT;
-    DECLARE v_brand_name VARCHAR(255);
-    DECLARE v_brand_img TEXT;
-    DECLARE v_branch_id INT;
-
-    -- Retrieve archived brand data
-    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
-    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
-    FROM `brands_archive`
-    WHERE `delete_id` = p_delete_id;
-
-    -- Insert the brand back into the original table
-    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
-    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
-
-    -- Delete the brand from the archive after restoration
-    DELETE FROM `brands_archive`
-    WHERE `delete_id` = p_delete_id;
-END $$
-
-DELIMITER ;
-
-
--- Procedure to restore a deleted brand from the archive
-DELIMITER $$
-
-CREATE PROCEDURE restore_brand_including_product_type(IN p_delete_id INT)
-BEGIN
-    DECLARE v_brand_id INT;
-    DECLARE v_brand_name VARCHAR(255);
-    DECLARE v_brand_img TEXT;
-    DECLARE v_branch_id INT;
-
-    -- Retrieve archived brand data
-    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
-    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
-    FROM `brands_archive`
-    WHERE `delete_id` = p_delete_id;
-
-    -- Insert the brand back into the original table
-    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
-    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
-
-    -- Insert the associated product types back into the original table
-    INSERT INTO `prod_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
-    SELECT pa.`type_id`, pa.`type_name`, pa.`brand_id`, pa.`prod_type`
-    FROM `product_type_archive` pa
-    WHERE pa.`deleted_brand_id` = v_brand_id;
-
-    -- Delete the brand from the archive after restoration
-    DELETE FROM `brands_archive`
-    WHERE `delete_id` = p_delete_id;
-
-    -- Delete the product types from the archive after restoration
-    DELETE FROM `product_type_archive`
-    WHERE `deleted_brand_id` = v_brand_id;
-END $$
-
-DELIMITER ;
-
-
--- Procedure to restore a deleted product from the archive
-DELIMITER $$
-
-CREATE PROCEDURE restore_product_type(IN p_delete_id INT)
-BEGIN
-    DECLARE v_deleted_brand_id INT;
-    DECLARE v_type_id INT;
-    DECLARE v_type_name TEXT;
-    DECLARE v_brand_id INT;
-    DECLARE v_prod_type TEXT;
-
-    -- Retrieve archived product data
-    SELECT `deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`
-    INTO v_deleted_brand_id, v_type_id, v_type_name, v_brand_id, v_prod_type
-    FROM `product_type_archive`
-    WHERE `delete_id` = p_delete_id;
-
-    -- Insert the product back into the original table
-    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
-    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
-
-    -- Delete the product type from the archive after restoration
-    DELETE FROM `product_type_archive`
-    WHERE `delete_id` = p_delete_id;
-END $$
-
-DELIMITER ;
-
-
-DELIMITER $$
-
-CREATE PROCEDURE restore_product_with_brand(IN p_delete_id INT)
-BEGIN
-    DECLARE v_brand_id INT;
-    DECLARE v_brand_name VARCHAR(255);
-    DECLARE v_brand_img TEXT;
-    DECLARE v_branch_id INT;
-    DECLARE v_type_id INT;
-    DECLARE v_type_name TEXT;
-    DECLARE v_prod_type TEXT;
-
-    -- Retrieve archived product type data
-    SELECT `type_id`, `type_name`, `prod_type`, `deleted_brand_id`
-    INTO v_type_id, v_type_name, v_prod_type, v_brand_id
-    FROM `product_type_archive`
-    WHERE `delete_id` = p_delete_id;
-
-    -- Check if the brand exists in the brands_archive, and if not, insert it back
-    IF v_brand_id IS NOT NULL THEN
-        -- Retrieve archived brand data
-        SELECT `brand_name`, `brand_img`, `branch_id`
-        INTO v_brand_name, v_brand_img, v_branch_id
-        FROM `brands_archive`
-        WHERE `brand_id` = v_brand_id;
-
-        -- Insert the brand back into the original table if not already restored
-        INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
-        VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
-
-        -- Delete the brand from the archive after restoration
-        DELETE FROM `brands_archive`
-        WHERE `brand_id` = v_brand_id;
-    END IF;
-
-    -- Insert the associated product type back into the original table
-    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
-    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
-
-    -- Delete the product type from the archive after restoration
-    DELETE FROM `product_type_archive`
-    WHERE `delete_id` = p_delete_id;
-
-END $$
-
-DELIMITER ;

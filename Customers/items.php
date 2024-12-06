@@ -81,7 +81,8 @@ if ($edit_row) {
                     <tbody>
                         <?php
                         include("config.php");
-                        $stmt = $DB_con->prepare('SELECT * FROM items');
+                        $stmt = $DB_con->prepare('SELECT * FROM items where branch = :branch');
+                        $stmt->bindParam(":branch", $_SESSION['current_branch']);
                         $stmt->execute();
 
                         if ($stmt->rowCount() > 0) {

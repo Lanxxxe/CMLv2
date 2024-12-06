@@ -283,9 +283,11 @@ if (isset($_GET['delete_return_id'])) {
                 </thead>
                 <tbody>
                 <?php
+                $branch = $_SESSION['current_branch'];
                 $stmt = $DB_con->prepare('SELECT returnitems.*,
                     (SELECT users.user_email FROM users WHERE users.user_id = returnitems.user_id) as user_email
-                FROM returnitems WHERE status NOT IN ("Confirmed", "Rejected")');
+                FROM returnitems WHERE branch = :branch AND status NOT IN ("Confirmed", "Rejected")');
+                $stmt->bindParam(':branch', $branch);
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {

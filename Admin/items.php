@@ -45,7 +45,7 @@ if (isset($_GET['delete_id'])) {
     <script src="../assets/js/chart.umd.min.js"></script>
 
 
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="js/datatables.min.js"></script>
 
     <!-- Include SweetAlert2 CSS and JS -->

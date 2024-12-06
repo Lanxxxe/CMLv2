@@ -525,6 +525,7 @@ if ($edit_row) {
                     <div class="sales-report-content">
                         <?php
                             $current_user_id = $_SESSION['user_id'];
+                            $branch = $_SESSION['current_branch'];
                             // $order_type_str = '';
                             // if (isset($order_type)) {
                             //     if($order_type === 'walk_in') {
@@ -554,10 +555,10 @@ if ($edit_row) {
 
                             // Fetch daily sales
                             $stmt_daily = $DB_con->prepare(
-                                'SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
+                                "SELECT SUM(order_total) as daily_sales, DATE(order_date) as date
                                 FROM orderdetails
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                                WHERE DATE(order_date) = ? AND user_id = ? ' . $date_filter
+                                WHERE DATE(order_date) = ? AND user_id = ? and order_pick_place = '$branch'" . $date_filter
                             );
                             $stmt_daily->execute([$end_date, $current_user_id]);
                             $daily = $stmt_daily->fetch(PDO::FETCH_ASSOC);
@@ -566,10 +567,10 @@ if ($edit_row) {
 
                             // Fetch weekly sales
                             $stmt_weekly = $DB_con->prepare(
-                                'SELECT SUM(order_total) as weekly_sales
+                                "SELECT SUM(order_total) as weekly_sales
                                  FROM orderdetails 
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                                 WHERE (DATE(order_date) BETWEEN ? AND ?) AND user_id = ? ' . $date_filter
+                                 WHERE (DATE(order_date) BETWEEN ? AND ?) AND user_id = ? and order_pick_place = '$branch' " . $date_filter
                             );
                             $stmt_weekly->execute([$start_date_weekly, $end_date, $current_user_id]);
                             $weekly = $stmt_weekly->fetch(PDO::FETCH_ASSOC);
@@ -579,10 +580,10 @@ if ($edit_row) {
 
                             // Fetch monthly sales
                             $stmt_monthly = $DB_con->prepare(
-                                'SELECT SUM(order_total) as monthly_sales
+                                "SELECT SUM(order_total) as monthly_sales
                                  FROM orderdetails 
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                                 WHERE (DATE(order_date) BETWEEN ? AND ?) AND user_id = ? ' . $date_filter
+                                 WHERE (DATE(order_date) BETWEEN ? AND ?) AND user_id = ? and order_pick_place = '$branch' " . $date_filter
                             );
                             $stmt_monthly->execute([$start_date_monthly, $end_date, $current_user_id]);
                             $monthly = $stmt_monthly->fetch(PDO::FETCH_ASSOC);
@@ -598,7 +599,7 @@ if ($edit_row) {
                                 <p>Daily Sales</p>
                                 <p><?php echo date('F j, Y', strtotime($dailyDate)); ?></p>
                             </div>
-                            <img src="./local_image/daily.jpeg" alt="Daily Sales">
+                            <img src="../Admin/local_image/daily.jpeg" alt="Daily Sales">
                         </div>
                         
                         <!-- Weekly Sales Container -->
@@ -608,7 +609,7 @@ if ($edit_row) {
                                 <p>Weekly Sales</p>
                                 <p><?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
                             </div>
-                            <img src="./local_image/weekly.jpeg" alt="Weekly Sales">
+                            <img src="../Admin/local_image/weekly.jpeg" alt="Weekly Sales">
                         </div>
 
                         <!-- Monthly Sales Container -->
@@ -618,7 +619,7 @@ if ($edit_row) {
                                 <p>Monthly Sales</p>
                                 <p><?php echo date('F j, Y', strtotime($monthlyStartDate)) . ' - ' . date('F j, Y', strtotime($monthlyEndDate)); ?></p>
                             </div>
-                            <img src="./local_image/monthly.jpeg" alt="Monthly Sales">
+                            <img src="../Admin/local_image/monthly.jpeg" alt="Monthly Sales">
                         </div>
                     </div>
                 </div>
@@ -687,13 +688,13 @@ if ($edit_row) {
                             <tbody class="table-striped">
                                 <?php
 
-                                $stmt = $DB_con->prepare('
+                                $stmt = $DB_con->prepare("
                                     SELECT 
                                         orderdetails.*
                                     FROM orderdetails 
-                                    WHERE orderdetails.user_id = :current_user  
+                                    WHERE orderdetails.user_id = :current_user  and order_pick_place = '$branch' 
                                     ORDER BY orderdetails.order_date DESC
-                                ');
+                                ");
                                 $stmt->bindParam(':current_user', $current_user_id, PDO::PARAM_INT);
                                 $stmt->execute();
 
@@ -741,10 +742,10 @@ if ($edit_row) {
     <!-- Mediul Modal -->
     <?php require_once "./salesReportModal.php"; ?>
     <?php
-        $sumqty_stmt = $DB_con->prepare('SELECT order_name, SUM(order_quantity) as sum_qty
+        $sumqty_stmt = $DB_con->prepare("SELECT order_name, SUM(order_quantity) as sum_qty
         FROM orderdetails LEFT JOIN paymentform ON paymentform.id = orderdetails.payment_id
-        WHERE orderdetails.user_id = :customer_user_id
-        GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5');
+        WHERE orderdetails.user_id = :customer_user_id and order_pick_place = '$branch'
+        GROUP BY order_name, order_price, gl ORDER BY sum_qty DESC LIMIT 5");
     $sumqty_stmt->bindParam(':customer_user_id', $current_user_id, PDO::PARAM_INT);
     $sumqty_stmt->execute();
     $sum_qty = $sumqty_stmt->fetchAll(PDO::FETCH_ASSOC);

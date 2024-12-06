@@ -47,6 +47,7 @@
                         </thead>
                         <tbody>
                             <?php
+                            // $branch = $_SESSION['current_branch)'];
                             // Fetch daily transactions
                             $stmt_daily = $DB_con->prepare('
                             SELECT 
@@ -59,7 +60,7 @@
                                 FROM orderdetails
                                     INNER JOIN users ON users.user_id = orderdetails.user_id 
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                                WHERE DATE(orderdetails.order_date) = ?' . $order_type_str);
+                                WHERE DATE(orderdetails.order_date) = ?' . $order_type_str . "and order_pick_place = '$branch' ");
                             $stmt_daily->execute([$end_date]);
                             if ($stmt_daily->rowCount() > 0) {
                                 while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
@@ -147,7 +148,7 @@
                             FROM orderdetails 
                                 INNER JOIN users ON users.user_id = orderdetails.user_id 
                                 LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
-                            WHERE DATE(orderdetails.order_date) BETWEEN ? AND ?' . $order_type_str
+                            WHERE DATE(orderdetails.order_date) BETWEEN ? AND ?' . $order_type_str . "and order_pick_place = '$branch' "
                             );
                             $stmt_weekly->execute([$start_date_weekly, $end_date]);
                             if ($stmt_weekly->rowCount() > 0) {
@@ -237,7 +238,7 @@
                                 INNER JOIN users ON users.user_id = orderdetails.user_id 
                                 LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id
                             WHERE DATE(order_date) BETWEEN 
-                                ? AND ?' . $order_type_str
+                                ? AND ?' . $order_type_str . "and order_pick_place = '$branch' "
                             );
                             $stmt_monthly->execute([$start_date, $end_date]);
                             if ($stmt_monthly->rowCount() > 0) {

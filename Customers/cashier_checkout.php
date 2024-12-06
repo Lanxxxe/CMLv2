@@ -120,7 +120,7 @@ try {
             'order_status' => 'Confirmed', // Or whatever status you prefer
             'order_date' => date('Y-m-d H:i:s'),
             'order_pick_up' =>  date('Y-m-d H:i:s'), // Add appropriate values if needed
-            'order_pick_place' =>  'Caloocan', // Add appropriate values if needed
+            'order_pick_place' =>  $assign_branch, // Add appropriate values if needed
             'gl' => empty($item['gl']) ? $item['gl'] : null,
             'product_id' => $item['item_id'] // Assuming you have this in your fetched data
         ];

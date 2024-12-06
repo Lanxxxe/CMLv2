@@ -69,6 +69,9 @@ include_once 'config.php';
                 $filter_date = $_GET['filter_date'] ?? null;
                 $filter_type = $_GET['filter_type'] ?? null;
 
+
+                // Get the current branch from the session
+                $branch = $_SESSION['current_branch'] ?? null;
                 // Base query
                 $query = "SELECT 
                             rp.return_payment_id,
@@ -85,6 +88,13 @@ include_once 'config.php';
                 // Conditions for filters
                 $conditions = [];
                 $params = [];
+
+                // Filter by branch
+                // if (!empty($branch)) {
+                //     $conditions[] = "ri.branch = :branch";
+                //     $params[':branch'] = $branch;
+                // }
+
 
                 // Filter by specific date
                 if (!empty($filter_date)) {

@@ -84,8 +84,8 @@ extract($edit_row);
           <tbody>
             <?php
             include("config.php");
-
-            $stmt = $DB_con->prepare("SELECT * FROM orderdetails where user_id='$user_id' ORDER BY order_pick_up DESC");
+            $branch = $_SESSION['current_branch'];
+            $stmt = $DB_con->prepare("SELECT * FROM orderdetails where user_id='$user_id' AND order_pick_place = '$branch' ORDER BY order_pick_up DESC");
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
@@ -113,7 +113,7 @@ extract($edit_row);
               <?php
               }
               include("config.php");
-              $stmt_edit = $DB_con->prepare("select sum(order_total) as totalx from orderdetails where user_id=:user_id");
+              $stmt_edit = $DB_con->prepare("select sum(order_total) as totalx from orderdetails where user_id=:user_id and order_pick_place = '$branch'");
               $stmt_edit->execute(array(':user_id' => $user_id));
               $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
               extract($edit_row);

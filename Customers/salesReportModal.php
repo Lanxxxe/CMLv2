@@ -22,8 +22,9 @@
                         <?php
                         $current_user_id = $_SESSION['user_id'];
                         // Fetch daily transactions
-                        $stmt_daily = $DB_con->prepare('SELECT * FROM orderdetails WHERE DATE(order_date) = CURDATE() 
-                        AND user_id = ?');
+                        $current_date = date('Y-m-d');
+                        $stmt_daily = $DB_con->prepare("SELECT * FROM orderdetails WHERE DATE(order_date) = '$current_date' 
+                        AND user_id = ? and order_pick_place = '$branch' ");
                         $stmt_daily->bindParam(1, $current_user_id, PDO::PARAM_INT);
                         $stmt_daily->execute();
                         while ($row = $stmt_daily->fetch(PDO::FETCH_ASSOC)) {
@@ -39,7 +40,7 @@
                 </table>
                 </div>
                 <div class="modal-footer hide-in-print">
-                    <a class="btn btn-primary" href="../Admin/reports/daily.php">Save as PDF</a>
+                    <a class="btn btn-primary" href="../Admin/reports/daily.php">Save as PDF </a>
                     <button type="button" class="btn btn-primary" onclick="printContent('dailySalesContent')">Print</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
@@ -71,8 +72,8 @@
                         <?php
                         // Fetch weekly transactions
                         $stmt_weekly = $DB_con->prepare(
-                            'SELECT * FROM orderdetails WHERE DATE(order_date) BETWEEN DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND CURDATE()
-                        AND user_id = ?');
+                            "SELECT * FROM orderdetails WHERE DATE(order_date) BETWEEN DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND CURDATE()
+                        AND user_id = ? and order_pick_place = '$branch'");
                         $stmt_weekly->bindParam(1, $current_user_id, PDO::PARAM_INT);
                         $stmt_weekly->execute();
                         while ($row = $stmt_weekly->fetch(PDO::FETCH_ASSOC)) {
@@ -119,11 +120,11 @@
                         <?php
                         // Fetch monthly transactions
                         $stmt_monthly = $DB_con->prepare(
-                            'SELECT * FROM orderdetails 
+                            "SELECT * FROM orderdetails 
                             WHERE DATE(order_date) BETWEEN DATE_FORMAT(CURDATE(), 
-                            "%Y-%m-01") 
+                            '%Y-%m-01') 
                             AND LAST_DAY(CURDATE()) 
-                            AND user_id = ?');
+                            AND user_id = ? and order_pick_place = '$branch'");
                         $stmt_monthly->bindParam(1, $current_user_id, PDO::PARAM_INT);
                         $stmt_monthly->execute();
                         while ($row = $stmt_monthly->fetch(PDO::FETCH_ASSOC)) {

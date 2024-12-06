@@ -34,6 +34,7 @@ try {
         $user_id = $_POST['user_id'] ?? null;
         $o_quantity = $_POST['order_quantity'] ?? null;
         $return_image = $_FILES['return_image'] ?? null;
+        $branch = $_SESSION['current_branch'];
         $return_status = 'Returned';
 
         // Validate file upload
@@ -91,9 +92,9 @@ try {
         }
 
         // Update the payment status to 'Refunded' and log the refund
-        $insertstmt = $DB_con->prepare("INSERT INTO return_payments (user_id, return_status, proof_of_payment, amount_return, quantity)
-            VALUES (?, ?, ?, ?, ?)");
-        $insertstmt->execute([$user_id,  $return_status, $file_name, $return_amount, $o_quantity]);
+        $insertstmt = $DB_con->prepare("INSERT INTO return_payments (user_id, return_status, proof_of_payment, amount_return, quantity, branch)
+            VALUES (?, ?, ?, ?, ?, ?)");
+        $insertstmt->execute([$user_id,  $return_status, $file_name, $return_amount, $o_quantity, $branch]);
 
         // Check if the update was successful
         if ($insertstmt->rowCount() > 0) {

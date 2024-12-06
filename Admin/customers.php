@@ -411,7 +411,7 @@ if (isset($_GET['reset_payment_id'])) {
                 if (result.isConfirmed) {
                     window.location.href = 'customers.php';
                 }
-            });
+                });
         </script>";
     }
 }
@@ -645,7 +645,8 @@ if (isset($_GET['delete_return_id'])) {
                         ");
                         $stmt->execute(['branch' => $branch]);
                         $tracks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $data = array_merge($payments, $tracks);
+                    
+                        $data = array_merge($payments, $tracks);
 
                     if (count($data) > 0) {
                         foreach ($data as $row) {

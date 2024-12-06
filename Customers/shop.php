@@ -277,7 +277,7 @@ extract($edit_row);
             }
 
 
-            $query = mysqli_query($conn, "SELECT DISTINCT * FROM items LIMIT $start, $limit WHERE");
+            $query = mysqli_query($conn, "SELECT DISTINCT * FROM items LIMIT $start, $limit");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 $exist = inWishlist($query2['item_id']);
