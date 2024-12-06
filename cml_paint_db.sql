@@ -960,17 +960,17 @@ INSERT INTO `returnitems` (`return_id`, `user_id`, `reason`, `quantity`, `produc
 --
 DELIMITER $$
 CREATE TRIGGER `trigger_delete_return_request` BEFORE DELETE ON `returnitems` FOR EACH ROW BEGIN
-    DECLARE user_email VARCHAR(255);
+    DECLARE v_user_email VARCHAR(255);
 
-    SELECT email INTO user_email
+    SELECT user_email INTO v_user_email
     FROM users 
-    WHERE id = OLD.user_id;  -- Fixed NEW to OLD since this is a DELETE trigger
+    WHERE user_id = OLD.user_id;  -- Fixed NEW to OLD since this is a DELETE trigger
     
     INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
     VALUES (
         OLD.return_id,
         'return deleted', 
-        user_email, 
+        v_user_email, 
         'Return Request Deleted'
     );
 END
@@ -978,17 +978,17 @@ $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `trigger_insert_return_request` AFTER INSERT ON `returnitems` FOR EACH ROW BEGIN
-    DECLARE user_email VARCHAR(255);
+    DECLARE v_user_email VARCHAR(255);
     
-    SELECT email INTO user_email
+    SELECT user_email INTO v_user_email
     FROM users 
-    WHERE id = NEW.user_id;
+    WHERE user_id = NEW.user_id;
     
     INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
     VALUES (
         NEW.return_id,
         'return request', 
-        user_email, 
+        v_user_email, 
         'New Return Request'  -- Updated message
     );
 END
@@ -996,18 +996,18 @@ $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `trigger_update_return_request` AFTER UPDATE ON `returnitems` FOR EACH ROW BEGIN
-    DECLARE user_email VARCHAR(255);
+    DECLARE v_user_email VARCHAR(255);
 
-    SELECT email INTO user_email
+    SELECT user_email INTO v_user_email
     FROM users 
-    WHERE id = NEW.user_id;
+    WHERE user_id = NEW.user_id;
     
     IF NEW.status = 'Confirmed' AND OLD.status != 'Confirmed' THEN 
         INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
         VALUES (
             NEW.return_id,
             'returned', 
-            user_email, 
+            v_user_email, 
             'Return Confirmed'
         );
     ELSEIF NEW.status = 'Rejected' AND OLD.status != 'Rejected' THEN 
@@ -1015,7 +1015,7 @@ CREATE TRIGGER `trigger_update_return_request` AFTER UPDATE ON `returnitems` FOR
         VALUES (
             NEW.return_id,
             'return rejected', 
-            user_email, 
+            v_user_email, 
             'Return Request Rejected'
         );
     END IF;
