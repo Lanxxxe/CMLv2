@@ -34,6 +34,8 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     $order_type = null;
 }
 
+$branch = $_SESSION['current_branch']
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,444 +61,444 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-.transactions-header {
-    padding: 0;
-    width: 100%;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.transactions-tabs {
-    display: flex;
-    flex: 1;
-    min-width: 300px;
-}
-
-.date-filter-form {
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    gap: 10px;
-}
-
-.date-inputs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.date-input-group input[type="date"] {
-    padding: 6px 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-    height: 34px;
-}
-
-.date-separator {
-    color: #666;
-    font-weight: 500;
-}
-
-.transactions-actions {
-    display: flex;
-    padding-right: 15px;
-    gap: 10px;
-}
-
-.action-btn {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    height: 34px;
-}
-
-.action-btn i {
-    font-size: 14px;
-}
-
-@media (max-width: 1200px) {
-    .transactions-header {
-        flex-direction: column;
-        padding: 10px 0;
-    }
-    
-    .transactions-tabs {
-        width: 100%;
-        overflow-x: auto;
-    }
-    
-    .date-filter-form {
-        padding: 10px 15px;
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .transactions-actions {
-        padding: 10px 15px;
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 768px) {
-    .date-inputs {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .date-input-group {
-        width: 100%;
-        max-width: 200px;
-    }
-}
-.date-filter {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    background: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    width: 100%;
-}
-
-.date-filter-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.date-filter input[type="date"] {
-    padding: 6px 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.date-filter span {
-    color: #495057;
-    font-weight: 500;
-}
-
-.date-filter button {
-    padding: 6px 15px;
-    margin-left: 10px;
-}
-
-@media print {
-    .date-filter {
-        display: none !important;
-    }
-}
-        #filterTab {
-            display: flex;
-            align-items: center;
-            position: fixed;
-            top: 50px;
-            background: #333;
-            border-radius: 0;
-            width: calc(100% - 225px);
-        }
-        #filterTab .mnav {
-            padding: 5px 20px;
-            border: none;
-            font-size: 18px;
-            margin-right: 2px;
-            background: #f2f2f2;
-            border-radius: 5px;
-            color: #0f0f0f;
-        }
-        #filterTab .mnav:first-child {
-            margin-left: 5px;
-        }
-        #saveAsPDFBtn {
-            margin-left: auto;
-            margin-right: 10px;
-        }
-        .printBtn {
-            margin-right: 10px;
-        }
-
-        #filterTab .activeFilterTab {
-            background: gray;
-            color: white;
-        }
-        #filterTab .mnav:hover:not(.activeFilterTab) {
-            color: gray;
-            transition: all 300ms;
-        }
-        .sales-report-container {
-            height: auto;
-        }
-
-
-        .sales-report-transactions {
-            margin: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .sales-report-transactions h2 {
-            padding: 20px;
-            margin: 0;
+        .transactions-header {
+            padding: 0;
+            width: 100%;
             background: #f8f9fa;
             border-bottom: 1px solid #dee2e6;
             border-radius: 8px 8px 0 0;
-            color: #333;
-            font-size: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .transactions-table {
-            padding: 20px;
-            overflow-x: auto;
+        .transactions-tabs {
+            display: flex;
+            flex: 1;
+            min-width: 300px;
         }
 
-        .transactions-table table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
+        .date-filter-form {
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
         }
 
-        .transactions-table thead th {
-            background-color: #f8f9fa;
-            color: #495057;
-            font-weight: 600;
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 2px solid #dee2e6;
-            white-space: nowrap;
+        .date-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .transactions-table tbody td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #dee2e6;
-            color: #212529;
+        .date-input-group input[type="date"] {
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            height: 34px;
         }
 
-        .transactions-table tbody tr:hover {
-            background-color: #f8f9fa;
+        .date-separator {
+            color: #666;
+            font-weight: 500;
         }
 
-        .order-status {
-            padding: 4px 8px;
+        .transactions-actions {
+            display: flex;
+            padding-right: 15px;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
             border-radius: 4px;
             font-weight: 500;
-            text-align: center;
-            display: inline-block;
-            min-width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
         }
 
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
+        .action-btn i {
+            font-size: 14px;
         }
 
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-cancelled {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-    .transactions-header {
-        padding: 0;
-        width: 100%;
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 8px 8px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .transactions-tabs {
-        display: flex;
-        flex: 1;
-    }
-
-    .tab-btn {
-        padding: 15px 25px;
-        color: #495057;
-        font-weight: 500;
-        text-decoration: none;
-        border: none;
-        border-right: 1px solid #dee2e6;
-        background: transparent;
-        transition: all 0.2s ease;
-    }
-
-    .tab-btn:hover {
-        background: rgba(13, 110, 253, 0.05);
-        color: #0d6efd;
-    }
-
-    .tab-btn.active {
-        background: #0d6efd;
-        color: white;
-    }
-
-    .transactions-actions {
-        display: flex;
-        padding-right: 15px;
-        gap: 10px;
-    }
-
-    .transactions-separator {
-        flex: 1;
-    }
-
-    .action-btn {
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .action-btn i {
-        font-size: 14px;
-    }
-
-    .transactions-header .tab-btn:first-child {
-        border-top-left-radius: 8px;
-    }
-
-    .transactions-header .tab-btn.active {
-        background-color: #666;
-    }
-
-    .transactions-header .tab-btn:hover {
-        text-decoration: none;
-    }
-
-    .transactions-header .tab-btn:not(.active):hover {
-        color: inherit;
-    }
-
-    .print-header {
-        display: none;
-        margin: 20px;
-    }
-
-    .h-head-text, .h-label {
-        margin: 1px;
-        font-weight: bold;
-    }
-
-    .reports-info {
-        display: flex;
-        flex-direction: column;
-        align-items: end;
-    }
-
-    .reports-info > * {
-        margin: 1px;
-    }
-
-        @media print {
-            @page {
-                size: 800px auto;
-                margin: 0;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            .printable, .printable * {
-                visibility: visible !important;
-            }
-
-            .printable {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                padding: 0.75rem !important;
-                margin: 0 !important;
-            }
-
-            #page-wrapper:not(.printable) {
-                display: none !important;
-            }
-
-            .printable tr * {
-                white-space: wrap !important;
-                overflow: wrap !important;
-                text-wrap: wrap !important;
-            }
-
-            /* Force background colors to print */
-            .sales-report-item {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            /* Apply specific background colors */
-            .sales-report-item:nth-child(1) {
-                background-color: #bfea91 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .sales-report-item:nth-child(2) {
-                background-color: #91d4ea !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .sales-report-item:nth-child(3) {
-                background-color: #cb91ea !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            /* Ensure text remains visible */
-            .sales-report-item h2,
-            .sales-report-item p {
-                color: black !important;
+        @media (max-width: 1200px) {
+            .transactions-header {
+                flex-direction: column;
+                padding: 10px 0;
             }
             
-            .hide-in-print {
-                display: none !important;
+            .transactions-tabs {
+                width: 100%;
+                overflow-x: auto;
             }
-            .modal {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
+            
+            .date-filter-form {
+                padding: 10px 15px;
+                width: 100%;
+                justify-content: center;
             }
-
-            .modal-dialog {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .close {
-                display: none !important;
-            }
-            .print-header {
-                display: flex !important;
-                justify-content: space-between;
+            
+            .transactions-actions {
+                padding: 10px 15px;
+                width: 100%;
+                justify-content: center;
             }
         }
+
+        @media (max-width: 768px) {
+            .date-inputs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .date-input-group {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+        .date-filter {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            width: 100%;
+        }
+
+        .date-filter-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-filter input[type="date"] {
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .date-filter span {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .date-filter button {
+            padding: 6px 15px;
+            margin-left: 10px;
+        }
+
+        @media print {
+            .date-filter {
+                display: none !important;
+            }
+        }
+                #filterTab {
+                    display: flex;
+                    align-items: center;
+                    position: fixed;
+                    top: 50px;
+                    background: #333;
+                    border-radius: 0;
+                    width: calc(100% - 225px);
+                }
+                #filterTab .mnav {
+                    padding: 5px 20px;
+                    border: none;
+                    font-size: 18px;
+                    margin-right: 2px;
+                    background: #f2f2f2;
+                    border-radius: 5px;
+                    color: #0f0f0f;
+                }
+                #filterTab .mnav:first-child {
+                    margin-left: 5px;
+                }
+                #saveAsPDFBtn {
+                    margin-left: auto;
+                    margin-right: 10px;
+                }
+                .printBtn {
+                    margin-right: 10px;
+                }
+
+                #filterTab .activeFilterTab {
+                    background: gray;
+                    color: white;
+                }
+                #filterTab .mnav:hover:not(.activeFilterTab) {
+                    color: gray;
+                    transition: all 300ms;
+                }
+                .sales-report-container {
+                    height: auto;
+                }
+
+
+                .sales-report-transactions {
+                    margin: 20px;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+
+                .sales-report-transactions h2 {
+                    padding: 20px;
+                    margin: 0;
+                    background: #f8f9fa;
+                    border-bottom: 1px solid #dee2e6;
+                    border-radius: 8px 8px 0 0;
+                    color: #333;
+                    font-size: 1.5rem;
+                }
+
+                .transactions-table {
+                    padding: 20px;
+                    overflow-x: auto;
+                }
+
+                .transactions-table table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 1rem;
+                }
+
+                .transactions-table thead th {
+                    background-color: #f8f9fa;
+                    color: #495057;
+                    font-weight: 600;
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 2px solid #dee2e6;
+                    white-space: nowrap;
+                }
+
+                .transactions-table tbody td {
+                    padding: 12px 15px;
+                    border-bottom: 1px solid #dee2e6;
+                    color: #212529;
+                }
+
+                .transactions-table tbody tr:hover {
+                    background-color: #f8f9fa;
+                }
+
+                .order-status {
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-weight: 500;
+                    text-align: center;
+                    display: inline-block;
+                    min-width: 100px;
+                }
+
+                .status-pending {
+                    background-color: #fff3cd;
+                    color: #856404;
+                }
+
+                .status-completed {
+                    background-color: #d4edda;
+                    color: #155724;
+                }
+
+                .status-cancelled {
+                    background-color: #f8d7da;
+                    color: #721c24;
+                }
+
+            .transactions-header {
+                padding: 0;
+                width: 100%;
+                background: #f8f9fa;
+                border-bottom: 1px solid #dee2e6;
+                border-radius: 8px 8px 0 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .transactions-tabs {
+                display: flex;
+                flex: 1;
+            }
+
+            .tab-btn {
+                padding: 15px 25px;
+                color: #495057;
+                font-weight: 500;
+                text-decoration: none;
+                border: none;
+                border-right: 1px solid #dee2e6;
+                background: transparent;
+                transition: all 0.2s ease;
+            }
+
+            .tab-btn:hover {
+                background: rgba(13, 110, 253, 0.05);
+                color: #0d6efd;
+            }
+
+            .tab-btn.active {
+                background: #0d6efd;
+                color: white;
+            }
+
+            .transactions-actions {
+                display: flex;
+                padding-right: 15px;
+                gap: 10px;
+            }
+
+            .transactions-separator {
+                flex: 1;
+            }
+
+            .action-btn {
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: 500;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+            .action-btn i {
+                font-size: 14px;
+            }
+
+            .transactions-header .tab-btn:first-child {
+                border-top-left-radius: 8px;
+            }
+
+            .transactions-header .tab-btn.active {
+                background-color: #666;
+            }
+
+            .transactions-header .tab-btn:hover {
+                text-decoration: none;
+            }
+
+            .transactions-header .tab-btn:not(.active):hover {
+                color: inherit;
+            }
+
+            .print-header {
+                display: none;
+                margin: 20px;
+            }
+
+            .h-head-text, .h-label {
+                margin: 1px;
+                font-weight: bold;
+            }
+
+            .reports-info {
+                display: flex;
+                flex-direction: column;
+                align-items: end;
+            }
+
+            .reports-info > * {
+                margin: 1px;
+            }
+
+                @media print {
+                    @page {
+                        size: 800px auto;
+                        margin: 0;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    body * {
+                        visibility: hidden !important;
+                    }
+
+                    .printable, .printable * {
+                        visibility: visible !important;
+                    }
+
+                    .printable {
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: 100% !important;
+                        padding: 0.75rem !important;
+                        margin: 0 !important;
+                    }
+
+                    #page-wrapper:not(.printable) {
+                        display: none !important;
+                    }
+
+                    .printable tr * {
+                        white-space: wrap !important;
+                        overflow: wrap !important;
+                        text-wrap: wrap !important;
+                    }
+
+                    /* Force background colors to print */
+                    .sales-report-item {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    /* Apply specific background colors */
+                    .sales-report-item:nth-child(1) {
+                        background-color: #bfea91 !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    .sales-report-item:nth-child(2) {
+                        background-color: #91d4ea !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    .sales-report-item:nth-child(3) {
+                        background-color: #cb91ea !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+
+                    /* Ensure text remains visible */
+                    .sales-report-item h2,
+                    .sales-report-item p {
+                        color: black !important;
+                    }
+                    
+                    .hide-in-print {
+                        display: none !important;
+                    }
+                    .modal {
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+
+                    .modal-dialog {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    .close {
+                        display: none !important;
+                    }
+                    .print-header {
+                        display: flex !important;
+                        justify-content: space-between;
+                    }
+                }
 
     </style>
 
@@ -726,11 +728,12 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
                                     paymentform.payment_method
                                 FROM users 
                                 INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
-                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id WHERE date(orderdetails.order_date) <= ?'
+                                LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id 
+                                WHERE orderdetails.order_pick_place = :branch  AND date(orderdetails.order_date) <= ?'
                                  . $order_type_str .
                                 'ORDER BY orderdetails.order_date DESC
                             ');
-                            $stmt->execute([$end_date]);
+                            $stmt->execute([$end_date, $branch]);
 
 
                                 if ($stmt->rowCount() > 0) {

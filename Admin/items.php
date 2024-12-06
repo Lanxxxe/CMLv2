@@ -205,7 +205,9 @@ if (isset($_GET['delete_id'])) {
             </thead>
             <tbody>
                 <?php
-                $stmt = $DB_con->prepare('SELECT * FROM items');
+                $branch = $_SESSION['current_branch']; 
+                $stmt = $DB_con->prepare('SELECT * FROM items where branch = :branch');
+                $stmt->bindParam(':branch', $branch);
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -283,7 +285,8 @@ if (isset($_GET['delete_id'])) {
                     <tbody>
                         <?php
                         include("config.php");
-                        $stmt = $DB_con->prepare('SELECT * FROM items');
+                        $stmt = $DB_con->prepare('SELECT * FROM items WHERE branch = :branch');
+                        $stmt->bindParam(':branch', $branch);
                         $stmt->execute();
 
                         if ($stmt->rowCount() > 0) {
@@ -404,7 +407,8 @@ if (isset($_GET['delete_id'])) {
             // Fetch item data from the PHP loop
             <?php
             // Reset the statement to ensure we can fetch the data again
-            $getProduct = $DB_con->prepare('SELECT * FROM items');
+            $getProduct = $DB_con->prepare('SELECT * FROM items WHERE branch = :branch');
+            $getProduct->bindParam(':branch', $branch);
             $getProduct->execute();
             while ($row = $getProduct->fetch(PDO::FETCH_ASSOC)) {
                 extract($row);

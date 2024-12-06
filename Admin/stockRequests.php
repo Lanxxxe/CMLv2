@@ -182,9 +182,7 @@ if (isset($_POST['action']) && in_array($_POST['action'], ['confirm', 'decline']
 
     </div>
 
-<!-- /#wrapper -->
-
-
+    <!-- /#wrapper -->
 	<!-- Mediul Modal -->
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>
