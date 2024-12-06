@@ -1326,8 +1326,213 @@ ALTER TABLE `paymentform`
 --
 ALTER TABLE `payment_track`
   ADD CONSTRAINT `paymentform_track_fk` FOREIGN KEY (`payment_id`) REFERENCES `paymentform` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `product_type`
+  ADD CONSTRAINT `brand_id` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`brand_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+
+
+-- Create the 'brands_archive' table to store archived brands when they are deleted
+CREATE TABLE `brands_archive` (
+  `delete_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `brand_id` INT NOT NULL,
+  `brand_name` VARCHAR(255) NOT NULL,
+  `brand_img` TEXT DEFAULT NULL,
+  `branch_id` INT DEFAULT NULL,
+  `deleted_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Create the 'product_type_archive' table to store archived product types when they are deleted
+CREATE TABLE `product_type_archive` (
+  `delete_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `deleted_brand_id` INT,
+  `type_id` INT(11) NOT NULL,
+  `type_name` TEXT NOT NULL,
+  `brand_id` INT(11) NOT NULL,
+  `prod_type` TEXT NOT NULL,
+  `deleted_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Trigger to archive brand data before deleting a brand
+DELIMITER $$
+
+CREATE TRIGGER before_delete_brand
+BEFORE DELETE ON `brands`
+FOR EACH ROW
+BEGIN
+    -- Archive the brand data
+    INSERT INTO `brands_archive` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (OLD.brand_id, OLD.brand_name, OLD.brand_img, OLD.branch_id);
+    
+    -- Archive related product types
+    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
+    SELECT OLD.brand_id, pt.`type_id`, pt.`type_name`, pt.`brand_id`, pt.`prod_type`
+    FROM `product_type` pt
+    WHERE pt.`brand_id` = OLD.brand_id;
+END $$
+
+DELIMITER ;
+
+-- Trigger to archive product data before deleting a product type
+DELIMITER $$
+
+CREATE TRIGGER before_delete_product_type
+BEFORE DELETE ON `product_type`
+FOR EACH ROW
+BEGIN
+    -- Archive the product type data
+    INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (NULL, OLD.type_id, OLD.type_name, OLD.brand_id, OLD.prod_type);
+END $$
+
+DELIMITER ;
+
+
+-- Procedure to restore a deleted brand from the archive
+DELIMITER $$
+
+CREATE PROCEDURE restore_brand(IN p_delete_id INT)
+BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+
+    -- Retrieve archived brand data
+    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
+    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
+    FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the brand back into the original table
+    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+    -- Delete the brand from the archive after restoration
+    DELETE FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+END $$
+
+DELIMITER ;
+
+
+-- Procedure to restore a deleted brand from the archive
+DELIMITER $$
+
+CREATE PROCEDURE restore_brand_including_product_type(IN p_delete_id INT)
+BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+
+    -- Retrieve archived brand data
+    SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
+    INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
+    FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the brand back into the original table
+    INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+    VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+    -- Insert the associated product types back into the original table
+    INSERT INTO `prod_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    SELECT pa.`type_id`, pa.`type_name`, pa.`brand_id`, pa.`prod_type`
+    FROM `product_type_archive` pa
+    WHERE pa.`deleted_brand_id` = v_brand_id;
+
+    -- Delete the brand from the archive after restoration
+    DELETE FROM `brands_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Delete the product types from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `deleted_brand_id` = v_brand_id;
+END $$
+
+DELIMITER ;
+
+
+-- Procedure to restore a deleted product from the archive
+DELIMITER $$
+
+CREATE PROCEDURE restore_product_type(IN p_delete_id INT)
+BEGIN
+    DECLARE v_deleted_brand_id INT;
+    DECLARE v_type_id INT;
+    DECLARE v_type_name TEXT;
+    DECLARE v_brand_id INT;
+    DECLARE v_prod_type TEXT;
+
+    -- Retrieve archived product data
+    SELECT `deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`
+    INTO v_deleted_brand_id, v_type_id, v_type_name, v_brand_id, v_prod_type
+    FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Insert the product back into the original table
+    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
+
+    -- Delete the product type from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+END $$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE restore_product_with_brand(IN p_delete_id INT)
+BEGIN
+    DECLARE v_brand_id INT;
+    DECLARE v_brand_name VARCHAR(255);
+    DECLARE v_brand_img TEXT;
+    DECLARE v_branch_id INT;
+    DECLARE v_type_id INT;
+    DECLARE v_type_name TEXT;
+    DECLARE v_prod_type TEXT;
+
+    -- Retrieve archived product type data
+    SELECT `type_id`, `type_name`, `prod_type`, `deleted_brand_id`
+    INTO v_type_id, v_type_name, v_prod_type, v_brand_id
+    FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+    -- Check if the brand exists in the brands_archive, and if not, insert it back
+    IF v_brand_id IS NOT NULL THEN
+        -- Retrieve archived brand data
+        SELECT `brand_name`, `brand_img`, `branch_id`
+        INTO v_brand_name, v_brand_img, v_branch_id
+        FROM `brands_archive`
+        WHERE `brand_id` = v_brand_id;
+
+        -- Insert the brand back into the original table if not already restored
+        INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
+        VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
+
+        -- Delete the brand from the archive after restoration
+        DELETE FROM `brands_archive`
+        WHERE `brand_id` = v_brand_id;
+    END IF;
+
+    -- Insert the associated product type back into the original table
+    INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
+    VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
+
+    -- Delete the product type from the archive after restoration
+    DELETE FROM `product_type_archive`
+    WHERE `delete_id` = p_delete_id;
+
+END $$
+
+DELIMITER ;

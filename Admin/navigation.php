@@ -42,6 +42,7 @@
                 if ($_SESSION['current_branch'] == 'Caloocan'){
             ?>
                 <li id="nav_maintenance"><a href="maintenance.php"> &nbsp; &nbsp; &nbsp; Maintenance</a></li>
+                <li id="nav_maintenance"><a href="archive.php"> &nbsp; &nbsp; &nbsp; Archive</a></li>
                 <li id="nav_user_management"><a href="userManagement.php"> &nbsp; &nbsp; &nbsp; User Management</a></li>
                 <li id="nav_request_stock"><a href="stockRequests.php"> &nbsp; &nbsp; &nbsp; Stock Requests</a></li>
             <?php

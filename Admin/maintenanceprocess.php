@@ -193,8 +193,8 @@ try {
             $DB_con->beginTransaction();
             
             // Delete associated tools first (due to foreign key constraint)
-            $stmt = $DB_con->prepare("DELETE FROM product_type WHERE brand_id = ?");
-            $stmt->execute([$brand_id]);
+            // $stmt = $DB_con->prepare("DELETE FROM product_type WHERE brand_id = ?");
+            // $stmt->execute([$brand_id]);
             
             // Delete the brand
             $stmt = $DB_con->prepare("DELETE FROM brands WHERE brand_id = ?");
