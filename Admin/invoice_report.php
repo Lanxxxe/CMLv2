@@ -80,7 +80,7 @@ include_once 'config.php';
                             rp.proof_of_payment,
                             rp.amount_return,
                             rp.quantity,
-                            rp.date as date_only  ,
+                            rp.date as date_only ,
                             CONCAT(u.user_firstname, ' ', u.user_lastname) as customer_name
                         FROM return_payments rp
                         LEFT JOIN users u ON rp.user_id = u.user_id";
@@ -90,10 +90,10 @@ include_once 'config.php';
                 $params = [];
 
                 // Filter by branch
-                // if (!empty($branch)) {
-                //     $conditions[] = "ri.branch = :branch";
-                //     $params[':branch'] = $branch;
-                // }
+                if (!empty($branch)) {
+                    $conditions[] = "rp.branch = :branch";
+                    $params[':branch'] = $branch;
+                }
 
 
                 // Filter by specific date
