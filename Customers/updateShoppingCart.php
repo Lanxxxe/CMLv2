@@ -9,11 +9,31 @@ if (isset($_POST['action'])){
         $quantity = trim($_POST['quantity']);
         $total = trim($_POST['total']);
         $orderID = trim($_POST['order_id']);
+        $productID = trim($_POST['product_id']);
+
+        // Query the current stock of the product
+        $stockStmt = $DB_con->prepare("SELECT quantity FROM items WHERE item_id = ?");
+        $stockStmt->execute([$productID]);
+        $product = $stockStmt->fetch(PDO::FETCH_ASSOC);
     
-        $updateStmt = $DB_con->prepare("UPDATE orderdetails SET order_quantity = ?, order_total = ? WHERE order_id = ?");
-        $updateStmt->execute([$quantity, $total, $orderID]);
-    
-        redirectWithMessage('success', 'Quantity update!');
+        if ($product) {
+            $currentStock = $product['quantity'];
+
+            // Check if the updated quantity is within the stock
+            if ($quantity <= $currentStock) {
+                // Proceed to update orderdetails
+                $updateStmt = $DB_con->prepare("UPDATE orderdetails SET order_quantity = ?, order_total = ? WHERE order_id = ?");
+                $updateStmt->execute([$quantity, $total, $orderID]);
+
+                echo json_encode(['status' => 'success', 'message' => 'Quantity updated successfully!']);
+            } else {
+                // Insufficient stock
+                echo json_encode(['status' => 'error', 'message' => 'Insufficient stock for the requested quantity!']);
+            }
+        } else {
+            // Product not found
+            echo json_encode(['status' => 'error', 'message' => 'Product not found.']);
+        }
     }
     else if ($_POST['action'] == 'update_pickup_date') {
         $pickupDate = trim($_POST['pickup_date']);
@@ -33,8 +53,4 @@ if (isset($_POST['action'])){
     
         redirectWithMessage('success', 'Order pick up place update!');
     }
-    
-
-
-
 }

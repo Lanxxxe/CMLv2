@@ -19,7 +19,6 @@ if ($edit_row) {
 ?>
 
 <?php
-require "config.php";
 $stmt_edit = $DB_con->prepare("SELECT SUM(order_total) AS total FROM orderdetails WHERE user_id = :user_id AND order_status = 'Ordered'");
 $stmt_edit->execute(array(':user_id' => $user_id));
 $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
@@ -29,7 +28,6 @@ if ($edit_row) {
 ?>
 
 <?php
-require_once 'config.php';
 if (isset($_GET['delete_id'])) {
     $stmt_delete = $DB_con->prepare('DELETE FROM orderdetails WHERE order_id = :order_id');
     $stmt_delete->bindParam(':order_id', $_GET['delete_id']);
@@ -41,8 +39,6 @@ if (isset($_GET['delete_id'])) {
 ?>
 
 <?php
-require_once 'config.php';
-
 if (isset($_GET['update_id'])) {
     $stmt_delete = $DB_con->prepare('UPDATE orderdetails SET order_status = "Ordered" WHERE order_status = "Pending" AND user_id = :user_id');
     $stmt_delete->bindParam(':user_id', $_GET['update_id']);
@@ -162,7 +158,7 @@ if (isset($_GET['update_id'])) {
                                         <?php echo $order_name ?>
                                     </td>
                                     <td>&#8369; <?php echo $order_price; ?> </td>
-                                    <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
+                                    <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>', '<?php echo $product_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
                                     <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
                                     <td onclick="updatePickUpPlace('<?php echo $order_pick_place ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_pick_place; ?></td>
                                     <td>&#8369; <?php echo $order_total; ?> </td>
@@ -455,7 +451,7 @@ if (isset($_GET['update_id'])) {
 
         // Update Shopping Cart
         
-        function updateQuantity(quantity, orderID, itemPrice){
+        function updateQuantity(quantity, orderID, itemPrice, productId){
             Swal.fire({
                 title: 'Edit Quantity',
                 html: `
@@ -483,23 +479,32 @@ if (isset($_GET['update_id'])) {
                     formData.append('order_id', orderID);
                     formData.append('quantity', result.value.quantity);
                     formData.append('total', result.value.total);
+                    formData.append('product_id', productId);
 
                     fetch('updateShoppingCart.php', {
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => response.text())
+                    .then(response => response.json()) // Parse the response as JSON
                     .then(data => {
-                        Swal.fire({
-                        icon: 'success',
-                        title: 'Update!',
-                        text: 'Quantity updated successfully',
-                    }).then(() => {
-                        window.location.reload();
-                    });
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: data.message, // Success message from the backend
+                            }).then(() => {
+                                window.location.reload(); // Reload the page on success
+                            });
+                        } else if (data.status === 'error') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message, // Error message from the backend
+                            });
+                        }
                     })
                     .catch(error => {
-                        Swal.fire('Error', 'Failed to update quantity', 'error');
+                        Swal.fire('Error', 'Failed to update quantity', 'error'); // Handle network or parsing errors
                     });
                 }
             });
