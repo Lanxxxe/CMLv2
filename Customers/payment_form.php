@@ -143,7 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<h2 style='font-size: 26; font-weight: 900; border: none; color: #044C92; padding: 2px;'>CML Paint Trading</h2>";
                             $receipt .= "<h2>Payment Receipt</h2>";
                             $receipt .= "<p><strong>Date Ordered:</strong> $formattedDateTime</p>";
-                            $receipt .= "<p><strong>Order ID/s:</strong> " . implode(', ', $order_ids) . "</p>";
+                            // $receipt .= "<p><strong>Order ID/s:</strong> " . implode(', ', $order_ids) . "</p>";
+                            $receipt .= "<p><strong>Transaction ID:</strong> " . $payment_id . "</p>";
                             $receipt .= "<p><strong>Name:</strong> $firstName $lastName</p>";
                             $receipt .= "<p><strong>Email:</strong> $email</p>";
                             $receipt .= "<p><strong>Address:</strong> $address</p>";
