@@ -248,7 +248,7 @@ function isActivated($s) {
                     <th>Total</th>
                     <th>Actions</th>
                     <th>Status</th>
-                </tr>
+                </tr>a
                 </thead>
                 <tbody>
                 <?php   

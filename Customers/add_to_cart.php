@@ -128,12 +128,8 @@ if (isset($_GET['cart']) && !empty($_GET['cart'])) {
                     <tr>
                         <td><label class="control-label">Pick up place.</label></td>
                         <td>
-                            <select name="order_pick_place" id="order_pick_place" class="form-control" required>
-                                <option value="Caloocan">Caloocan</option>
-                                <option value="Valenzuela City">Valenzuela</option>
-                                <option value="Quezon City">Quezon City</option>
-                                <option value="San Jose Del Monte, Bulacan">San Jose de Monte, Bulacan</option>
-                            </select>
+                            <input name="order_pick_place" id="order_pick_place" class="form-control" value="<?php echo $edit_row['branch']; ?>" readonly />
+        
                         </td>
                     </tr>
                     <tr>

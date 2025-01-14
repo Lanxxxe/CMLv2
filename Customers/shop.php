@@ -295,6 +295,7 @@ extract($edit_row);
                             </a>
                             <center><h4 class="itemKey"><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
+                            <center><h4> Branch: <?php echo $query2['branch'] ?> </h4></center>
                             <div style='display: flex;'>
                                 <a class='btn btn-danger' style='flex: 1;' href='add_to_cart.php?cart=<?php echo $query2['item_id']?>'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
                             <?php
@@ -432,8 +433,9 @@ extract($edit_row);
             const panels = document.querySelectorAll('.panel-item');
 
             panels.forEach(panel => {
-                const itemName = panel.querySelector('.brandNameClass').textContent.toLowerCase();
-                if (itemName.includes(searchValue)) {
+                const itemName = panel.querySelector('.itemKey').textContent.toLowerCase();
+                const itemBrand = panel.querySelector('.brandNameClass').textContent.toLowerCase();
+                if (itemName.includes(searchValue) || itemBrand.includes(searchValue)) {
                     panel.style.display = '';
                 } else {
                     panel.style.display = 'none';
