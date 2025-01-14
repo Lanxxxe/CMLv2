@@ -143,7 +143,9 @@ if (isset($_GET['update_id'])) {
                     <tbody>
                         <?php
                         require "config.php";
-                        $stmt = $DB_con->prepare("SELECT * FROM orderdetails WHERE order_status = 'Pending' AND user_id = :user_id");
+                            $stmt = $DB_con->prepare("SELECT o.*, i.quantity as stocks  FROM orderdetails o
+                            LEFT JOIN items i ON i.item_id = o.product_id
+                            WHERE order_status = 'Pending' AND user_id = :user_id");
                         $stmt->execute(array(':user_id' => $user_id));
 
                         if ($stmt->rowCount() > 0) {
@@ -158,7 +160,7 @@ if (isset($_GET['update_id'])) {
                                         <?php echo $order_name ?>
                                     </td>
                                     <td>&#8369; <?php echo $order_price; ?> </td>
-                                    <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>', '<?php echo $product_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
+                                <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>', '<?php echo $product_id ?>', '<?php echo $stocks ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
                                     <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
                                     <td onclick="updatePickUpPlace('<?php echo $order_pick_place ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_pick_place; ?></td>
                                     <td>&#8369; <?php echo $order_total; ?> </td>
@@ -451,13 +453,13 @@ if (isset($_GET['update_id'])) {
 
         // Update Shopping Cart
         
-        function updateQuantity(quantity, orderID, itemPrice, productId){
+        function updateQuantity(quantity, orderID, itemPrice, productId, stocks){
             Swal.fire({
                 title: 'Edit Quantity',
                 html: `
                     <div class="form-group">
                         <label class="form-label" for="editQuantity">Quantity</label>
-                        <input type="number" id="editQuantity" class="swal2-input" min='1' value="${quantity}">
+                        <input type="number" id="editQuantity" class="swal2-input" min='1' max='${stocks}' value="${quantity}">
                     </div>
                 `,
                 showCancelButton: true,

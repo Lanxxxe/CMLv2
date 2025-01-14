@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 include 'config.php';
 
@@ -15,6 +17,10 @@ if (isset($_POST['action'])){
         $stockStmt = $DB_con->prepare("SELECT quantity FROM items WHERE item_id = ?");
         $stockStmt->execute([$productID]);
         $product = $stockStmt->fetch(PDO::FETCH_ASSOC);
+
+        $qtyStmt = $DB_con->prepare("SELECT order_quantity FROM orderdetails WHERE order_id = ?");
+        $qtyStmt->execute([$orderID]);
+        $prevOrderQty = $qtyStmt->fetch(PDO::FETCH_NUM)[0];
     
         if ($product) {
             $currentStock = $product['quantity'];
@@ -24,6 +30,12 @@ if (isset($_POST['action'])){
                 // Proceed to update orderdetails
                 $updateStmt = $DB_con->prepare("UPDATE orderdetails SET order_quantity = ?, order_total = ? WHERE order_id = ?");
                 $updateStmt->execute([$quantity, $total, $orderID]);
+
+                $updateStmt = $DB_con->prepare("UPDATE items SET quantity = (quantity + :old_order_qty) - :quantity WHERE item_id = :item_id");
+                $updateStmt->bindParam(':old_order_qty', $prevOrderQty);
+                $updateStmt->bindParam(':quantity', $quantity);
+                $updateStmt->bindParam(':item_id', $productID);
+                $updateStmt->execute();
 
                 echo json_encode(['status' => 'success', 'message' => 'Quantity updated successfully!']);
             } else {
