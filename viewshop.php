@@ -169,7 +169,7 @@ session_start();
                     </div>
                     <div class='panel-body'>
                         <a class='fancybox-buttons' href='Admin/item_images/" . $query2['item_image'] . "' data-fancybox-group='button' title='Page " . $id . "- " . $query2['item_name'] . "'>
-                            <img src='Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:350px;height:150px;' />
+                            <img src='Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:350px;height:150px;object-fit: contain;' />
                         </a>
                         <center><h4> " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
                         <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
