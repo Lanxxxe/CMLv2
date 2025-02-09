@@ -64,7 +64,7 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
         <div class="return-item-form">
           <form action="returnItem.php" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-              <label for="reason">Reason for Return:</label>
+              <label for="reason">Reason for Return<span style="color: red;">*</span></label>
               <select class="form-control" id="reason" name="reason" required>
                 <option value="" selected>Select a reason</option>
                 <option value="Product not as described">Product not as described</option>
@@ -77,7 +77,7 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <div class="form-group">
 
-              <label for="productName">Product Name</label>
+              <label for="productName">Product Name<span style="color: red;">*</span></label>
               <input list="userOrders" type="text" class="form-control" id="productName" name="productName" autocomplete="on" required>
             <datalist id="userOrders">
                 <?php 
@@ -89,11 +89,11 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
             </datalist>
             </div>
             <div class="form-group">
-              <label for="orderNumber">Quantity:</label>
+              <label for="orderNumber">Quantity<span style="color: red;">*</span></label>
               <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
             </div>
             <div class="form-group">
-              <label for="branch">Branch:</label>
+              <label for="branch">Branch<span style="color: red;">*</span></label>
               <select name="branch" id="branch" class="form-control" required>
                   <option value="" selected disabled>Select from what branch bought the product</option>
                   <option value="Caloocan">Caloocan</option>
@@ -103,11 +103,11 @@ $order_data = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
               </select>
             </div>
             <div class="form-group">
-              <label for="image1">Product Image:</label>
+              <label for="image1">Product Image<span style="color: red;">*</span></label>
               <input type="file" class="form-control" id="productImage" name="productImage" required>
             </div>
             <div class="form-group">
-              <label for="image2">Receipt:</label>
+              <label for="image2">Receipt<span style="color: red;">*</span></label>
               <input type="file" class="form-control" id="receipt" name="receipt" required>
             </div>
             <button type="submit" class="btn btn-primary" name="returnItem">Submit Return Request</button>

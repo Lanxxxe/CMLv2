@@ -241,7 +241,24 @@ extract($edit_row);
             }
 
             $branch = $_SESSION['current_branch'];
-            $query = mysqli_query($conn, "SELECT DISTINCT item_id, item_name, brand_name, item_image, item_price, quantity as item_quantity FROM items WHERE branch = '$branch' LIMIT $start, $limit");
+            $query = mysqli_query($conn, "
+                SELECT i.* 
+                FROM items i
+                INNER JOIN (
+                    SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
+                    FROM items
+                    GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+                ) as subquery
+                ON i.item_name = subquery.item_name 
+                AND i.brand_name = subquery.brand_name 
+                AND i.type = subquery.type 
+                AND i.gl = subquery.gl 
+                AND i.pallet_id = subquery.pallet_id 
+                AND i.branch = subquery.branch 
+                AND i.expiration_date = subquery.min_expiration
+                WHERE i.branch = '$branch'
+                LIMIT $start, $limit
+            ");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 ?>
@@ -259,7 +276,9 @@ extract($edit_row);
                             <center><h4><?php echo $query2['item_name'] ?></h4></center>
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
-                                <button class='btn btn-danger' style='flex: 1;' onclick='addToCart(<?= $query2['item_id'] ?>, <?= json_encode($query2['item_name']) ?>,<?= $query2['item_price'] ?>, <?= $query2['item_quantity'] ?>, <?= json_encode($query2['item_image']) ?>)'><span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
+                                <button class='btn btn-danger' style='flex: 1;' 
+                                onclick="addToCart(<?= $query2['item_id'] ?>, <?= json_encode($query2['item_name']) ?>,<?= $query2['item_price'] ?>, <?= $query2['item_quantity'] ?>, <?= json_encode($query2['item_image']) ?>)">
+                                <span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
                             </div>
                         </div>
                     </div>
@@ -269,7 +288,24 @@ extract($edit_row);
 
             echo "<div class='container'></div>";
 
-            $rows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM items"));
+            $rows = mysqli_num_rows(mysqli_query($conn, "
+            SELECT i.* 
+            FROM items i
+            INNER JOIN (
+                SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
+                FROM items
+                GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+            ) as subquery
+            ON i.item_name = subquery.item_name 
+            AND i.brand_name = subquery.brand_name 
+            AND i.type = subquery.type 
+            AND i.gl = subquery.gl 
+            AND i.pallet_id = subquery.pallet_id 
+            AND i.branch = subquery.branch 
+            AND i.expiration_date = subquery.min_expiration
+            WHERE i.branch = '$branch'
+            LIMIT $start, $limit
+        "));
             $total = ceil($rows / $limit);
             echo "<br /><ul class='pager'>";
             if ($id > 1) {
@@ -497,6 +533,7 @@ let cart = new FormData();
 
 function addToCart(itemId, name, price, maxQuantity, itemImage) {
     const item = cart.get(itemId);
+    console.log(item)
     let quantity = 1;
     if (item) {
         quantity = JSON.parse(item).quantity + 1;

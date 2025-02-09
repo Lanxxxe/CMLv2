@@ -443,6 +443,7 @@ $conn->close();
                 }
                 ?>
             </div>
+            <label class="form-label">Type of Payment<span style="color: red;">*</span></label>
             <div class="input_group">
                 <div class="input_box">
                     <select name="paymentType" required id="paymentType" class="name">
@@ -459,6 +460,7 @@ $conn->close();
                     <i class="fa fa-credit-card icon"></i>
                 </div>
             </div>
+            <label class="form-label">Amount<span style="color: red;">*</span></label>
             <div class="input_box" id="amountInput">
                 <input type="number" name="amount" value="<?php echo $total_amount; ?>" readonly class="name" min="1" max="<?php echo $total_amount; ?>">
                 <i class="fa fa-money icon" aria-hidden="true"></i>
@@ -468,7 +470,7 @@ $conn->close();
                 if ($_SESSION['user_type'] != 'Cashier'){
             ?>
                 <!-- Image Upload Start -->
-                <h4>Proof Of Payment</h4>
+                <h4>Proof Of Payment<span style="color: red;">*</span></h4>
                 <div class="input_group">
                     <div class="input_box">
                         <input type="file" name="payment_image" required class="name">

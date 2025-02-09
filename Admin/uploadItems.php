@@ -15,13 +15,13 @@ include_once 'config.php';
                 <form enctype="multipart/form-data" method="post" id="uploadpaints">
                     <!-- action="additems.php" -->
                     <fieldset>
-                        <p>Color Name:</p>
+                        <p>Color Name<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input class="form-control" placeholder="Item Color" name="item_name" type="text"
                                 required>
                         </div>
 
-                        <p>Brand:</p>
+                        <p>Brand<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="paint_brand_id" id="paintBrandSelect" class="form-control" required>
                                 <option value="">Select Brand</option>
@@ -41,14 +41,14 @@ include_once 'config.php';
                             </select>
                         </div>
                         
-                        <p class="mt-3">Type:</p>
+                        <p class="mt-3">Type<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="paint_type_id" id="paintTypeSelect" class="form-control" required disabled>
                                 <option value="">Select Brand First</option>
                             </select>
                         </div>
 
-                        <p class="mt-3">Pallet:</p>
+                        <p class="mt-3">Pallet<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="pallet" id="pallet" class="form-control" required>
                             <option value="">Select Pallet</option>
@@ -71,7 +71,7 @@ include_once 'config.php';
                         </div>
 
 
-                        <p>Gallon/Liter:</p>
+                        <p>Gallon/Liter<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="gl" id="gl" class="form-control">
                                 <option value="" disabled selected>Select an option</option>
@@ -80,21 +80,21 @@ include_once 'config.php';
                             </select>
                         </div>
                         
-                        <p>Price:</p>
+                        <p>Price<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input id="priceinput" class="form-control" placeholder="Price" name="item_price" min="1" type="number">
                         </div>
-                        <p>Quantity:</p>
+                        <p>Quantity<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input type="number" placeholder="Quantity" class="form-control" name="quantity" min="1" required>
                         </div>
-                        <p>Expiration Date:</p>
+                        <p>Expiration Date<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input class="form-control" name="expiration_date" 
                                 type="date" required>
                         </div>
                         
-                        <p>Choose Image:</p>
+                        <p>Choose Image<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input class="form-control" type="file" name="item_image" accept="image/*" required />
                         </div>
@@ -122,22 +122,22 @@ include_once 'config.php';
                 <form enctype="multipart/form-data" method="post" id="uploadItemsForm">
                     <!-- action="additems.php" -->
                     <fieldset>
-                        <p>Item:</p>
+                        <p>Item<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input class="form-control" placeholder="Name of Item" name="item_name" type="text" required>
                         </div>
 
-                        <p>Price:</p>
+                        <p>Price<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input id="priceinput" class="form-control" placeholder="Price" name="item_price"
                                 type="text">
                         </div>
-                        <p>Quantity:</p>
+                        <p>Quantity<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input type="number" placeholder="Quantity" class="form-control" name="quantity" min="1" required>
                         </div>
 
-                        <p>Brand:</p>
+                        <p>Brand<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="brand_id" id="brandSelect" class="form-control" required>
                                 <option value="">Select Brand</option>
@@ -155,7 +155,7 @@ include_once 'config.php';
                             </select>
                         </div>
                         
-                        <p class="mt-3">Type:</p>
+                        <p class="mt-3">Type<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <select name="type_id" id="typeSelect" class="form-control" required disabled>
                                 <option value="">Select Brand First</option>
@@ -163,7 +163,7 @@ include_once 'config.php';
                         </div>
 
 
-                        <p>Choose Image:</p>
+                        <p>Choose Image<span style="color: red;">*</span></p>
                         <div class="form-group">
                             <input class="form-control" type="file" name="item_image" accept="image/*" required />
                         </div>

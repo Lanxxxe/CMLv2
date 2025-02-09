@@ -276,8 +276,24 @@ extract($edit_row);
                 return false;
             }
 
-
-            $query = mysqli_query($conn, "SELECT DISTINCT * FROM items LIMIT $start, $limit");
+            // Modified SQL query to select only the items with the nearest expiration date
+            $query = mysqli_query($conn, "
+                SELECT i.* 
+                FROM items i
+                INNER JOIN (
+                    SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
+                    FROM items
+                    GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+                ) as subquery
+                ON i.item_name = subquery.item_name 
+                AND i.brand_name = subquery.brand_name 
+                AND i.type = subquery.type 
+                AND i.gl = subquery.gl 
+                AND i.pallet_id = subquery.pallet_id 
+                AND i.branch = subquery.branch 
+                AND i.expiration_date = subquery.min_expiration
+                LIMIT $start, $limit
+            ");
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 $exist = inWishlist($query2['item_id']);
@@ -314,7 +330,27 @@ extract($edit_row);
 
             echo "<div class='container'></div>";
 
-            $rows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM items"));
+            // Count the total number of unique items for pagination
+            $rows = mysqli_num_rows(mysqli_query($conn, "
+                SELECT COUNT(*) as total
+                FROM (
+                    SELECT i.* 
+                    FROM items i
+                    INNER JOIN (
+                        SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
+                        FROM items
+                        GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+                    ) as subquery
+                    ON i.item_name = subquery.item_name 
+                    AND i.brand_name = subquery.brand_name 
+                    AND i.type = subquery.type 
+                    AND i.gl = subquery.gl 
+                    AND i.pallet_id = subquery.pallet_id 
+                    AND i.branch = subquery.branch 
+                    AND i.expiration_date = subquery.min_expiration
+                ) as unique_items
+            "));
+
             $total = ceil($rows / $limit);
             echo "<br /><ul class='pager'>";
             if ($id > 1) {

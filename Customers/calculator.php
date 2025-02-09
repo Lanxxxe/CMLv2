@@ -76,7 +76,7 @@ try {
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
                         <div class="form-group" style="font-size: 20px;">
-                            <label class="form-label" for="brandSelect">Brand:</label>
+                            <label class="form-label" for="brandSelect">Brand<span style="color: red;">*</span></label>
                             <select name="brand_id" id="brandSelect" class="form-control" required>
                                 <option value="">Select Brand</option>
                                 <?php
@@ -100,7 +100,7 @@ try {
                         </div>
                         
                         <div class="form-group" style="font-size: 20px;">
-                            <label for="typeSelect">Type:</label>
+                            <label for="typeSelect">Type<span style="color: red;">*</span></label>
                             <select name="type_id" id="typeSelect" class="form-control" required disabled>
                                 <option value="">Select Brand First</option>
                             </select>
@@ -108,24 +108,24 @@ try {
 
                         <div class="row">
                             <div class="form-group col-md-6" style="font-size: 20px;">
-                                <label class="form-label">Width (m): </label>
+                                <label class="form-label">Width (m)<span style="color: red;">*</span> </label>
                                 <input class="form-control" placeholder="Enter width of wall" id="width" type="text">
                             </div>
                             <div class="form-group col-md-6" style="font-size: 20px;">
-                                <label class="form-label">Height (m): </label>
+                                <label class="form-label">Height (m)<span style="color: red;">*</span> </label>
                                 <input class="form-control" placeholder="Enter height of wall" id="height" type="text">
                             </div>
                         </div>
 
 
                         <div class="form-group" style="font-size: 20px;">
-                            <label class="form-label">Surface Area (m2): </label>
+                            <label class="form-label">Surface Area (m2)<span style="color: red;">*</span> </label>
                             <input class="form-control" id="surfaceArea" type="text" readonly>
                         </div>
                         
                         <div class="row">
                             <div class="form-group col-md-6" style="font-size: 20px;">
-                                <label class="form-label">No. of coats: </label>
+                                <label class="form-label">No. of coats<span style="color: red;">*</span> </label>
                                 <input class="form-control" placeholder="Enter number of coats" id="coatsNumber" value="1" min="1" onkeypress="return isNumber(event)" type="number">
                             </div>
                             <div class="form-group col-md-6" style="font-size: 20px;">

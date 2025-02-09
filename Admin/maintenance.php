@@ -460,7 +460,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             title: 'Add New Brand',
             html: `
                 <div class="${formControlStyle}"> 
-                    <label for="brandImage" class="${labelStyle}">Brand Name</label>
+                    <label for="brandImage" class="${labelStyle}">Brand Name<span style="color: red;">*</span></label>
                     <input 
                         type="text" 
                         id="brandName" 
@@ -468,7 +468,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                         
                         placeholder="Enter brand name">
                     
-                    <label for="brandImage" class="${labelStyle}">Brand Image</label>
+                    <label for="brandImage" class="${labelStyle}">Brand Image<span style="color: red;">*</span></label>
                     <input 
                         type="file" 
                         id="brandImage" 
@@ -550,7 +550,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                     <label class="form-label ${labelStyle}" for="editBrandName">Brand Name</label>
                     <input type="text" id="editBrandName" class="swal2-input ${inputStyle}" value="${brandName}">
                     
-                    <label class="form-label ${labelStyle}" for="editBrandImage">Brand Image</label>
+                    <label class="form-label ${labelStyle}" for="editBrandImage">Brand Image<span style="color: red;">*</span></label>
                     <input type="file" id="editBrandImage" class="swal2-file ${inputStyle}"  accept="image/*">                
                 </div>
                 ${currentImage ? `
@@ -637,9 +637,9 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             html: `
 
                 <div class="${formControlStyle}">
-                    <label class="form-label ${labelStyle}">Product Name</label>
+                    <label class="form-label ${labelStyle}">Product Name<span style="color: red;">*</span></label>
                     <input type="text" id="productName" class="swal2-input ${inputStyle}" placeholder="Enter product name">
-                    <label class="form-label ${labelStyle}">Product Type</label>
+                    <label class="form-label ${labelStyle}">Product Type<span style="color: red;">*</span></label>
                     <input type="text" id="productType" class="swal2-input ${inputStyle}" placeholder="paint, tool, etc...">
                 </div>
             `,
@@ -783,15 +783,15 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
             html: `
                 <form id="addForm">
                     <div class="mb-3">
-                        <label class="form-label">Code</label>
+                        <label class="form-label">Code<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="code" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" style="margin-top: 15px">Name</label>
+                        <label class="form-label" style="margin-top: 15px">Name<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" style="margin-top: 15px">Color (RGB)</label>
+                        <label class="form-label" style="margin-top: 15px">Color (RGB)<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="rgb" placeholder="rgb(0, 0, 0)" required>
                     </div>
                 </form>

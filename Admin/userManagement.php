@@ -252,7 +252,7 @@ if(isset($_GET['brand_id'])) {
     <?php include_once("uploadItems.php"); ?>
     <?php include_once("insertBrandsModal.php"); ?>
 		
-<script>
+    <script>
     let labelStyle = "sw-custom-label";
     let inputStyle = "sw-custom-input";
     let formControlStyle = "sw-custom-form-control";
@@ -371,25 +371,25 @@ if(isset($_GET['brand_id'])) {
             title: 'Add New Account',
             html: `
                 <div class="${formControlStyle}">
-                    <label class="form-label ${labelStyle}" for="newUserEmail">Email</label>
+                    <label class="form-label ${labelStyle}" for="newUserEmail">Email<span style="color: red;">*</span></label>
                     <input type="text" id="newUserEmail" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="newUserPassword">Password</label>
+                    <label class="form-label ${labelStyle}" for="newUserPassword">Password<span style="color: red;">*</span></label>
                     <input type="password" id="newUserPassword" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="newUserFirstName">First Name</label>
+                    <label class="form-label ${labelStyle}" for="newUserFirstName">First Name<span style="color: red;">*</span></label>
                     <input type="text" id="newUserFirstName" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="newUserLastName">Last Name</label>
+                    <label class="form-label ${labelStyle}" for="newUserLastName">Last Name<span style="color: red;">*</span></label>
                     <input type="text" id="newUserLastName" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="newUserAddress">Address</label>
+                    <label class="form-label ${labelStyle}" for="newUserAddress">Address<span style="color: red;">*</span></label>
                     <input type="text" id="newUserAddress" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="newUserMobile">Mobile Number</label>
+                    <label class="form-label ${labelStyle}" for="newUserMobile">Mobile Number<span style="color: red;">*</span></label>
                     <input type="text" id="newUserMobile" class="swal2-input ${inputStyle}">
 
-                    <label class="form-label ${labelStyle}" for="assignBranch">Branch Assign</label>
+                    <label class="form-label ${labelStyle}" for="assignBranch">Branch Assign<span style="color: red;">*</span></label>
                     <select class="form-select ${labelStyle}" id="assignBranch" aria-label="Assigned Branch">
                         <option selected>Select Branch</option>
                         <option value="Caloocan">Caloocan (Main)</option>
