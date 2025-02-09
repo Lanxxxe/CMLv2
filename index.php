@@ -55,12 +55,13 @@ session_start();
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-center"
-                    style="flex-grow: 1; display: flex; justify-content: center; margin-left: 200px;">
+                    style="flex-grow: 1; display: flex; justify-content: center; margin-left: 150px;">
                     <li><a href="#home">HOME</a></li>
                     <li><a href="#testimonials-sec">BRANCHES</a></li>
                     <li><a href="#faculty-sec">MANAGERS</a></li>
                     <li><a href="#brand-sec">BRANDS</a></li>
                     <li><a href="#course-sec">ABOUT US</a></li>
+                    <li><a href="terms.php">TERMS &amp; CONDITION</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#features-sec" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#ln"
