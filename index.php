@@ -37,6 +37,22 @@ session_start();
         .hide {
           display: none !important;
         }
+
+        #footer {
+            background: #333;
+            color: #fff;
+            padding: 15px 0;
+        }
+        #footer a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px; /* Adds space between links */
+        }
+        #footer a:hover {
+            text-decoration: underline;
+            color: rgb(100, 121, 244);
+        }
+
     </style>
 </head>
 
@@ -55,13 +71,12 @@ session_start();
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-center"
-                    style="flex-grow: 1; display: flex; justify-content: center; margin-left: 150px;">
+                    style="flex-grow: 1; display: flex; justify-content: center; margin-left: 250px;">
                     <li><a href="#home">HOME</a></li>
                     <li><a href="#testimonials-sec">BRANCHES</a></li>
                     <li><a href="#faculty-sec">MANAGERS</a></li>
                     <li><a href="#brand-sec">BRANDS</a></li>
                     <li><a href="#course-sec">ABOUT US</a></li>
-                    <li><a href="terms.php">TERMS &amp; CONDITION</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#features-sec" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#ln"
@@ -515,12 +530,18 @@ session_start();
     <br />
     <br />
     <br />
-    <!-- Script -->
-    <!-- CONTACT SECTION END-->
-    <div id="footer">
-        &copy 2024 CML Paint Trading Shop | All Rights Reserved <a style="color: #fff" target="_blank"></a>
-    </div>
-    <!-- FOOTER SECTION END-->
+
+    <footer id="footer" class="bg-dark text-white">
+        <div class="container">
+            <div class="text-center">
+                <a href="terms.php" class="text-white">Terms and Conditions</a>
+                <a href="privacy.php" class="text-white">Privacy Policy</a>
+            </div>
+            <div class="text-center">
+                &copy; 2024 CML Paint Trading Shop | All Rights Reserved
+            </div>
+        </div>
+    </footer>
 
     <div id="loading" class="hide"></div>
     <!--  Jquery Core Script -->

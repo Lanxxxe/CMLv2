@@ -17,6 +17,7 @@
         .terms-container {
             padding: 40px 0;
             margin-top: 50px;
+            overflow-y: auto;
         }
         .terms-section {
             margin-bottom: 30px;
@@ -125,15 +126,15 @@
             background: #fff;
             border-radius: 8px;
         }
-        #footer {
-            margin-top: 50px;
-        }
-
         .active-toc {
             background: #008CBA;
             color: white !important;
             font-weight: bold;
         }
+        #footer {
+            margin-top: 50px;
+        }
+
         a:focus {
             border: none !important;
         }
