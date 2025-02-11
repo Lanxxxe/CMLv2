@@ -36,7 +36,6 @@ extract($edit_row);
     <script type="text/javascript" src="jquery.fancybox-thumbs.js?v=1.0.7"></script>
     <script type="text/javascript" src="jquery.fancybox-media.js?v=1.0.6"></script>
     <link rel="stylesheet" type="text/css" href="./css/cashier_shop.css"/>
-
     <script type="text/javascript">
         $(document).ready(function() {
             $('.fancybox').fancybox();
@@ -277,7 +276,7 @@ extract($edit_row);
                             <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
                             <div style='display: flex;'>
                                 <button class='btn btn-danger' style='flex: 1;' 
-                                onclick="addToCart(<?= $query2['item_id'] ?>, <?= json_encode($query2['item_name']) ?>,<?= $query2['item_price'] ?>, <?= $query2['item_quantity'] ?>, <?= json_encode($query2['item_image']) ?>)">
+                                onclick="addToCart(<?= $query2['item_id'] ?>, '<?= htmlspecialchars($query2['item_name'], ENT_QUOTES) ?>',<?= $query2['item_price'] ?>, <?= $query2['quantity'] ?>, '<?= htmlspecialchars($query2['item_image'], ENT_QUOTES) ?>')">
                                 <span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
                             </div>
                         </div>
@@ -533,7 +532,6 @@ let cart = new FormData();
 
 function addToCart(itemId, name, price, maxQuantity, itemImage) {
     const item = cart.get(itemId);
-    console.log(item)
     let quantity = 1;
     if (item) {
         quantity = JSON.parse(item).quantity + 1;
