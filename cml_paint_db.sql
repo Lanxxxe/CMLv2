@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 06, 2024 at 06:21 PM
+-- Generation Time: Feb 12, 2025 at 06:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -344,20 +344,6 @@ CREATE TABLE `admin_notifications` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `admin_notifications`
---
-
-INSERT INTO `admin_notifications` (`id`, `user_email`, `head_msg`, `ntype`, `payment_id`, `return_id`, `order_id`, `status`, `created_at`) VALUES
-(9, 'kate@email.com', 'Return Request Deleted', 'return deleted', NULL, 4, NULL, 'unread', '2024-12-06 09:12:20'),
-(10, 'kate@email.com', 'Return Request Deleted', 'return deleted', NULL, 13, NULL, 'unread', '2024-12-06 09:12:20'),
-(12, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 73, NULL, NULL, 'unread', '2024-12-06 15:54:39'),
-(14, 'qccashier@email.com', 'New Order Placed', 'ordered', 74, NULL, NULL, 'unread', '2024-12-06 15:57:45'),
-(16, 'qccashier@email.com', 'New Order Placed', 'ordered', 75, NULL, NULL, 'unread', '2024-12-06 15:59:34'),
-(18, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 76, NULL, NULL, 'unread', '2024-12-06 16:03:04'),
-(20, 'valenzuelacashier@email.com', 'New Order Placed', 'ordered', 77, NULL, NULL, 'unread', '2024-12-06 16:05:28'),
-(22, 'qccashier@email.com', 'New Order Placed', 'ordered', 78, NULL, NULL, 'unread', '2024-12-06 16:31:41');
-
 -- --------------------------------------------------------
 
 --
@@ -490,20 +476,10 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`, `branch`) VALUES
-(53, 'Latex Paint', 'Ecomax', '95392.jpg', '2024-12-05 00:00:00.000000', '2026-12-16', '200', 'Latex Paint', 497.00, 'Gallon', 10, NULL),
-(54, 'Latex Patin', 'Ecomax', '659045.jpg', '2024-12-05 00:00:00.000000', '2026-12-17', '200', 'Gloss', 230.00, 'Gallon', 16, 'Caloocan'),
-(55, 'Boysen Paint', 'Boysen', '553060.jpg', '2024-12-05 00:00:00.000000', '2026-12-24', '200', 'Semi Gloss Paint', 122.00, 'Gallon', 17, 'Quezon City'),
-(57, 'Paint Brush', 'Hippo', '756276.jpg', '2024-12-05 00:00:00.000000', NULL, '100', 'Paint Brush', 100.00, '', NULL, 'Quezon City'),
-(58, 'Latex Paint', 'Boysen', '69601.png', '2024-12-06 00:00:00.000000', '2026-12-29', '200', 'Latex Paint', 200.00, 'Gallon', 16, 'Caloocan'),
-(59, 'Boysen Paint', 'Boysen', '469207.jpg', '2024-12-06 00:00:00.000000', '2026-12-23', '100', 'Semi Gloss Paint', 200.00, 'Gallon', 18, 'Caloocan'),
-(60, 'Latex Patin', 'Boysen', '155924.jpeg', '2024-12-06 00:00:00.000000', '2026-12-22', '200', 'Aluminum Paint', 200.00, 'Gallon', 13, 'Caloocan'),
-(61, 'Sample Paint', 'Boysen', '648211.jpeg', '2024-12-06 00:00:00.000000', '2026-12-16', '200', 'Interior Paint', 200.00, 'Gallon', 15, 'Caloocan'),
-(62, 'Latex Paint', 'Boysen', '116734.jpeg', '2024-12-06 00:00:00.000000', '2026-12-08', '100', 'Gloss', 198.00, 'Gallon', 14, 'Quezon City'),
-(63, 'Boysen Paint', 'Boysen', '647240.jpeg', '2024-12-06 00:00:00.000000', '2026-12-08', '200', 'Latex Paint', 200.00, 'Gallon', 16, 'Quezon City'),
-(64, 'Boysen Paint', 'Boysen', '888878.jpeg', '2024-12-06 00:00:00.000000', '2026-12-16', '200', 'Latex Paint', 199.00, 'Gallon', 16, 'Valenzuela City'),
-(65, 'Latex Paint', 'Boysen', '638221.jpeg', '2024-12-06 00:00:00.000000', '2026-12-15', '100', 'Oil Paint', 197.00, 'Gallon', 17, 'Valenzuela City'),
-(66, 'Latex Patin', 'Boysen', '600730.jpeg', '2024-12-06 00:00:00.000000', '2026-12-09', '200', 'Exterior Paint', 200.00, 'Gallon', 17, 'Valenzuela City'),
-(67, 'Sample Paint', 'Boysen', '556557.jpeg', '2024-12-06 00:00:00.000000', '2026-12-24', '100', 'Flat Paint', 200.00, 'Gallon', 18, 'Valenzuela City');
+(87, 'Latex Paint', 'Boysen', '764116.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 100.00, 'Gallon', 15, 'Caloocan'),
+(88, 'Latex Paint', 'Boysen', '278330.jpg', '2025-02-13 00:00:00.000000', '2027-02-12', '250', 'Oil Paint', 150.00, 'Gallon', 3, 'Caloocan'),
+(89, 'Latex Paint', 'Boysen', '75472.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '100', 'Gloss', 200.00, 'Gallon', 12, 'Valenzuela City'),
+(90, 'Boysen Paint', 'Boysen', '426978.png', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 200.00, 'Gallon', 6, 'Valenzuela City');
 
 -- --------------------------------------------------------
 
@@ -528,21 +504,14 @@ CREATE TABLE `orderdetails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Dumping data for table `orderdetails`
---
-
-INSERT INTO `orderdetails` (`order_id`, `user_id`, `order_name`, `order_price`, `order_quantity`, `order_total`, `order_status`, `order_date`, `order_pick_up`, `order_pick_place`, `gl`, `payment_id`, `product_id`) VALUES
-(153, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 16:54:39.000000', 'Caloocan', NULL, 73, 65),
-(155, 29, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 16:57:45.000000', 'Caloocan', NULL, 74, 62),
-(157, 29, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-06', '2024-12-06 16:59:34.000000', 'Caloocan', NULL, 75, 55),
-(160, 30, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2024-12-06', '2024-12-06 17:03:04.000000', 'Valenzuela City', NULL, 76, 64),
-(161, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:03:04.000000', 'Valenzuela City', NULL, 76, 65),
-(163, 30, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:05:28.000000', 'Valenzuela City', NULL, 77, 65),
-(165, 29, 'Latex Paint', 100, 1, 100, 'Confirmed', '2024-12-06', '2024-12-06 17:31:41.000000', 'Quezon City', NULL, 78, 62);
-
---
 -- Triggers `orderdetails`
 --
+DELIMITER $$
+CREATE TRIGGER `delete_on_cart` BEFORE DELETE ON `orderdetails` FOR EACH ROW BEGIN
+    UPDATE items SET quantity = quantity + OLD.order_quantity WHERE item_id = OLD.product_id;
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `trigger_change_order_status_notif` AFTER UPDATE ON `orderdetails` FOR EACH ROW BEGIN
     DECLARE user_email VARCHAR(255);
@@ -867,18 +836,6 @@ CREATE TABLE `paymentform` (
   `payment_status` varchar(20) DEFAULT 'verification',
   `months_paid` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `paymentform`
---
-
-INSERT INTO `paymentform` (`id`, `firstname`, `lastname`, `email`, `address`, `mobile`, `payment_method`, `payment_type`, `amount`, `payment_image_path`, `created_at`, `order_id`, `payment_status`, `months_paid`) VALUES
-(73, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 15:54:39', NULL, 'Confirmed', 0),
-(74, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 15:57:45', NULL, 'Confirmed', 0),
-(75, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 200.00, '', '2024-12-06 15:59:34', NULL, 'Confirmed', 0),
-(76, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 300.00, '', '2024-12-06 16:03:04', NULL, 'Confirmed', 0),
-(77, 'valenzuela', 'cashier', 'valenzuelacashier@email.com', 'Valenzuela City', '0923917941', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 16:05:28', NULL, 'Confirmed', 0),
-(78, 'quezon city', 'cashier', 'qccashier@email.com', 'Quezon City', '092391823', 'Walk In', 'Full Payment', 100.00, '', '2024-12-06 16:31:41', NULL, 'Confirmed', 0);
 
 --
 -- Triggers `paymentform`
@@ -1219,13 +1176,6 @@ CREATE TABLE `wishlist` (
   `item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Dumping data for table `wishlist`
---
-
-INSERT INTO `wishlist` (`wish_id`, `user_id`, `item_id`) VALUES
-(6, 0, 47);
-
 -- --------------------------------------------------------
 
 --
@@ -1387,13 +1337,13 @@ ALTER TABLE `cartitems`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
 -- AUTO_INCREMENT for table `pallets`
@@ -1488,16 +1438,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-DELIMITER $$
-
-CREATE TRIGGER delete_on_cart
-BEFORE DELETE ON orderdetails 
-FOR EACH ROW
-BEGIN
-    UPDATE items SET quantity = quantity + OLD.order_quantity WHERE item_id = OLD.product_id;
-END $$
-
-DELIMITER ;
-
