@@ -179,10 +179,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "</table>";
                             // $receipt .= "<p><strong>Amount:</strong> $amount</p>";
                             // $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
-                            if (strcasecmp($paymentType, "") !== 0) {
-                                $receipt .= "<p><strong>Amount Paid:</strong> ₱" . number_format($amount) . "</p>";
-                                $receipt .= "<p><strong>Remaining Balance:</strong> ₱" .   number_format($_total_amount - $amount) . "</p>";
-                            }
+                            $receipt .= "<p><strong>Amount Paid:</strong> ₱" . number_format($amount) . "</p>";
+                            $receipt .= "<p><strong>Remaining Balance:</strong> ₱" .   number_format($_total_amount - $amount) . "</p>";
 
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
                             // if ($_SESSION['user_type'] != 'Cashier'){
