@@ -241,23 +241,34 @@ extract($edit_row);
 
             $branch = $_SESSION['current_branch'];
             $query = mysqli_query($conn, "
-                SELECT i.* 
-                FROM items i
-                INNER JOIN (
-                    SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
-                    FROM items
-                    GROUP BY item_name, brand_name, type, gl, pallet_id, branch
-                ) as subquery
-                ON i.item_name = subquery.item_name 
-                AND i.brand_name = subquery.brand_name 
-                AND i.type = subquery.type 
-                AND i.gl = subquery.gl 
-                AND i.pallet_id = subquery.pallet_id 
-                AND i.branch = subquery.branch 
-                AND i.expiration_date = subquery.min_expiration
-                WHERE i.branch = '$branch'
+                SELECT * FROM (
+                    SELECT i.* 
+                    FROM items i
+                    INNER JOIN (
+                        SELECT item_name, brand_name, type, gl, pallet_id, branch, 
+                            MIN(expiration_date) as min_expiration
+                        FROM items
+                        WHERE expiration_date IS NOT NULL
+                        GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+                    ) as subquery
+                    ON i.item_name = subquery.item_name 
+                    AND i.brand_name = subquery.brand_name 
+                    AND i.type = subquery.type 
+                    AND i.gl = subquery.gl 
+                    AND i.pallet_id = subquery.pallet_id 
+                    AND i.branch = subquery.branch 
+                    AND (i.expiration_date = subquery.min_expiration OR i.expiration_date IS NULL)
+                    
+                    UNION
+                    
+                    SELECT * FROM items 
+                    WHERE expiration_date IS NULL 
+                    AND pallet_id IS NULL 
+                    AND branch = '$branch'
+                ) as combined_items
                 LIMIT $start, $limit
             ");
+
 
             while ($query2 = mysqli_fetch_assoc($query)) {
                 ?>
@@ -287,41 +298,54 @@ extract($edit_row);
 
             echo "<div class='container'></div>";
 
-            $rows = mysqli_num_rows(mysqli_query($conn, "
-            SELECT i.* 
-            FROM items i
-            INNER JOIN (
-                SELECT item_name, brand_name, type, gl, pallet_id, branch, MIN(expiration_date) as min_expiration
-                FROM items
-                GROUP BY item_name, brand_name, type, gl, pallet_id, branch
-            ) as subquery
-            ON i.item_name = subquery.item_name 
-            AND i.brand_name = subquery.brand_name 
-            AND i.type = subquery.type 
-            AND i.gl = subquery.gl 
-            AND i.pallet_id = subquery.pallet_id 
-            AND i.branch = subquery.branch 
-            AND i.expiration_date = subquery.min_expiration
-            WHERE i.branch = '$branch'
-            LIMIT $start, $limit
-        "));
+            $result = mysqli_query($conn, "
+            SELECT COUNT(*) as total
+            FROM (
+                SELECT i.* 
+                FROM items i
+                INNER JOIN (
+                    SELECT item_name, brand_name, type, gl, pallet_id, branch, 
+                        MIN(expiration_date) as min_expiration
+                    FROM items
+                    WHERE expiration_date IS NOT NULL
+                    GROUP BY item_name, brand_name, type, gl, pallet_id, branch
+                ) as subquery
+                ON i.item_name = subquery.item_name 
+                AND i.brand_name = subquery.brand_name 
+                AND i.type = subquery.type 
+                AND i.gl = subquery.gl 
+                AND i.pallet_id = subquery.pallet_id 
+                AND i.branch = subquery.branch 
+                AND (i.expiration_date = subquery.min_expiration OR i.expiration_date IS NULL)
+
+                UNION
+
+                SELECT * FROM items 
+                WHERE expiration_date IS NULL AND pallet_id IS NULL
+            ) as unique_items
+            ");
+
+            $row = mysqli_fetch_assoc($result);  // Fetch the count result
+            $rows = $row['total'];  // Get the total number of unique items
+
             $total = ceil($rows / $limit);
+
             echo "<br /><ul class='pager'>";
             if ($id > 1) {
-                echo "<li><a style='color:white;background-color : #033c73;' href='?id=" . ($id - 1) . "'>Previous Page</a><li>";
+            echo "<li><a style='color:white;background-color : #033c73;' href='?id=" . ($id - 1) . "'>Previous Page</a><li>";
             }
-            if ($id != $total) {
-                echo "<li><a style='color:white;background-color : #033c73;' href='?id=" . ($id + 1) . "' class='pager'>Next Page</a></li>";
+            if ($id < $total) {
+            echo "<li><a style='color:white;background-color : #033c73;' href='?id=" . ($id + 1) . "' class='pager'>Next Page</a></li>";
             }
             echo "</ul>";
 
             echo "<center><ul class='pagination pagination-lg'>";
             for ($i = 1; $i <= $total; $i++) {
-                if ($i == $id) {
-                    echo "<li class='pagination active'><a style='color:white;background-color : #033c73;'>" . $i . "</a></li>";
-                } else {
-                    echo "<li><a href='?id=" . $i . "'>" . $i . "</a></li>";
-                }
+            if ($i == $id) {
+                echo "<li class='active'><a style='color:white;background-color : #033c73;'>" . $i . "</a></li>";
+            } else {
+                echo "<li><a href='?id=" . $i . "'>" . $i . "</a></li>";
+            }
             }
             echo "</ul></center>";
             ?>
