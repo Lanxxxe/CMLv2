@@ -25,7 +25,7 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
+CREATE PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
     DECLARE v_payment_id INT;
     DECLARE v_amount DECIMAL(10,2);
     DECLARE v_payment_type VARCHAR(255);
@@ -74,7 +74,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `confirm_payment` (IN `p_track_id` I
     SELECT 'success' as status, 'Payment confirmed successfully' as message;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
+CREATE PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
     DECLARE current_qty INT;
     DECLARE done INT DEFAULT FALSE;
     DECLARE v_order_id INT;
@@ -175,7 +175,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ProcessReturnItems` (IN `p_return_i
     
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `request_payment` (IN `p_payment_id` INT, IN `p_amount` DECIMAL(10,2), IN `p_payment_image` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `request_payment` (IN `p_payment_id` INT, IN `p_amount` DECIMAL(10,2), IN `p_payment_image` VARCHAR(255))   BEGIN
     DECLARE last_track_status VARCHAR(20);
     DECLARE v_payment_type VARCHAR(255);
     
@@ -208,7 +208,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `request_payment` (IN `p_payment_id`
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand` (IN `p_delete_id` INT)   BEGIN
+CREATE PROCEDURE `restore_brand` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_brand_id INT;
     DECLARE v_brand_name VARCHAR(255);
     DECLARE v_brand_img TEXT;
@@ -229,7 +229,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand` (IN `p_delete_id` IN
     WHERE `delete_id` = p_delete_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand_including_product_type` (IN `p_delete_id` INT)   BEGIN
+CREATE PROCEDURE `restore_brand_including_product_type` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_brand_id INT;
     DECLARE v_brand_name VARCHAR(255);
     DECLARE v_brand_img TEXT;
@@ -260,7 +260,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_brand_including_product_typ
     WHERE `deleted_brand_id` = v_brand_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_product_type` (IN `p_delete_id` INT)   BEGIN
+CREATE PROCEDURE `restore_product_type` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_deleted_brand_id INT;
     DECLARE v_type_id INT;
     DECLARE v_type_name TEXT;
@@ -282,7 +282,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_product_type` (IN `p_delete
     WHERE `delete_id` = p_delete_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `restore_product_with_brand` (IN `p_delete_id` INT)   BEGIN
+CREATE PROCEDURE `restore_product_with_brand` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_brand_id INT;
     DECLARE v_brand_name VARCHAR(255);
     DECLARE v_brand_img TEXT;
@@ -1184,7 +1184,7 @@ CREATE TABLE `wishlist` (
 --
 DROP TABLE IF EXISTS `admin_notifications_views`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `admin_notifications_views`  AS SELECT `a`.`id` AS `id`, `a`.`user_email` AS `user_email`, `a`.`status` AS `status`, `a`.`ntype` AS `ntype`, `a`.`head_msg` AS `head_msg`, `a`.`created_at` AS `created_at`, CASE WHEN `a`.`payment_id` is null AND `a`.`order_id` is not null THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',`o`.`order_name`,'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',`o`.`order_name`,'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') end from `orderdetails` `o` where `o`.`order_id` = `a`.`order_id`) WHEN `a`.`ntype` in ('ordered','requested','confirmed','cancelled') THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') end from `orderdetails` `o` where `o`.`payment_id` = `a`.`payment_id` group by `a`.`payment_id`) WHEN `a`.`ntype` in ('returned','return request','return rejected','return deleted') THEN (select case `a`.`ntype` when 'returned' then concat(`a`.`user_email`,' has returned ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return request' then concat(`a`.`user_email`,' has requested to return ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return rejected' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been rejected') when 'return deleted' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been deleted') end from `returnitems` `r` where `r`.`return_id` = `a`.`return_id`) END AS `message` FROM `admin_notifications` AS `a` ;
+CREATE VIEW `admin_notifications_views`  AS SELECT `a`.`id` AS `id`, `a`.`user_email` AS `user_email`, `a`.`status` AS `status`, `a`.`ntype` AS `ntype`, `a`.`head_msg` AS `head_msg`, `a`.`created_at` AS `created_at`, CASE WHEN `a`.`payment_id` is null AND `a`.`order_id` is not null THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',`o`.`order_name`,'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',`o`.`order_name`,'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') end from `orderdetails` `o` where `o`.`order_id` = `a`.`order_id`) WHEN `a`.`ntype` in ('ordered','requested','confirmed','cancelled') THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') end from `orderdetails` `o` where `o`.`payment_id` = `a`.`payment_id` group by `a`.`payment_id`) WHEN `a`.`ntype` in ('returned','return request','return rejected','return deleted') THEN (select case `a`.`ntype` when 'returned' then concat(`a`.`user_email`,' has returned ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return request' then concat(`a`.`user_email`,' has requested to return ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return rejected' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been rejected') when 'return deleted' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been deleted') end from `returnitems` `r` where `r`.`return_id` = `a`.`return_id`) END AS `message` FROM `admin_notifications` AS `a` ;
 
 --
 -- Indexes for dumped tables
