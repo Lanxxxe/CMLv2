@@ -3000,3 +3000,8 @@
 (2025-02-09 16:26:09) Error: [2] Undefined array key "item_quantity" - C:\xampp\htdocs\CML\CMLv2\Customers\cashier_shop.php:278
 (2025-02-09 16:26:19) Error: [2] Undefined array key "item_quantity" - C:\xampp\htdocs\CML\CMLv2\Customers\cashier_shop.php:280
 (2025-02-09 16:26:19) Error: [2] Undefined array key "item_quantity" - C:\xampp\htdocs\CML\CMLv2\Customers\cashier_shop.php:280
+(2025-02-12 18:09:02) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-12 18:09:02) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-12 18:09:02) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-12 18:09:08) Error: [2] Undefined variable $total - C:\xampp\htdocs\CML\CMLv2\Customers\navigation.php:64
+(2025-02-12 18:09:08) Error: [2] Undefined variable $user_email - C:\xampp\htdocs\CML\CMLv2\Customers\navigation.php:70
