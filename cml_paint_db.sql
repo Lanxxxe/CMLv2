@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 12, 2025 at 06:18 PM
+-- Generation Time: Feb 13, 2025 at 02:02 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -468,18 +468,19 @@ CREATE TABLE `items` (
   `quantity` decimal(10,2) DEFAULT NULL,
   `gl` varchar(255) NOT NULL,
   `pallet_id` int(11) DEFAULT NULL,
-  `branch` varchar(50) DEFAULT NULL
+  `branch` varchar(50) DEFAULT NULL,
+  `hex` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `items`
 --
 
-INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`, `branch`) VALUES
-(87, 'Latex Paint', 'Boysen', '764116.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 100.00, 'Gallon', 15, 'Caloocan'),
-(88, 'Latex Paint', 'Boysen', '278330.jpg', '2025-02-13 00:00:00.000000', '2027-02-12', '250', 'Oil Paint', 150.00, 'Gallon', 3, 'Caloocan'),
-(89, 'Latex Paint', 'Boysen', '75472.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '100', 'Gloss', 200.00, 'Gallon', 12, 'Valenzuela City'),
-(90, 'Boysen Paint', 'Boysen', '426978.png', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 200.00, 'Gallon', 6, 'Valenzuela City');
+INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`, `branch`, `hex`) VALUES
+(87, 'Latex Paint', 'Boysen', '764116.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 100.00, 'Gallon', 15, 'Caloocan', ''),
+(88, 'Latex Paint', 'Boysen', '278330.jpg', '2025-02-13 00:00:00.000000', '2027-02-12', '250', 'Oil Paint', 150.00, 'Gallon', 3, 'Caloocan', ''),
+(89, 'Latex Paint', 'Boysen', '75472.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '100', 'Gloss', 200.00, 'Gallon', 12, 'Valenzuela City', ''),
+(90, 'Boysen Paint', 'Boysen', '426978.png', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 200.00, 'Gallon', 6, 'Valenzuela City', '');
 
 -- --------------------------------------------------------
 
