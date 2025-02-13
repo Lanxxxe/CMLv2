@@ -71,7 +71,7 @@ require_once 'config.php';
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            margin-top: 50px;
         }
         .return-card {
             max-width: 500px;
@@ -114,11 +114,9 @@ require_once 'config.php';
                         ");
                         $getPaymentInformation->execute([$cancel_payment_id]);
 
-                        $payment_information = $getPaymentInformation->fetchAll(PDO::FETCH_ASSOC);
+                        $info = $getPaymentInformation->fetch(PDO::FETCH_ASSOC);
 
                         // Check if data is available
-                        if (count($payment_information) > 0) {
-                            foreach ($payment_information as $info) {
                                 ?>
                                 <form id="refundForm" action="" method="POST" enctype="multipart/form-data">
                                     <!-- Display Payment Information -->
@@ -163,10 +161,6 @@ require_once 'config.php';
                                 </form>
                                 <?php
                             }
-                        } else {
-                            echo "<p>No payment information found for the specified ID and type.</p>";
-                        }
-                    }
                     ?>
                 </div>
             </div>

@@ -85,7 +85,16 @@ extract($edit_row);
             <?php
             include("config.php");
             $branch = $_SESSION['current_branch'];
-            $stmt = $DB_con->prepare("SELECT * FROM orderdetails where user_id='$user_id' AND order_pick_place = '$branch' ORDER BY order_pick_up DESC");
+            $brancCheck = '';
+            if ($branch) {
+                $brancCheck = "AND order_pick_place = :branch";
+            }
+
+            $stmt = $DB_con->prepare("SELECT * FROM orderdetails where user_id=:user_id $brancCheck ORDER BY order_pick_up DESC");
+            $stmt->bindParam(':user_id', $user_id);
+            if ($branch) {
+                $stmt->bindParam(':branch', $branch);
+            }
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
@@ -113,8 +122,12 @@ extract($edit_row);
               <?php
               }
               include("config.php");
-              $stmt_edit = $DB_con->prepare("select sum(order_total) as totalx from orderdetails where user_id=:user_id and order_pick_place = '$branch'");
-              $stmt_edit->execute(array(':user_id' => $user_id));
+              $stmt_edit = $DB_con->prepare("select sum(order_total) as totalx from orderdetails where user_id=:user_id $brancCheck");
+              $stmt_edit->bindParam(':user_id', $user_id);
+              if ($branch) {
+                  $stmt_edit->bindParam(':branch', $branch);
+              }
+              $stmt_edit->execute();
               $edit_row = $stmt_edit->fetch(PDO::FETCH_ASSOC);
               extract($edit_row);
               echo "<tr>";
