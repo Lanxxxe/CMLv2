@@ -55,7 +55,7 @@
         <ul class="nav navbar-nav navbar-right navbar-user">
             <li class="dropdown messages-dropdown">
                 <a href="#"><i class="fa fa-calendar"></i> <?php
-                                                            $Today = date('y:m:d');
+                                                            $Today = date('Y-m-d'); 
                                                             $new = date('l, F d, Y', strtotime($Today));
                                                             echo $new; ?></a>
 
