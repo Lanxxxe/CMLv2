@@ -71,7 +71,7 @@ require_once 'config.php';
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            margin-top: 50px;
         }
         .return-card {
             max-width: 500px;
