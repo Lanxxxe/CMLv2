@@ -64,17 +64,20 @@ try {
         <?php include_once("navigation.php") ?>
 
 		<div id="page-wrapper">
-            <div class="alert alert-default" style="color:white;background-color:#008CBA">
+            <!-- <div class="alert alert-default" style="color:white;background-color:#008CBA">
                 <center>
                     <h3> <span class="glyphicon glyphicon-edit"></span> Paint Paint Calculator</h3>
                 </center>
-            </div>
+            </div> -->
 
             <br />
-
+            
             <div class="container-fluid">
+                <h2>Calculator Formula:</h2>
+                <h4>Price per Gallons = (surface area x coats number) / 10</h4>
+                <h4>Total Price = total gallons x price per Gallons</h4>
                 <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-6 col-sm-12" style="margin-top: 1rem;">
                         <div class="form-group" style="font-size: 20px;">
                             <label class="form-label" for="brandSelect">Brand<span style="color: red;">*</span></label>
                             <select name="brand_id" id="brandSelect" class="form-control" required>
@@ -129,7 +132,7 @@ try {
                                 <input class="form-control" placeholder="Enter number of coats" id="coatsNumber" value="1" min="1" onkeypress="return isNumber(event)" type="number">
                             </div>
                             <div class="form-group col-md-6" style="font-size: 20px;">
-                                <label class="form-label">Gallons in Total: </label>
+                                <label class="form-label">Gallons in Total: <span></span> </label>
                                 <input class="form-control" id="totalGallons" type="text" readonly>
                             </div>
                         </div>

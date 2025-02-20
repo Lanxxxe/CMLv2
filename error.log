@@ -3013,3 +3013,18 @@
 (2025-02-13 13:55:06) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
 (2025-02-13 13:55:06) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
 (2025-02-13 13:55:06) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-20 18:34:06) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:34:06) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:34:06) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-20 18:44:10) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:10) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:11) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-20 18:44:11) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:11) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:11) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-20 18:44:16) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:16) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:44:16) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13
+(2025-02-20 18:47:43) Error: [2] include(../../vendor/autoload.php): Failed to open stream: No such file or directory - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:47:43) Error: [2] include(): Failed opening '../../vendor/autoload.php' for inclusion (include_path='C:\xampp\php\PEAR') - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\db-connect.php:14
+(2025-02-20 18:47:43) Error: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated - C:\xampp\htdocs\CML\CMLv2\Customers\paint-match\step1.php:13

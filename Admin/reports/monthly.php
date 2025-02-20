@@ -168,10 +168,23 @@ ob_start();
     <!--         Printed by: <?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?><br> -->
     <!--     </div> -->
     <!-- </div> -->
+    <?php 
+        $order_type_str = '';
+        $report_type = 'All';
+        if (isset($order_type)) {
+            if($order_type === 'walk_in') {
+                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+                $report_type = 'Walk In';
+            } else if($order_type === 'gcash') {
+                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+                $report_type = 'Online';
+            }
+        }
+    ?>
 
     <div class="header">
         <div class="company-name">CML Paint Trading</div>
-        <div class="report-title">Sales Report</div>
+        <div class="report-title"><?php echo htmlspecialchars($report_type) ?> Sales Report</div>
         <div class="report-info">
             Date Printed: <?php echo date('F d, Y h:i A'); ?><br>
             Printed by: <?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?>
@@ -179,15 +192,6 @@ ob_start();
     </div>
 
     <?php
-        $order_type_str = '';
-        if (isset($order_type)) {
-            if($order_type === 'walk_in') {
-                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
-            } else if($order_type === 'gcash') {
-                $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
-            }
-        }
-
         $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
         $stmt_dates->execute();
         $date_range = $stmt_dates->fetch(PDO::FETCH_ASSOC);
