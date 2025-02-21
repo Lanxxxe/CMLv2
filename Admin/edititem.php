@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 session_start();
 
 if (!$_SESSION['admin_username']) {
@@ -174,8 +176,8 @@ if (isset($_POST['btn_save_updates'])) {
 
                     <tr>
                         <td><label class="control-label">Price.</label></td>
-                        <td><input id="inputprice" class="form-control" type="text" name="item_price"
-                                value="<?php echo $item_price; ?>" required /></td>
+                        <td><input id="inputprice" class="form-control" type="number" name="item_price"
+                                value="<?php echo number_format($item_price, 2); ?>" step="0.01" required /></td>
                     </tr>
 
                     <tr>

@@ -321,7 +321,7 @@ if (isset($_GET['delete_id'])) {
                                     <td><?php echo $item_name . (($gl)? " (" . $gl . ")" : "") ?></td>
                                     <td><?php echo $brand_name ?></td>
                                     <td><?php echo $type ?></td>
-                                    <td>&#8369; <?php echo $item_price; ?></td>
+                                    <td>&#8369; <?php echo number_format($row['item_price'], 2); ?></td>
                                     <td><?php echo $quantity . " " . $gl ?></td>
                                     <td><?php echo $formattedDate1 ?></td>
                                     <td><?php echo $formattedDate; ?></td>
