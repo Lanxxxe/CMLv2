@@ -34,6 +34,18 @@ if ($order_type !== 'walk_in' && $order_type !== 'online' && $order_type !== 'gc
     $order_type = null;
 }
 
+$order_type_str = '';
+$report_type = 'All';
+if (isset($order_type)) {
+    if($order_type === 'walk_in') {
+        $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
+        $report_type = 'Walk In';
+    } else if($order_type === 'gcash') {
+        $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
+        $report_type = 'Online';
+    }
+}
+
 $branch = $_SESSION['current_branch']
 
 ?>
@@ -512,7 +524,7 @@ $branch = $_SESSION['current_branch']
             <div class="print-header">
                 <h1 class="h-head-text">CML Paint Trading</h1>
                 <div class="reports-info">
-                    <h2 class="h-label">Sales Report</h2>
+                    <h2 class="h-label"><?php echo htmlspecialchars($report_type) ?>  Sales Report</h2>
                     <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
                     <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
                 </div>
@@ -527,14 +539,7 @@ $branch = $_SESSION['current_branch']
 
                     <div class="sales-report-content">
                         <?php
-                            $order_type_str = '';
-                            if (isset($order_type)) {
-                                if($order_type === 'walk_in') {
-                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'walk in\'';
-                                } else if($order_type === 'gcash') {
-                                    $order_type_str = ' AND LCASE(paymentform.payment_method) = \'gcash\'';
-                                }
-                            }
+                            
 
                             $stmt_dates = $DB_con->prepare('SELECT MIN(DATE(order_date)) as min_date, MAX(DATE(order_date)) as max_date FROM orderdetails');
                             $stmt_dates->execute();
@@ -646,16 +651,16 @@ $branch = $_SESSION['current_branch']
                             <input type="hidden" name="order_type" value="<?php echo htmlspecialchars($order_type); ?>">
                         <?php endif; ?>
                         <div class="date-inputs">
-                            <!-- <div class="date-input-group"> -->
-                            <!--     <input type="date"  -->
-                            <!--            id="start_date"  -->
-                            <!--            name="start_date"  -->
-                            <!--            min="<?php echo htmlspecialchars($min_date); ?>"  -->
-                            <!--            max="<?php echo date('Y-m-d'); ?>" -->
-                            <!--            value="<?php echo htmlspecialchars($start_date ?? ''); ?>" -->
-                            <!--            placeholder="Start Date"> -->
-                            <!-- </div> -->
-                            <!-- <div class="date-separator">-</div> -->
+                            <!-- <div class="date-input-group">
+                                <input type="date" 
+                                       id="start_date" 
+                                       name="start_date" 
+                                       min="<?php echo htmlspecialchars($start_date); ?>" 
+                                       max="<?php echo date('Y-m-d'); ?>"
+                                       value="<?php echo htmlspecialchars($start_date ?? $start_date); ?>"
+                                       placeholder="Start Date">
+                            </div>
+                            <div class="date-separator">-</div> -->
                             <div class="date-input-group">
                                 <input type="date" 
                                        id="end_date" 
@@ -699,7 +704,6 @@ $branch = $_SESSION['current_branch']
                         </button>
                     </div>
                 </div>
-
                     <div class="transactions-table">
                         <table>
                             <thead>
@@ -751,7 +755,7 @@ $branch = $_SESSION['current_branch']
                                             <td><?php echo htmlspecialchars($orderDate); ?></td>
                                             <td><?php echo htmlspecialchars($row['order_id']); ?></td>
                                             <td><?php echo htmlspecialchars($customerName); ?></td>
-                                            <td><?php echo htmlspecialchars($row['order_name']) . $order_type_str_r; ?></td>
+                                            <td><?php echo htmlspecialchars($row['order_name']) ?></td>
                                             <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
                                             <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
                                             <td><?php echo htmlspecialchars($row['payment_method'] ?? 'N/A'); ?></td>

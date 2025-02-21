@@ -19,7 +19,7 @@
         <div class="print-header">
             <h1 class="h-head-text">CML Paint Trading</h1>
             <div class="reports-info">
-                <h2 class="h-label">Sales Report</h2>
+                <h2 class="h-label"><?php echo htmlspecialchars($report_type) ?>  Sales Report</h2>
                 <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
                 <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
             </div>
@@ -108,9 +108,13 @@
         <div class="print-header">
             <h1 class="h-head-text">CML Paint Trading</h1>
             <div class="reports-info">
-                <h2 class="h-label">Sales Report</h2>
+                <h2 class="h-label"><?php echo htmlspecialchars($report_type) ?>  Sales Report</h2>
                 <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
                 <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
+                <p>Date Covered: <?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></p>
+
+                
+            
             </div>
         </div>
         <div class="modal-content">
@@ -118,6 +122,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h2 class="modal-title" id="myModalLabel">Weekly Sales</h2>
+                <h4>Date: <?php echo date('F j, Y', strtotime($weeklyStartDate)) . ' - ' . date('F j, Y', strtotime($weeklyEndDate)); ?></h4>
             </div>
             <div class="modal-body">
                 <div class="transactions-table">
@@ -179,7 +184,7 @@
                 </div>
             </div>
             <div class="modal-footer hide-in-print">
-                <a class="btn btn-primary" href="reports/weekly.php<?php echo $pdf_args ?>">
+                <a class="btn btn-primary" href="reports/weekly.php<?php echo (strpos($pdf_args, '?') === false ? '?' : '&') . 'weekly_start_date=' . strtotime($weeklyStartDate) . '&weekly_end_date=' . strtotime($weeklyEndDate); ?>">
                     <i class="fa fa-file-pdf-o"></i> Save PDF
                 </a>
                 <button type="button" class="btn btn-primary" onclick="printContent('weeklySalesContent')">
@@ -197,7 +202,7 @@
         <div class="print-header">
             <h1 class="h-head-text">CML Paint Trading</h1>
             <div class="reports-info">
-                <h2 class="h-label">Sales Report</h2>
+                <h2 class="h-label"><?php echo htmlspecialchars($report_type) ?>  Sales Report</h2>
                 <p>Date Printed: <span class="date-printed"><?php echo date('F d, Y h:i A'); ?></span></p>
                 <p>Printed By: <span class="printed-by"><?php echo htmlspecialchars($_SESSION['user_firstname'] . ' ' . $_SESSION['user_lastname']); ?></span></p>
             </div>

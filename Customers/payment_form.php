@@ -114,8 +114,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         // Get Orders
                         $stmt_select = $conn->prepare(
-                            "SELECT order_name as name, SUM(order_quantity) as qty, MAX(order_price) as price
-                            FROM orderdetails WHERE order_id IN ($placeholders) GROUP BY order_name"
+                            "SELECT 
+                                od.order_name AS name, 
+                                SUM(od.order_quantity) AS qty, 
+                                MAX(od.order_price) AS price, 
+                                i.brand_name AS brand
+                            FROM 
+                                orderdetails od
+                            JOIN 
+                                items i ON od.product_id = i.item_id
+                            WHERE 
+                                od.order_id IN ($placeholders)
+                            GROUP BY 
+                                od.order_name, i.brand_name"
                         );
                         $types = str_repeat('i', count($order_ids));
                         $stmt_select->bind_param($types, ...$order_ids);
@@ -157,6 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $receipt .= "<thead>";
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
                                     $receipt .= "<th style=\"padding: 4px 0;\"> Item </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\"> Brand </th>";
                                     $receipt .= "<th style=\"padding: 4px 0;\"> Quantity </th>";
                                     $receipt .= "<th style=\"padding: 4px 0;\"> Price </th>";
                                 $receipt .= "</tr>";
@@ -166,13 +178,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             foreach ($order_list as $order_data) {
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
                                     $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['name']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['brand']} </td>";
                                     $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['qty']} </td>";
                                     $receipt .= "<td style=\"padding: 4px 0;\">₱{$order_data['price']} </td>";
                                 $receipt .= "</tr>";
                                 $_total_amount += $order_data['price'] * $order_data['qty'];
                             }
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
-                                    $receipt .= "<th colspan=\"2\" style=\"padding: 4px 0;\"> Total Amount </th>";
+                                    $receipt .= "<th colspan=\"3\" style=\"padding: 4px 0;\"> Total Amount </th>";
                                     $receipt .= "<th style=\"padding: 4px 0;\">₱$_total_amount </th>";
                                 $receipt .= "</tr>";
                             $receipt .= "</tbody>";
