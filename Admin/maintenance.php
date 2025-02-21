@@ -330,7 +330,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                             <div class="brand-actions">
                                 <button class="btn btn-primary" onclick="showAddProductModal(<?php echo $brandId; ?>)">Add Product</button>
                                 <button class="btn btn-warning" style="color: #fff !important;" onclick="showEditBrandModal(<?php echo $brandId; ?>, '<?php echo htmlspecialchars($brand['name']) ?? ''; ?>', '<?php echo htmlspecialchars($brand['img'] ?? ''); ?>')">Edit Brand</button>
-                                <button class="btn btn-danger" onclick="confirmDeleteBrand(<?php echo $brandId; ?>)">Delete Brand</button>
+                                <button class="btn btn-danger" onclick="confirmDeleteBrand(<?php echo $brandId; ?>)">Archive Brand</button>
                             </div>
                         </div>
                         <ul class="tools-list">
@@ -339,7 +339,7 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
                                     <span><?php echo htmlspecialchars($tool['name']); ?></span>
                                     <div>
                                     <button class="btn btn-warning" style="color: #fff !important;" onclick="showEditProductModal(<?php echo $tool['id']; ?>, '<?php echo htmlspecialchars($tool['name'] ?? ''); ?>', '<?php echo htmlspecialchars($tool['prod_type'] ?? ''); ?>')">Edit Product</button>                                    
-                                    <button class="btn btn-danger" onclick="confirmDeleteProduct(<?php echo $tool['id']; ?>)">Delete</button>
+                                    <button class="btn btn-danger" onclick="confirmDeleteProduct(<?php echo $tool['id']; ?>)">Archive</button>
                                     </div>
                                 </li>
                             <?php } ?>
@@ -601,8 +601,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     // Delete Brand
     function confirmDeleteBrand(brandId) {
         Swal.fire({
-            title: 'Delete Brand',
-            text: 'Are you sure you want to delete this brand? This will also delete all associated tools.',
+            title: 'Archive Brand',
+            text: 'Are you sure you want to archive this brand? This will also archive all associated tools, keeping them for future reference.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it',
@@ -739,8 +739,8 @@ $total_rejected = $stmt_rejected->fetch(PDO::FETCH_ASSOC)['total'];
     // Delete Tool
     function confirmDeleteProduct(toolId) {
         Swal.fire({
-            title: 'Delete Product',
-            text: 'Are you sure you want to delete this tool?',
+            title: 'Archive Product',
+            text: 'Are you sure you want to archive this product?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it',
