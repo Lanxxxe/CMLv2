@@ -657,7 +657,7 @@ if (isset($_GET['delete_return_id'])) {
                                 <td><?php echo htmlspecialchars($row['user_email']); ?></td>
                                 <td><?php echo htmlspecialchars($displayType); ?></td>
                                 <td><?php echo htmlspecialchars($row['order_status']); ?></td>
-                                <td>₱<?php echo htmlspecialchars($row['order_total']); ?></td>
+                                <td>₱<?php echo number_format($row['order_total'], 2); ?></td>
                                 <td>
                                     <a class="btn btn-success" href="javascript:confirmOrder('<?php echo htmlspecialchars($row['payment_id']); ?>', '<?php echo htmlspecialchars($row['payment_type']); ?>', '<?php echo htmlspecialchars($row['user_email']); ?>', '<?php echo htmlspecialchars($row['order_status']); ?>', '<?php echo htmlspecialchars($row['order_total']); ?>', '<?php echo htmlspecialchars($row['payment_image_path']); ?>');">
                                         <span class='glyphicon glyphicon-shopping-cart'></span> Confirm Order

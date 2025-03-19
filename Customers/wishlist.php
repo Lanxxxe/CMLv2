@@ -276,7 +276,7 @@ extract($edit_row);
                         <img src='../Admin/item_images/" . $query2['item_image'] . "' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
                     </a>
                     <center><h4> " . $query2['item_name'] . " (" . $query2['gl'] . ") </h4></center>
-                    <center><h4> Price: &#8369; " . $query2['item_price'] . " </h4></center>
+                    <center><h4> Price: &#8369; " . number_format($query2['item_price'], 2) . " </h4></center>
                 <div style='display: flex;'>
                     <a class='btn btn-primary' style='flex: 1;' href='add_to_cart.php?cart=" . $query2['item_id'] . "'><span class='glyphicon glyphicon-shopping-cart'></span> Add to cart</a>
                     <a class='btn btn-danger' style='flex: 1; margin-left: 4px;' href='delete-wish.php?wish=" . $query2['wish_id'] . "'><span class='glyphicon glyphicon-trash'></span> Remove </a>

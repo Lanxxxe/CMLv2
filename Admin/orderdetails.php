@@ -285,12 +285,12 @@ function isActivated($s) {
                             <td><?php echo htmlspecialchars($row['order_date'])?></td>
                             <td><?php echo htmlspecialchars($row['user_firstname']) . ' ' . htmlspecialchars($row['user_lastname']); ?></td>
                             <td><?php echo htmlspecialchars($row['order_name']); ?></td>
-                            <td>&#8369; <?php echo htmlspecialchars($row['order_price']); ?></td>
+                            <td>&#8369; <?php echo number_format($row['order_price'], 2); ?></td>
                             <td><?php echo htmlspecialchars($row['order_quantity']); ?></td>
                             <td><?php echo $row['gl'] ? $row['gl'] : ''; ?></td>
                             <td><?php echo htmlspecialchars($formattedDate); ?></td>
                             <td><?php echo htmlspecialchars($row['order_pick_place']); ?></td>
-                            <td>&#8369; <?php echo htmlspecialchars($row['order_total']); ?></td>
+                            <td>&#8369; <?php echo number_format($row['order_total'], 2); ?></td>
 							<td><?php echo htmlspecialchars($row['order_status']) ?></td>
                             <td style="cursor: pointer;" 
                                 <?php echo ($row['order_status'] != 'Pending' && $row['order_status'] != 'Verification' && $row['order_status'] != 'Returned') 

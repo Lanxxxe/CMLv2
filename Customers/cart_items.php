@@ -163,7 +163,7 @@ if (isset($_GET['update_id'])) {
                                 <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>', '<?php echo $product_id ?>', '<?php echo $stocks ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
                                     <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
                                     <td onclick="updatePickUpPlace('<?php echo $order_pick_place ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_pick_place; ?></td>
-                                    <td>&#8369; <?php echo $order_total; ?> </td>
+                                    <td>&#8369; <?php echo number_format($order_total, 2); ?> </td>
                                     <td>
                                         <div style="display: flex; justify-content: center; align-items: center;">
                                             <a style="flex: 1;" class="btn btn-danger" href="?delete_id=<?php echo $row['order_id']; ?>"
@@ -184,7 +184,7 @@ if (isset($_GET['update_id'])) {
                                 echo "<tr>";
                                 echo "<td colspan='5' align='right'>Total Price:";
                                 echo "</td>";
-                                echo "<td>&#8369; " . "<span id=\"totalPrice\">$totalx</span>";
+                                echo "<td>&#8369; " . "<span id=\"totalPrice\">" . number_format($totalx, 2) . "</span>";
                                 echo "</td>";
                                 echo "<td style='display: flex; justify-content: center; align-items: center;'>";
                                 // Query again to get the first pending order's order_id
@@ -337,7 +337,7 @@ if (isset($_GET['update_id'])) {
                     allBtnChecked = false;
                 }
             });
-            totalPrice.textContent = total;
+            totalPrice.textContent = total.toFixed(2);
             return allBtnChecked;
         }
 

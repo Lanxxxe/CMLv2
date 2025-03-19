@@ -180,20 +180,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['name']} </td>";
                                     $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['brand']} </td>";
                                     $receipt .= "<td style=\"padding: 4px 0;\">{$order_data['qty']} </td>";
-                                    $receipt .= "<td style=\"padding: 4px 0;\">₱{$order_data['price']} </td>";
+                                    $receipt .= "<td style=\"padding: 4px 0;\">₱" . number_format($order_data['price'], 2) ."</td>";
                                 $receipt .= "</tr>";
                                 $_total_amount += $order_data['price'] * $order_data['qty'];
                             }
                                 $receipt .= "<tr style=\"border-bottom: 1px solid #6c757d; padding: 1px 4px;\">";
                                     $receipt .= "<th colspan=\"3\" style=\"padding: 4px 0;\"> Total Amount </th>";
-                                    $receipt .= "<th style=\"padding: 4px 0;\">₱$_total_amount </th>";
+                                    $receipt .= "<th style=\"padding: 4px 0;\">₱" . number_format($_total_amount, 2) . "</th>";
                                 $receipt .= "</tr>";
                             $receipt .= "</tbody>";
                             $receipt .= "</table>";
                             // $receipt .= "<p><strong>Amount:</strong> $amount</p>";
                             // $receipt .= "<p><strong>Order IDs:</strong> " . implode(', ', $order_ids) . "</p>";
-                            $receipt .= "<p><strong>Amount Paid:</strong> ₱" . number_format($amount) . "</p>";
-                            $receipt .= "<p><strong>Remaining Balance:</strong> ₱" .   number_format($_total_amount - $amount) . "</p>";
+                            $receipt .= "<p><strong>Amount Paid:</strong> ₱" . number_format($amount, 2) . "</p>";
+                            $receipt .= "<p><strong>Remaining Balance:</strong> ₱" .   number_format($_total_amount - $amount, 2) . "</p>";
 
                             $receipt .= "<p><strong>Payment Status:</strong> $order_stats</p>";
                             // if ($_SESSION['user_type'] != 'Cashier'){
@@ -473,7 +473,7 @@ $conn->close();
             </div>
             <label class="form-label">Amount<span style="color: red;">*</span></label>
             <div class="input_box" id="amountInput">
-                <input type="number" name="amount" value="<?php echo $total_amount; ?>" readonly class="name" min="1" max="<?php echo $total_amount; ?>">
+                <input type="number" name="amount" value="<?php echo number_format($total_amount, 2); ?>" step="0.01" readonly class="name" min="0.00" max="<?php echo $total_amount; ?>">
                 <i class="fa fa-money icon" aria-hidden="true"></i>
             </div>
 
@@ -532,10 +532,10 @@ $conn->close();
             var amountField = document.querySelector('input[name="amount"]');
             if (paymentType === 'Full Payment') {
                 amountField.readOnly = true;
-                amountField.value = <?php echo $total_amount; ?>;
+                amountField.value = (<?php echo $total_amount; ?>).toFixed(2);
             } else if (paymentType === 'Down Payment') {
                 amountField.readOnly = true;
-                amountField.value = <?php echo $total_amount * 0.5; ?>;
+                amountField.value = (<?php echo $total_amount * 0.5; ?>).toFixed(2);
             } else {
                 amountField.readOnly = false;
                 amountField.value = '';

@@ -284,7 +284,7 @@ extract($edit_row);
                                 <img src='../Admin/item_images/<?php echo $query2['item_image'] ?>' class='img img-thumbnail' style='width:100%;height:260px;object-fit: contain;' />
                             </a>
                             <center><h4><?php echo $query2['item_name'] ?></h4></center>
-                            <center><h4> Price: &#8369; <?php echo $query2['item_price'] ?> </h4></center>
+                            <center><h4> Price: &#8369; <?php echo number_format($query2['item_price'], 2) ?> </h4></center>
                             <div style='display: flex;'>
                                 <button class='btn btn-danger' style='flex: 1;' 
                                 onclick="addToCart(<?= $query2['item_id'] ?>, '<?= htmlspecialchars($query2['item_name'], ENT_QUOTES) ?>',<?= $query2['item_price'] ?>, <?= $query2['quantity'] ?>, '<?= htmlspecialchars($query2['item_image'], ENT_QUOTES) ?>')">

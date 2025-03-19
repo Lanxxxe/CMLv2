@@ -107,7 +107,7 @@ extract($edit_row);
 
                   <td><?php echo $order_id; ?></td>
                   <td><?php echo $order_name . " (" . $gl . ")"; ?></td>
-                  <td>&#8369; <?php echo $order_price; ?> </td>
+                  <td>&#8369; <?php echo number_format($order_price, 2); ?> </td>
                   <td><?php echo $order_quantity . " " . $gl; ?></td>
                   <td><?php echo $formattedDate; ?></td>
                   <td><?php echo $order_pick_place; ?></td>
