@@ -335,7 +335,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                         const data = JSON.parse(response);
                         if (data.status === 'success') {
                             const payment = data.data;
-                            const remaining = payment.total_amount - payment.amount;
+                            const remaining = (payment.total_amount - payment.amount).toFixed(2);
                             
                             $('#view-order-id').text(payment.id);
                             $('#view-customer').text(payment.firstname + ' ' + payment.lastname);
@@ -464,7 +464,7 @@ $downpayment_row = $stmt_downpayment->fetchAll(PDO::FETCH_ASSOC);
                 });
 
                 // Handle payment amount validation for downpayment
-                $('#payment-amount').on('input', function() {
+                $('#payment-amount').on('blur', function() {
                     if ($('#payment-type').val() === 'downpayment') {
                         const amount = parseFloat($(this).val());
                         const remaining = parseFloat($('#remaining-balance').text());

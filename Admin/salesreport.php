@@ -723,7 +723,7 @@ $branch = $_SESSION['current_branch']
                                 $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
 
                                 $stmt = $DB_con->prepare('
-                                    SELECT 
+                                    SELECT DISTINCT
                                         users.user_email, 
                                         users.user_firstname, 
                                         users.user_lastname, 
@@ -733,7 +733,9 @@ $branch = $_SESSION['current_branch']
                                     FROM users 
                                     INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
                                     LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id 
-                                    WHERE orderdetails.order_pick_place = :branch 
+                                    LEFT JOIN payment_track pt ON paymentform.id = pt.payment_id
+                                    WHERE (orderdetails.order_status = "Confirmed" AND (pt.status = "Confirmed" OR pt.status IS NULL))
+                                    AND orderdetails.order_pick_place = :branch 
                                     AND date(orderdetails.order_date) <= :end_date ' 
                                     . $order_type_str . 
                                     'ORDER BY orderdetails.order_date DESC
