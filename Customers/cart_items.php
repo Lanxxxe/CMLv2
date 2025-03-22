@@ -159,7 +159,7 @@ if (isset($_GET['update_id'])) {
                                         <input class="checkOrdered" type="checkbox" data-order="<?php echo $row['order_id'] . ':' . $row['order_price'] . ':' . $row['order_quantity'] ?>">
                                         <?php echo $order_name ?>
                                     </td>
-                                    <td>&#8369; <?php echo $order_price; ?> </td>
+                                    <td>&#8369; <?php echo number_format($order_price, 2); ?> </td>
                                 <td onclick="updateQuantity('<?php echo $order_quantity ?>', '<?php echo $order_id ?>', '<?php echo $order_price ?>', '<?php echo $product_id ?>', '<?php echo $stocks ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_quantity . " " . $gl; ?></td>
                                     <td onclick="updatePickUpDate('<?php echo $formattedDate ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $formattedDate; ?></td>
                                     <td onclick="updatePickUpPlace('<?php echo $order_pick_place ?>', '<?php echo $order_id ?>');" style="cursor: pointer;"><span class='glyphicon glyphicon-pencil' style="margin-right: 7px;"></span> <?php echo $order_pick_place; ?></td>
