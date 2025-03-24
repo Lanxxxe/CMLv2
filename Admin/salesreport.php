@@ -723,22 +723,27 @@ $branch = $_SESSION['current_branch']
                                 $order_type_str_r = str_replace(" AND", "WHERE", $order_type_str);
 
                                 $stmt = $DB_con->prepare('
-                                    SELECT DISTINCT
+                                    SELECT
                                         users.user_email, 
-                                        users.user_firstname, 
-                                        users.user_lastname, 
+                                        if ((pf.firstname = "" AND pf.lastname = ""), users.user_firstname, pf.firstname) as user_firstname, 
+                                        if ((pf.firstname = "" AND pf.lastname = ""), users.user_lastname, pf.lastname) as user_lastname, 
                                         users.user_address, 
-                                        orderdetails.*,
-                                        paymentform.payment_method
+                                        od.*, 
+                                        pf.payment_method
                                     FROM users 
-                                    INNER JOIN orderdetails ON users.user_id = orderdetails.user_id 
-                                    LEFT JOIN paymentform ON orderdetails.payment_id = paymentform.id 
-                                    LEFT JOIN payment_track pt ON paymentform.id = pt.payment_id
-                                    WHERE (orderdetails.order_status = "Confirmed" AND (pt.status = "Confirmed" OR pt.status IS NULL))
-                                    AND orderdetails.order_pick_place = :branch 
-                                    AND date(orderdetails.order_date) <= :end_date ' 
-                                    . $order_type_str . 
-                                    'ORDER BY orderdetails.order_date DESC
+                                    INNER JOIN orderdetails od ON users.user_id = od.user_id 
+                                    LEFT JOIN paymentform pf ON od.payment_id = pf.id 
+                                    LEFT JOIN payment_track pt ON pf.id = pt.payment_id
+                                    WHERE od.order_status = "Confirmed"
+                                    AND (pf.payment_type = "Full Payment" OR (
+                                        (SELECT SUM(o.order_total) 
+                                         FROM orderdetails o
+                                         WHERE o.payment_id = pf.id) = pf.amount
+                                    ))
+                                    AND od.order_pick_place = :branch 
+                                    AND DATE(od.order_date) <= :end_date '
+                                    . str_replace('paymentform', 'pf', $order_type_str) . 
+                                    'ORDER BY od.order_date DESC
                                 ');
                                 $stmt->execute([
                                     ':branch' => $branch,

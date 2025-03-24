@@ -287,7 +287,7 @@ extract($edit_row);
                             <center><h4> Price: &#8369; <?php echo number_format($query2['item_price'], 2) ?> </h4></center>
                             <div style='display: flex;'>
                                 <button class='btn btn-danger' style='flex: 1;' 
-                                onclick="addToCart(<?= $query2['item_id'] ?>, '<?= htmlspecialchars($query2['item_name'], ENT_QUOTES) ?>',<?= $query2['item_price'] ?>, <?= $query2['quantity'] ?>, '<?= htmlspecialchars($query2['item_image'], ENT_QUOTES) ?>')">
+                                onclick="addToCart(<?= $query2['item_id'] ?>, '<?= htmlspecialchars($query2['item_name'], ENT_QUOTES) ?>',<?= $query2['item_price'] ?>, <?= $query2['quantity'] ?>, '<?= htmlspecialchars($query2['item_image'], ENT_QUOTES) ?>', '<?= $query2['gl'] ?>')">
                                 <span class='glyphicon glyphicon-shopping-cart'></span> Add </button>
                             </div>
                         </div>
@@ -554,7 +554,7 @@ extract($edit_row);
 <script>
 let cart = new FormData();
 
-function addToCart(itemId, name, price, maxQuantity, itemImage) {
+function addToCart(itemId, name, price, maxQuantity, itemImage, gl) {
     const item = cart.get(itemId);
     let quantity = 1;
     if (item) {
@@ -566,7 +566,7 @@ function addToCart(itemId, name, price, maxQuantity, itemImage) {
         return;
     }
 
-    cart.set(itemId, JSON.stringify({ name, price, quantity, maxQuantity, itemImage }));
+    cart.set(itemId, JSON.stringify({ name, price, quantity, maxQuantity, itemImage, gl }));
     updateCartDisplay();
 }
 
@@ -865,8 +865,14 @@ document.addEventListener('click', (event) => {
     const confirmPayment = event.target.closest('#confirmPayment');
     if (confirmPayment) {
         const token = confirmPayment.getAttribute('data-token');
+        const customer_name = document.getElementById('customerName').value;
+        const customer_contact_no = document.getElementById('customerContact').value;
+
         const formData = new FormData();
+
         formData.append('_token', token);
+        formData.append('customer_name', customer_name);
+        formData.append('customer_contact_no', customer_contact_no);
         fetch('./cashier_checkout.php', {
             method: 'POST',
             body: formData,
@@ -884,6 +890,7 @@ document.addEventListener('click', (event) => {
                         location.reload();
                     });
             } else {
+                console.log(data.message);
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops!',

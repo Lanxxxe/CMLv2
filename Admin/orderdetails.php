@@ -248,20 +248,21 @@ function isActivated($s) {
                     <th>Total</th>
                     <th>Actions</th>
                     <th>Status</th>
-                </tr>a
+                </tr>
                 </thead>
                 <tbody>
                 <?php   
                     $stmt = $DB_con->prepare(
                         "SELECT
                             users.user_email,
-                            users.user_firstname,
-                            users.user_lastname,
+                            if ((pf.firstname = '' AND pf.lastname = ''), users.user_firstname, pf.firstname) as user_firstname, 
+                            if ((pf.firstname = '' AND pf.lastname = ''), users.user_lastname, pf.lastname) as user_lastname, 
                             users.user_address,
                             orderdetails.*,
                             order_pick_place
                         FROM users
                             INNER JOIN orderdetails ON users.user_id = orderdetails.user_id
+                            INNER JOIN paymentform pf ON orderdetails.payment_id = pf.id
                         WHERE $sql_cmd AND order_pick_place = :branch_location
                         ORDER BY orderdetails.order_date DESC"
                     );

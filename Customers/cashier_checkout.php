@@ -22,9 +22,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Sanitize and validate input fields
-$firstName = $_SESSION['user_firstname'] ?? '';
-$lastName = $_SESSION['user_lastname'] ?? '';
-$mobile = $_SESSION['user_mobile'] ?? '';
+if (isset($_POST['customer_name'])) {
+  $lastPosTmp = strrpos($_POST['customer_name'], " ");
+
+  if ($lastPosTmp === false) {
+      // No space found, assume full name is the first name
+      $firstName = $_POST['customer_name'];
+      $lastName = '';
+  } else {
+      $firstName = substr($_POST['customer_name'], 0, $lastPosTmp);
+      $lastName = substr($_POST['customer_name'], $lastPosTmp + 1);
+  }
+  $mobile = $_POST['customer_contact_no'] ?? '';
+} else {
+    $firstName = $_SESSION['user_firstname'] ?? '';
+    $lastName = $_SESSION['user_lastname'] ?? '';
+    $mobile = $_SESSION['user_mobile'] ?? '';
+}
+
 $email = $_SESSION['user_email'] ?? '';
 $address = $_SESSION['user_address'] ?? '';
 $paymentType = 'Full Payment';
@@ -121,7 +136,7 @@ try {
             'order_date' => date('Y-m-d H:i:s'),
             'order_pick_up' =>  date('Y-m-d H:i:s'), // Add appropriate values if needed
             'order_pick_place' =>  $assign_branch, // Add appropriate values if needed
-            'gl' => empty($item['gl']) ? $item['gl'] : null,
+            'gl' => $item['gl'],
             'product_id' => $item['item_id'] // Assuming you have this in your fetched data
         ];
     }
