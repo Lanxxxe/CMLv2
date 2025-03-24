@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2-1.fc41
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Feb 13, 2025 at 02:02 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Mar 24, 2025 at 04:01 AM
+-- Server version: 8.0.40
+-- PHP Version: 8.3.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
     DECLARE v_total_amount DECIMAL(10,2);
     DECLARE v_current_amount DECIMAL(10,2);
     
-    -- Get payment details
+    
     SELECT pt.payment_id, pt.amount, pf.payment_type, pf.amount, 
            (SELECT SUM(order_total) FROM orderdetails WHERE payment_id = pt.payment_id)
     INTO v_payment_id, v_amount, v_payment_type, v_current_amount, v_total_amount
@@ -42,25 +42,25 @@ CREATE PROCEDURE `confirm_payment` (IN `p_track_id` INT)   BEGIN
     
     START TRANSACTION;
     
-    -- Update payment track status
+    
     UPDATE payment_track
     SET status = 'Confirmed'
     WHERE track_id = p_track_id;
     
-    -- Update paymentform based on payment type
+    
     IF v_payment_type = 'Installment' THEN
         UPDATE paymentform
         SET months_paid = months_paid + 1,
-            payment_status = IF(months_paid + 1 >= 12, 'Comfirmed', payment_status)
+            payment_status = IF(months_paid + 1 >= 12, 'Confirmed', payment_status)
         WHERE id = v_payment_id;
-    ELSE -- Down payment
+    ELSE 
         UPDATE paymentform
         SET amount = amount + v_amount,
-            payment_status = IF(amount + v_amount >= v_total_amount, 'Comfirmed', payment_status)
+            payment_status = IF(amount + v_amount >= v_total_amount, 'Confirmed', payment_status)
         WHERE id = v_payment_id;
     END IF;
     
-    -- Update orderdetails status if payment is complete
+    
     IF (v_payment_type = 'Installment' AND (SELECT months_paid FROM paymentform WHERE id = v_payment_id) >= 12)
         OR (v_payment_type = 'Down payment' AND (v_current_amount + v_amount >= v_total_amount)) THEN
         
@@ -91,7 +91,7 @@ CREATE PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
     DECLARE v_payment_id INT;
     DECLARE v_product_id INT;
     
-    -- Cursor for orders sorted by date
+    
     DECLARE order_cursor CURSOR FOR 
         SELECT order_id, order_quantity,
                user_id, order_name, order_price, order_total,
@@ -105,15 +105,15 @@ CREATE PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
-    -- Start transaction
+    
     START TRANSACTION;
     
-    -- Get initial return quantity
+    
     SELECT quantity INTO current_qty
     FROM returnitems
     WHERE return_id = p_return_id;
     
-    -- Open cursor
+    
     OPEN order_cursor;
     
     read_loop: LOOP
@@ -127,20 +127,20 @@ CREATE PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
         END IF;
         
         IF v_order_quantity <= current_qty THEN
-            -- Update entire order to 'return' status
+            
             UPDATE orderdetails 
             SET order_status = 'Returned'
             WHERE order_id = v_order_id;
             
             SET current_qty = current_qty - v_order_quantity;
         ELSE
-            -- Split the order
+            
             UPDATE orderdetails
             SET order_quantity = order_quantity - current_qty,
                 order_total = order_price * (order_quantity - current_qty)
             WHERE order_id = v_order_id;
             
-            -- Insert new order for the returned portion
+            
             INSERT INTO orderdetails (
                 user_id, order_name, order_price, order_quantity, 
                 order_total, order_status, order_date, order_pick_up,
@@ -162,15 +162,15 @@ CREATE PROCEDURE `ProcessReturnItems` (IN `p_return_id` INT)   BEGIN
         END IF;
     END LOOP;
     
-    -- Close cursor
+    
     CLOSE order_cursor;
     
-    -- Update return item status
+    
     UPDATE returnitems 
     SET status = 'Confirmed'
     WHERE return_id = p_return_id;
     
-    -- Commit transaction
+    
     COMMIT;
     
 END$$
@@ -179,25 +179,25 @@ CREATE PROCEDURE `request_payment` (IN `p_payment_id` INT, IN `p_amount` DECIMAL
     DECLARE last_track_status VARCHAR(20);
     DECLARE v_payment_type VARCHAR(255);
     
-    -- Get the status of the latest track record
+    
     SELECT status INTO last_track_status
     FROM payment_track
     WHERE payment_id = p_payment_id
     ORDER BY track_id DESC
     LIMIT 1;
     
-    -- Get payment type
+    
     SELECT payment_type INTO v_payment_type
     FROM paymentform
     WHERE id = p_payment_id;
     
-    -- Check if we can process new payment (no track or last track was confirmed)
+    
     IF (last_track_status IS NULL OR last_track_status = 'Confirmed') THEN
-        -- Insert new payment track record
+        
         INSERT INTO payment_track (payment_id, amount, status)
         VALUES (p_payment_id, p_amount, 'Requested');
         
-        -- Update payment image in paymentform
+        
         UPDATE paymentform
         SET payment_image_path = p_payment_image
         WHERE id = p_payment_id;
@@ -214,17 +214,17 @@ CREATE PROCEDURE `restore_brand` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_brand_img TEXT;
     DECLARE v_branch_id INT;
 
-    -- Retrieve archived brand data
+    
     SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
     INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
     FROM `brands_archive`
     WHERE `delete_id` = p_delete_id;
 
-    -- Insert the brand back into the original table
+    
     INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
     VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
 
-    -- Delete the brand from the archive after restoration
+    
     DELETE FROM `brands_archive`
     WHERE `delete_id` = p_delete_id;
 END$$
@@ -235,27 +235,27 @@ CREATE PROCEDURE `restore_brand_including_product_type` (IN `p_delete_id` INT)  
     DECLARE v_brand_img TEXT;
     DECLARE v_branch_id INT;
 
-    -- Retrieve archived brand data
+    
     SELECT `brand_id`, `brand_name`, `brand_img`, `branch_id`
     INTO v_brand_id, v_brand_name, v_brand_img, v_branch_id
     FROM `brands_archive`
     WHERE `delete_id` = p_delete_id;
 
-    -- Insert the brand back into the original table
+    
     INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
     VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
 
-    -- Insert the associated product types back into the original table
+    
     INSERT INTO `prod_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
     SELECT pa.`type_id`, pa.`type_name`, pa.`brand_id`, pa.`prod_type`
     FROM `product_type_archive` pa
     WHERE pa.`deleted_brand_id` = v_brand_id;
 
-    -- Delete the brand from the archive after restoration
+    
     DELETE FROM `brands_archive`
     WHERE `delete_id` = p_delete_id;
 
-    -- Delete the product types from the archive after restoration
+    
     DELETE FROM `product_type_archive`
     WHERE `deleted_brand_id` = v_brand_id;
 END$$
@@ -267,17 +267,17 @@ CREATE PROCEDURE `restore_product_type` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_brand_id INT;
     DECLARE v_prod_type TEXT;
 
-    -- Retrieve archived product data
+    
     SELECT `deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`
     INTO v_deleted_brand_id, v_type_id, v_type_name, v_brand_id, v_prod_type
     FROM `product_type_archive`
     WHERE `delete_id` = p_delete_id;
 
-    -- Insert the product back into the original table
+    
     INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
     VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
 
-    -- Delete the product type from the archive after restoration
+    
     DELETE FROM `product_type_archive`
     WHERE `delete_id` = p_delete_id;
 END$$
@@ -291,34 +291,34 @@ CREATE PROCEDURE `restore_product_with_brand` (IN `p_delete_id` INT)   BEGIN
     DECLARE v_type_name TEXT;
     DECLARE v_prod_type TEXT;
 
-    -- Retrieve archived product type data
+    
     SELECT `type_id`, `type_name`, `prod_type`, `deleted_brand_id`
     INTO v_type_id, v_type_name, v_prod_type, v_brand_id
     FROM `product_type_archive`
     WHERE `delete_id` = p_delete_id;
 
-    -- Check if the brand exists in the brands_archive, and if not, insert it back
+    
     IF v_brand_id IS NOT NULL THEN
-        -- Retrieve archived brand data
+        
         SELECT `brand_name`, `brand_img`, `branch_id`
         INTO v_brand_name, v_brand_img, v_branch_id
         FROM `brands_archive`
         WHERE `brand_id` = v_brand_id;
 
-        -- Insert the brand back into the original table if not already restored
+        
         INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
         VALUES (v_brand_id, v_brand_name, v_brand_img, v_branch_id);
 
-        -- Delete the brand from the archive after restoration
+        
         DELETE FROM `brands_archive`
         WHERE `brand_id` = v_brand_id;
     END IF;
 
-    -- Insert the associated product type back into the original table
+    
     INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`)
     VALUES (v_type_id, v_type_name, v_brand_id, v_prod_type);
 
-    -- Delete the product type from the archive after restoration
+    
     DELETE FROM `product_type_archive`
     WHERE `delete_id` = p_delete_id;
 
@@ -333,16 +333,59 @@ DELIMITER ;
 --
 
 CREATE TABLE `admin_notifications` (
-  `id` int(11) NOT NULL,
-  `user_email` varchar(255) NOT NULL,
-  `head_msg` varchar(255) NOT NULL,
-  `ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted') NOT NULL,
-  `payment_id` int(11) DEFAULT NULL,
-  `return_id` int(11) DEFAULT NULL,
-  `order_id` int(11) DEFAULT NULL,
-  `status` enum('read','unread') NOT NULL DEFAULT 'unread',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `id` int NOT NULL,
+  `user_email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `head_msg` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted') COLLATE utf8mb4_general_ci NOT NULL,
+  `payment_id` int DEFAULT NULL,
+  `return_id` int DEFAULT NULL,
+  `order_id` int DEFAULT NULL,
+  `status` enum('read','unread') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'unread',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_notifications`
+--
+
+INSERT INTO `admin_notifications` (`id`, `user_email`, `head_msg`, `ntype`, `payment_id`, `return_id`, `order_id`, `status`, `created_at`) VALUES
+(23, 'kate@email.com', 'New Order Placed', 'ordered', 79, NULL, NULL, 'unread', '2025-03-24 00:34:19'),
+(24, 'kate@email.com', 'Payment Confirmed', 'confirmed', 79, NULL, NULL, 'unread', '2025-03-24 00:34:53'),
+(25, 'kate@email.com', 'Payment Approval Required', 'requested', 80, NULL, NULL, 'unread', '2025-03-24 00:35:36'),
+(26, 'kate@email.com', 'Payment Confirmed', 'confirmed', 80, NULL, NULL, 'unread', '2025-03-24 00:45:37'),
+(27, 'kate@email.com', 'Payment Installment Request', 'requested', 80, NULL, NULL, 'unread', '2025-03-24 00:46:15'),
+(28, 'kate@email.com', 'Payment Approval Required', 'requested', 81, NULL, NULL, 'unread', '2025-03-24 01:09:26'),
+(29, 'kate@email.com', 'Payment Confirmed', 'confirmed', 81, NULL, NULL, 'unread', '2025-03-24 01:09:41'),
+(30, 'kate@email.com', 'Payment Installment Request', 'requested', 81, NULL, NULL, 'unread', '2025-03-24 01:47:43'),
+(31, 'kate@email.com', 'Payment Installment Request', 'requested', 81, NULL, NULL, 'unread', '2025-03-24 01:48:16'),
+(32, 'kate@email.com', 'New Order Placed', 'ordered', 82, NULL, NULL, 'unread', '2025-03-24 02:20:33'),
+(33, 'kate@email.com', 'New Order Placed', 'ordered', 83, NULL, NULL, 'unread', '2025-03-24 02:20:47'),
+(35, 'cashier@gmail.com', 'New Order Placed', 'ordered', 84, NULL, NULL, 'unread', '2025-03-24 02:22:01'),
+(37, 'cashier@gmail.com', 'New Order Placed', 'ordered', 85, NULL, NULL, 'unread', '2025-03-24 02:22:34'),
+(38, 'kate@email.com', 'Payment Confirmed', 'confirmed', 83, NULL, NULL, 'unread', '2025-03-24 02:22:55'),
+(39, 'kate@email.com', 'Payment Confirmed', 'confirmed', 82, NULL, NULL, 'unread', '2025-03-24 02:23:00'),
+(41, 'cashier@gmail.com', 'New Order Placed', 'ordered', 86, NULL, NULL, 'unread', '2025-03-24 02:41:42'),
+(43, 'cashier@gmail.com', 'New Order Placed', 'ordered', 87, NULL, NULL, 'unread', '2025-03-24 02:58:12'),
+(45, 'cashier@gmail.com', 'New Order Placed', 'ordered', 88, NULL, NULL, 'unread', '2025-03-24 03:14:35'),
+(60, 'cashier@gmail.com', 'New Order Placed', 'ordered', 99, NULL, NULL, 'unread', '2025-03-24 03:28:27'),
+(62, 'cashier@gmail.com', 'New Order Placed', 'ordered', 100, NULL, NULL, 'unread', '2025-03-24 03:34:20'),
+(64, 'cashier@gmail.com', 'New Order Placed', 'ordered', 101, NULL, NULL, 'unread', '2025-03-24 03:44:11'),
+(66, 'cashier@gmail.com', 'New Order Placed', 'ordered', 102, NULL, NULL, 'unread', '2025-03-24 03:46:02'),
+(68, 'cashier@gmail.com', 'New Order Placed', 'ordered', 103, NULL, NULL, 'unread', '2025-03-24 03:48:03'),
+(70, 'cashier@gmail.com', 'New Order Placed', 'ordered', 104, NULL, NULL, 'unread', '2025-03-24 03:50:25'),
+(72, 'cashier@gmail.com', 'New Order Placed', 'ordered', 105, NULL, NULL, 'unread', '2025-03-24 03:50:32'),
+(74, 'cashier@gmail.com', 'New Order Placed', 'ordered', 106, NULL, NULL, 'unread', '2025-03-24 03:50:44'),
+(76, 'cashier@gmail.com', 'New Order Placed', 'ordered', 107, NULL, NULL, 'unread', '2025-03-24 03:50:50'),
+(78, 'cashier@gmail.com', 'New Order Placed', 'ordered', 108, NULL, NULL, 'unread', '2025-03-24 03:51:04'),
+(80, 'cashier@gmail.com', 'New Order Placed', 'ordered', 109, NULL, NULL, 'unread', '2025-03-24 03:51:21'),
+(82, 'cashier@gmail.com', 'New Order Placed', 'ordered', 110, NULL, NULL, 'unread', '2025-03-24 03:51:27'),
+(83, 'jay@gmail.com', 'New Order Placed', 'ordered', 111, NULL, NULL, 'unread', '2025-03-24 03:59:03'),
+(84, 'jay@gmail.com', 'Payment Approval Required', 'requested', 112, NULL, NULL, 'unread', '2025-03-24 03:59:21'),
+(85, 'jay@gmail.com', 'New Order Placed', 'ordered', 113, NULL, NULL, 'unread', '2025-03-24 03:59:59'),
+(86, 'jay@gmail.com', 'Payment Confirmed', 'confirmed', 113, NULL, NULL, 'unread', '2025-03-24 04:00:30'),
+(87, 'jay@gmail.com', 'Payment Confirmed', 'confirmed', 111, NULL, NULL, 'unread', '2025-03-24 04:00:35'),
+(88, 'jay@gmail.com', 'Payment Confirmed', 'confirmed', 112, NULL, NULL, 'unread', '2025-03-24 04:00:39'),
+(89, 'jay@gmail.com', 'Payment Installment Request', 'requested', 112, NULL, NULL, 'unread', '2025-03-24 04:00:54');
 
 -- --------------------------------------------------------
 
@@ -351,13 +394,13 @@ CREATE TABLE `admin_notifications` (
 -- (See below for the actual view)
 --
 CREATE TABLE `admin_notifications_views` (
-`id` int(11)
+`id` int
 ,`user_email` varchar(255)
 ,`status` enum('read','unread')
 ,`ntype` enum('ordered','returned','confirmed','requested','cancelled','return request','return rejected','return deleted')
 ,`head_msg` varchar(255)
 ,`created_at` timestamp
-,`message` mediumtext
+,`message` text
 );
 
 -- --------------------------------------------------------
@@ -367,8 +410,8 @@ CREATE TABLE `admin_notifications_views` (
 --
 
 CREATE TABLE `branch` (
-  `branch_id` int(11) NOT NULL,
-  `branch_location` text DEFAULT NULL
+  `branch_id` int NOT NULL,
+  `branch_location` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -388,10 +431,10 @@ INSERT INTO `branch` (`branch_id`, `branch_location`) VALUES
 --
 
 CREATE TABLE `brands` (
-  `brand_id` int(11) NOT NULL,
-  `brand_name` varchar(255) NOT NULL,
-  `brand_img` text DEFAULT NULL,
-  `branch_id` int(11) DEFAULT NULL
+  `brand_id` int NOT NULL,
+  `brand_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_img` text COLLATE utf8mb4_general_ci,
+  `branch_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -409,11 +452,11 @@ INSERT INTO `brands` (`brand_id`, `brand_name`, `brand_img`, `branch_id`) VALUES
 --
 DELIMITER $$
 CREATE TRIGGER `before_delete_brand` BEFORE DELETE ON `brands` FOR EACH ROW BEGIN
-    -- Archive the brand data
+    
     INSERT INTO `brands_archive` (`brand_id`, `brand_name`, `brand_img`, `branch_id`)
     VALUES (OLD.brand_id, OLD.brand_name, OLD.brand_img, OLD.branch_id);
     
-    -- Archive related product types
+    
     INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
     SELECT OLD.brand_id, pt.`type_id`, pt.`type_name`, pt.`brand_id`, pt.`prod_type`
     FROM `product_type` pt
@@ -429,12 +472,12 @@ DELIMITER ;
 --
 
 CREATE TABLE `brands_archive` (
-  `delete_id` int(11) NOT NULL,
-  `brand_id` int(11) NOT NULL,
-  `brand_name` varchar(255) NOT NULL,
-  `brand_img` text DEFAULT NULL,
-  `branch_id` int(11) DEFAULT NULL,
-  `deleted_at` datetime DEFAULT current_timestamp()
+  `delete_id` int NOT NULL,
+  `brand_id` int NOT NULL,
+  `brand_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_img` text COLLATE utf8mb4_general_ci,
+  `branch_id` int DEFAULT NULL,
+  `deleted_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -444,10 +487,10 @@ CREATE TABLE `brands_archive` (
 --
 
 CREATE TABLE `cartitems` (
-  `itemID` int(11) NOT NULL,
-  `palletName` varchar(255) NOT NULL,
-  `palletCode` varchar(255) NOT NULL,
-  `palletRGB` varchar(255) NOT NULL
+  `itemID` int NOT NULL,
+  `palletName` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `palletCode` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `palletRGB` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -457,7 +500,7 @@ CREATE TABLE `cartitems` (
 --
 
 CREATE TABLE `items` (
-  `item_id` int(10) UNSIGNED NOT NULL,
+  `item_id` int UNSIGNED NOT NULL,
   `item_name` varchar(5000) NOT NULL DEFAULT '',
   `brand_name` varchar(255) NOT NULL,
   `item_image` varchar(5000) NOT NULL DEFAULT '',
@@ -467,20 +510,20 @@ CREATE TABLE `items` (
   `type` varchar(255) NOT NULL,
   `quantity` decimal(10,2) DEFAULT NULL,
   `gl` varchar(255) NOT NULL,
-  `pallet_id` int(11) DEFAULT NULL,
+  `pallet_id` int DEFAULT NULL,
   `branch` varchar(50) DEFAULT NULL,
   `hex` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `items`
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_date`, `expiration_date`, `item_price`, `type`, `quantity`, `gl`, `pallet_id`, `branch`, `hex`) VALUES
-(87, 'Latex Paint', 'Boysen', '764116.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 100.00, 'Gallon', 15, 'Caloocan', ''),
-(88, 'Latex Paint', 'Boysen', '278330.jpg', '2025-02-13 00:00:00.000000', '2027-02-12', '250', 'Oil Paint', 150.00, 'Gallon', 3, 'Caloocan', ''),
-(89, 'Latex Paint', 'Boysen', '75472.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '100', 'Gloss', 200.00, 'Gallon', 12, 'Valenzuela City', ''),
-(90, 'Boysen Paint', 'Boysen', '426978.png', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 200.00, 'Gallon', 6, 'Valenzuela City', '');
+(87, 'Latex Paint', 'Boysen', '764116.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 91.00, 'Gallon', 15, 'Caloocan', ''),
+(88, 'Latex Paint', 'Boysen', '278330.jpg', '2025-02-13 00:00:00.000000', '2027-02-12', '250', 'Oil Paint', 141.00, 'Gallon', 3, 'Caloocan', ''),
+(89, 'Latex Paint', 'Boysen', '75472.jpg', '2025-02-13 00:00:00.000000', '2027-02-13', '100', 'Gloss', 192.00, 'Gallon', 12, 'Valenzuela City', ''),
+(90, 'Boysen Paint', 'Boysen', '426978.png', '2025-02-13 00:00:00.000000', '2027-02-13', '200', 'Latex Paint', 191.00, 'Gallon', 6, 'Valenzuela City', '');
 
 -- --------------------------------------------------------
 
@@ -489,20 +532,66 @@ INSERT INTO `items` (`item_id`, `item_name`, `brand_name`, `item_image`, `item_d
 --
 
 CREATE TABLE `orderdetails` (
-  `order_id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL DEFAULT 0,
+  `order_id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL DEFAULT '0',
   `order_name` varchar(1000) NOT NULL DEFAULT '',
-  `order_price` double NOT NULL DEFAULT 0,
-  `order_quantity` int(10) UNSIGNED NOT NULL DEFAULT 0,
-  `order_total` double NOT NULL DEFAULT 0,
+  `order_price` double NOT NULL DEFAULT '0',
+  `order_quantity` int UNSIGNED NOT NULL DEFAULT '0',
+  `order_total` double NOT NULL DEFAULT '0',
   `order_status` varchar(45) NOT NULL DEFAULT '',
   `order_date` date DEFAULT NULL,
   `order_pick_up` datetime(6) DEFAULT NULL,
   `order_pick_place` enum('Caloocan','San Jose Del Monte, Bulacan','Quezon City','Valenzuela City') DEFAULT NULL,
   `gl` enum('Gallon','Liter') DEFAULT NULL,
-  `payment_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `payment_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `orderdetails`
+--
+
+INSERT INTO `orderdetails` (order_id, user_id, order_name, order_price, order_quantity, order_total, order_status, order_date, order_pick_up, order_pick_place, gl, payment_id, product_id) VALUES
+(170, 8, 'Latex Paint', 200, 2, 400, 'Confirmed', '2025-03-15', '2025-03-16 14:30:00.000000', 'Caloocan', 'Gallon', 81, 87),
+(171, 8, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-10', '2025-03-11 09:45:00.000000', 'Caloocan', 'Gallon', 79, 88),
+(172, 8, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-02-28', '2025-03-01 18:00:00.000000', 'Valenzuela City', 'Gallon', 79, 89),
+(173, 8, 'Boysen Paint', 200, 3, 600, 'Confirmed', '2025-03-05', '2025-03-06 12:15:00.000000', 'Valenzuela City', 'Gallon', 80, 90),
+(174, 8, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-20', '2025-03-21 16:19:00.000000', 'Caloocan', 'Gallon', 82, 87),
+(175, 8, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-18', '2025-03-19 10:20:00.000000', 'Caloocan', 'Gallon', 83, 88),
+(178, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-12', '2025-03-13 08:22:01.000000', 'Caloocan', 'Gallon', 84, 88),
+(179, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-12', '2025-03-13 08:22:01.000000', 'Caloocan', 'Gallon', 84, 90),
+(182, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-14', '2025-03-15 11:22:34.000000', 'Caloocan', 'Gallon', 85, 88),
+(183, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-14', '2025-03-15 11:22:34.000000', 'Caloocan', 'Gallon', 85, 89),
+(186, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-16', '2025-03-17 13:41:42.000000', 'Caloocan', 'Gallon', 86, 89),
+(187, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-16', '2025-03-17 13:41:42.000000', 'Caloocan', 'Gallon', 86, 90),
+(189, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-18', '2025-03-19 15:58:12.000000', 'Caloocan', 'Gallon', 87, 88),
+(191, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-19', '2025-03-20 10:14:35.000000', 'Caloocan', 'Gallon', 88, 89),
+(206, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-21', '2025-03-22 12:28:27.000000', 'Caloocan', 'Gallon', 99, 89),
+(208, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-22', '2025-03-23 14:34:20.000000', 'Caloocan', 'Gallon', 100, 90),
+(210, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-23', '2025-03-24 16:44:11.000000', 'Caloocan', 'Gallon', 101, 88),
+(212, 17, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:46:02.000000', 'Caloocan', 'Gallon', 102, 87),
+(214, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:48:03.000000', 'Caloocan', 'Gallon', 103, 90),
+(216, 17, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:50:25.000000', 'Caloocan', 'Gallon', 104, 87),
+(219, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-24', '2025-03-25 18:50:32.000000', 'Caloocan', 'Gallon', 105, 88),
+(220, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-24', '2025-03-25 18:50:32.000000', 'Caloocan', 'Gallon', 105, 89),
+(222, 17, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:50:44.000000', 'Caloocan', 'Gallon', 106, 90),
+(224, 17, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-24', '2025-03-25 18:50:50.000000', 'Caloocan', 'Gallon', 107, 88),
+(226, 17, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-24', '2025-03-25 18:51:04.000000', 'Caloocan', 'Gallon', 108, 89),
+(228, 17, 'Latex Paint', 200, 2, 400, 'Confirmed', '2025-03-24', '2025-03-25 18:51:21.000000', 'Caloocan', 'Gallon', 109, 87),
+(230, 17, 'Boysen Paint', 200, 2, 400, 'Confirmed', '2025-03-24', '2025-03-25 18:51:27.000000', 'Caloocan', 'Gallon', 110, 90),
+(231, 31, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:58:00.000000', 'Caloocan', 'Gallon', 112, 87),
+(232, 31, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-24', '2025-03-25 18:58:00.000000', 'Caloocan', 'Gallon', 112, 88),
+(233, 31, 'Latex Paint', 100, 1, 100, 'Pending', '2025-03-24', '2025-03-25 18:58:00.000000', 'Valenzuela City', 'Gallon', NULL, 89),
+(234, 31, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:58:00.000000', 'Caloocan', 'Gallon', 111, 87),
+(235, 31, 'Latex Paint', 200, 1, 200, 'Confirmed', '2025-03-24', '2025-03-25 18:59:00.000000', 'Caloocan', 'Gallon', 113, 87),
+(236, 32, 'Boysen Paint', 200, 2, 400, 'Confirmed', '2025-03-10', '2025-03-11 10:00:00.000000', 'Caloocan', 'Gallon', 114, 90),
+(237, 33, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-12', '2025-03-13 11:30:00.000000', 'Caloocan', 'Gallon', 115, 88),
+(238, 34, 'Latex Paint', 100, 3, 300, 'Confirmed', '2025-03-14', '2025-03-15 12:45:00.000000', 'Valenzuela City', 'Gallon', 116, 89),
+(239, 35, 'Boysen Paint', 200, 1, 200, 'Confirmed', '2025-03-16', '2025-03-17 14:00:00.000000', 'Caloocan', 'Gallon', 117, 90),
+(240, 36, 'Latex Paint', 200, 2, 400, 'Confirmed', '2025-03-18', '2025-03-19 15:15:00.000000', 'Caloocan', 'Gallon', 118, 87),
+(241, 37, 'Latex Paint', 250, 1, 250, 'Confirmed', '2025-03-20', '2025-03-21 16:30:00.000000', 'Caloocan', 'Gallon', 119, 88),
+(242, 38, 'Latex Paint', 100, 1, 100, 'Confirmed', '2025-03-22', '2025-03-23 17:45:00.000000', 'Caloocan', 'Gallon', 120, 89),
+(243, 39, 'Boysen Paint', 200, 3, 600, 'Confirmed', '2025-03-24', '2025-03-25 18:00:00.000000', 'Caloocan', 'Gallon', 121, 90);
 
 --
 -- Triggers `orderdetails`
@@ -560,10 +649,10 @@ DELIMITER ;
 --
 
 CREATE TABLE `pallets` (
-  `pallet_id` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `rgb` varchar(255) NOT NULL
+  `pallet_id` int NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `rgb` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -822,21 +911,61 @@ INSERT INTO `pallets` (`pallet_id`, `code`, `name`, `rgb`) VALUES
 --
 
 CREATE TABLE `paymentform` (
-  `id` int(11) NOT NULL,
-  `firstname` varchar(255) DEFAULT NULL,
-  `lastname` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `mobile` varchar(255) NOT NULL,
-  `payment_method` varchar(255) NOT NULL,
-  `payment_type` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `firstname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `lastname` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_general_ci,
+  `mobile` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `payment_method` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `payment_type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `amount` decimal(10,2) DEFAULT NULL,
-  `payment_image_path` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `order_id` int(10) UNSIGNED DEFAULT NULL,
-  `payment_status` varchar(20) DEFAULT 'verification',
-  `months_paid` int(11) NOT NULL DEFAULT 0
+  `payment_image_path` text COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `order_id` int UNSIGNED DEFAULT NULL,
+  `payment_status` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'verification',
+  `months_paid` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `paymentform`
+--
+
+
+INSERT INTO `paymentform` (id, firstname, lastname, email, address, mobile, payment_method, payment_type, amount, payment_image_path, created_at, order_id, payment_status, months_paid) VALUES
+(79, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 350.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-15 10:34:19', NULL, 'Confirmed', 0),
+(80, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 300.00, './uploaded_images/67e0ab578ee3b.jpg', '2025-03-10 11:35:36', NULL, 'Confirmed', 0),
+(81, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Down Payment', 400.00, './uploaded_images/67e0b9e0c7c08.jpg', '2025-03-05 12:09:26', NULL, 'Confirmed', 0),
+(82, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 200.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-20 13:20:33', NULL, 'Confirmed', 0),
+(83, 'Kate', 'Ruaza', 'kate@email.com', 'myaddress', '093473455', 'Gcash', 'Full Payment', 250.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-18 14:20:47', NULL, 'Confirmed', 0),
+(84, 'Maria', 'Santos', 'maria@gmail.com', 'Manila', '091238141', 'Walk In', 'Full Payment', 450.00, '', '2025-03-12 15:22:01', NULL, 'Confirmed', 0),
+(85, 'Juan', 'Dela Cruz', 'juan@gmail.com', 'Quezon City', '091238142', 'Walk In', 'Full Payment', 350.00, '', '2025-03-14 16:22:34', NULL, 'Confirmed', 0),
+(86, 'Ana', 'Reyes', 'ana@gmail.com', 'Makati', '091238143', 'Walk In', 'Full Payment', 300.00, '', '2025-03-16 17:41:42', NULL, 'Confirmed', 0),
+(87, 'Pedro', 'Gonzales', 'pedro@gmail.com', 'Pasig', '091238144', 'Walk In', 'Full Payment', 250.00, '', '2025-03-18 18:58:12', NULL, 'Confirmed', 0),
+(88, 'Luis', 'Torres', 'luis@gmail.com', 'Taguig', '091238145', 'Walk In', 'Full Payment', 100.00, '', '2025-03-19 19:14:35', NULL, 'Confirmed', 0),
+(99, 'Joshua', 'Smith', 'joshua@gmail.com', 'Caloocan', '09593536253', 'Walk In', 'Full Payment', 100.00, '', '2025-03-21 20:28:27', NULL, 'Confirmed', 0),
+(100, 'Johnson', 'Lee', 'johnson@gmail.com', 'Caloocan', '09535532111', 'Walk In', 'Full Payment', 200.00, '', '2025-03-22 21:34:20', NULL, 'Confirmed', 0),
+(101, 'Anna', 'Martinez', 'anna@gmail.com', 'Caloocan', '09123456789', 'Walk In', 'Full Payment', 250.00, '', '2025-03-23 22:44:11', NULL, 'Confirmed', 0),
+(102, 'John', 'Doe', 'john@gmail.com', 'Caloocan', '09123456788', 'Walk In', 'Full Payment', 200.00, '', '2025-03-24 23:46:02', NULL, 'Confirmed', 0),
+(103, 'Michael', 'Tan', 'michael@gmail.com', 'Caloocan', '09123456787', 'Walk In', 'Full Payment', 200.00, '', '2025-03-24 23:48:03', NULL, 'Confirmed', 0),
+(104, 'Sarah', 'Lim', 'sarah@gmail.com', 'Caloocan', '09123456786', 'Walk In', 'Full Payment', 200.00, '', '2025-03-24 23:50:25', NULL, 'Confirmed', 0),
+(105, 'David', 'Garcia', 'david@gmail.com', 'Caloocan', '09123456785', 'Walk In', 'Full Payment', 350.00, '', '2025-03-24 23:50:32', NULL, 'Confirmed', 0),
+(106, 'Elena', 'Chua', 'elena@gmail.com', 'Caloocan', '09123456784', 'Walk In', 'Full Payment', 200.00, '', '2025-03-24 23:50:44', NULL, 'Confirmed', 0),
+(107, 'Carlos', 'Ng', 'carlos@gmail.com', 'Caloocan', '09123456783', 'Walk In', 'Full Payment', 250.00, '', '2025-03-24 23:50:50', NULL, 'Confirmed', 0),
+(108, 'Sofia', 'Yu', 'sofia@gmail.com', 'Caloocan', '09123456782', 'Walk In', 'Full Payment', 100.00, '', '2025-03-24 23:51:04', NULL, 'Confirmed', 0),
+(109, 'Daniel', 'Wong', 'daniel@gmail.com', 'Caloocan', '09123456781', 'Walk In', 'Full Payment', 400.00, '', '2025-03-24 23:51:21', NULL, 'Confirmed', 0),
+(110, 'Grace', 'Chen', 'grace@gmail.com', 'Caloocan', '09123456780', 'Walk In', 'Full Payment', 400.00, '', '2025-03-24 23:51:27', NULL, 'Confirmed', 0),
+(111, 'Jay', 'Casio', 'jay@gmail.com', 'City', '09123456789', 'Gcash', 'Full Payment', 200.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-24 23:59:03', NULL, 'Confirmed', 0),
+(112, 'Jay', 'Casio', 'jay@gmail.com', 'City', '09123456789', 'Gcash', 'Down Payment', 450.00, './uploaded_images/67e0d8f658d09.jpg', '2025-03-24 23:59:21', NULL, 'Confirmed', 0),
+(113, 'Jay', 'Casio', 'jay@gmail.com', 'City', '09123456789', 'Gcash', 'Full Payment', 200.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-24 23:59:59', NULL, 'Confirmed', 0),
+(114, 'Michael', 'Tan', 'michael@gmail.com', 'Caloocan', '09123456787', 'Gcash', 'Full Payment', 400.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-10 09:00:00', NULL, 'Confirmed', 0),
+(115, 'Sarah', 'Lim', 'sarah@gmail.com', 'Caloocan', '09123456786', 'Gcash', 'Full Payment', 250.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-12 10:30:00', NULL, 'Confirmed', 0),
+(116, 'David', 'Garcia', 'david@gmail.com', 'Caloocan', '09123456785', 'Gcash', 'Down Payment', 150.00, './uploaded_images/67e0b9e0c7c08.jpg', '2025-03-14 11:45:00', NULL, 'Confirmed', 0),
+(117, 'Elena', 'Chua', 'elena@gmail.com', 'Caloocan', '09123456784', 'Walk In', 'Full Payment', 200.00, '', '2025-03-16 13:00:00', NULL, 'Confirmed', 0),
+(118, 'Carlos', 'Ng', 'carlos@gmail.com', 'Caloocan', '09123456783', 'Gcash', 'Full Payment', 400.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-18 14:15:00', NULL, 'Confirmed', 0),
+(119, 'Sofia', 'Yu', 'sofia@gmail.com', 'Caloocan', '09123456782', 'Gcash', 'Full Payment', 250.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-20 15:30:00', NULL, 'Confirmed', 0),
+(120, 'Daniel', 'Wong', 'daniel@gmail.com', 'Caloocan', '09123456781', 'Walk In', 'Full Payment', 100.00, '', '2025-03-22 16:45:00', NULL, 'Confirmed', 0),
+(121, 'Grace', 'Chen', 'grace@gmail.com', 'Caloocan', '09123456780', 'Gcash', 'Full Payment', 600.00, './uploaded_images/e79dd102b35213f815291e0fb4bd12df.jpg', '2025-03-24 17:00:00', NULL, 'Confirmed', 0);
 
 --
 -- Triggers `paymentform`
@@ -871,7 +1000,7 @@ CREATE TRIGGER `trigger_update_order_notif` AFTER UPDATE ON `paymentform` FOR EA
             NEW.id,
             'confirmed', 
             NEW.email, 
-            'Payment Confirmed'  -- Fixed typo
+            'Payment Confirmed'  
         );
     ELSEIF NEW.payment_status = 'Failed' AND OLD.payment_status != 'Failed' THEN
         INSERT INTO admin_notifications (payment_id, ntype, user_email, head_msg)
@@ -893,12 +1022,31 @@ DELIMITER ;
 --
 
 CREATE TABLE `payment_track` (
-  `track_id` int(11) NOT NULL,
-  `payment_id` int(11) NOT NULL,
+  `track_id` int NOT NULL,
+  `payment_id` int NOT NULL,
   `status` varchar(32) NOT NULL DEFAULT 'Requested',
   `amount` decimal(10,2) NOT NULL,
-  `date_tracked` datetime(6) NOT NULL DEFAULT current_timestamp(6)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `date_tracked` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `payment_track`
+--
+
+INSERT INTO `payment_track` (track_id, payment_id, status, amount, date_tracked) VALUES
+(1, 80, 'Requested', 130.00, '2025-03-10 08:46:15.588063'),
+(2, 81, 'Confirmed', 100.00, '2025-03-05 09:47:43.267358'),
+(3, 81, 'Confirmed', 100.00, '2025-03-05 09:48:16.819990'),
+(4, 112, 'Confirmed', 225.00, '2025-03-24 12:00:54.364818'),
+(5, 114, 'Confirmed', 400.00, '2025-03-10 09:15:00.000000'),
+(6, 115, 'Confirmed', 250.00, '2025-03-12 10:45:00.000000'),
+(7, 116, 'Requested', 150.00, '2025-03-14 12:00:00.000000'),
+(8, 116, 'Confirmed', 150.00, '2025-03-14 12:30:00.000000'),
+(9, 117, 'Confirmed', 200.00, '2025-03-16 13:15:00.000000'),
+(10, 118, 'Confirmed', 400.00, '2025-03-18 14:30:00.000000'),
+(11, 119, 'Confirmed', 250.00, '2025-03-20 15:45:00.000000'),
+(12, 120, 'Confirmed', 100.00, '2025-03-22 17:00:00.000000'),
+(13, 121, 'Confirmed', 600.00, '2025-03-24 18:15:00.000000');
 
 --
 -- Triggers `payment_track`
@@ -932,13 +1080,13 @@ DELIMITER ;
 --
 
 CREATE TABLE `product_requests` (
-  `request_id` int(11) NOT NULL,
-  `product_name` varchar(255) NOT NULL,
-  `product_brand` varchar(255) DEFAULT NULL,
-  `quantity` int(11) NOT NULL,
-  `requesting_branch` varchar(255) NOT NULL,
-  `status` enum('Pending','Declined','Confirmed') DEFAULT NULL,
-  `requested_at` datetime DEFAULT current_timestamp(),
+  `request_id` int NOT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `product_brand` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quantity` int NOT NULL,
+  `requesting_branch` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `status` enum('Pending','Declined','Confirmed') COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `requested_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `approved_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -956,7 +1104,7 @@ INSERT INTO `product_requests` (`request_id`, `product_name`, `product_brand`, `
 --
 DELIMITER $$
 CREATE TRIGGER `update_approved_date` BEFORE UPDATE ON `product_requests` FOR EACH ROW BEGIN
-    -- Check if the status is being changed to 'Confirmed' or 'Declined'
+    
     IF NEW.status IN ('Confirmed', 'Declined') AND OLD.status != NEW.status THEN
         SET NEW.approved_date = NOW();
     END IF;
@@ -971,10 +1119,10 @@ DELIMITER ;
 --
 
 CREATE TABLE `product_type` (
-  `type_id` int(11) NOT NULL,
-  `type_name` text NOT NULL,
-  `brand_id` int(11) NOT NULL,
-  `prod_type` text NOT NULL
+  `type_id` int NOT NULL,
+  `type_name` text COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_id` int NOT NULL,
+  `prod_type` text COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1006,7 +1154,7 @@ INSERT INTO `product_type` (`type_id`, `type_name`, `brand_id`, `prod_type`) VAL
 --
 DELIMITER $$
 CREATE TRIGGER `before_delete_product_type` BEFORE DELETE ON `product_type` FOR EACH ROW BEGIN
-    -- Archive the product type data
+    
     INSERT INTO `product_type_archive` (`deleted_brand_id`, `type_id`, `type_name`, `brand_id`, `prod_type`)
     VALUES (NULL, OLD.type_id, OLD.type_name, OLD.brand_id, OLD.prod_type);
 END
@@ -1020,13 +1168,13 @@ DELIMITER ;
 --
 
 CREATE TABLE `product_type_archive` (
-  `delete_id` int(11) NOT NULL,
-  `deleted_brand_id` int(11) DEFAULT NULL,
-  `type_id` int(11) NOT NULL,
-  `type_name` text NOT NULL,
-  `brand_id` int(11) NOT NULL,
-  `prod_type` text NOT NULL,
-  `deleted_at` datetime DEFAULT current_timestamp()
+  `delete_id` int NOT NULL,
+  `deleted_brand_id` int DEFAULT NULL,
+  `type_id` int NOT NULL,
+  `type_name` text COLLATE utf8mb4_general_ci NOT NULL,
+  `brand_id` int NOT NULL,
+  `prod_type` text COLLATE utf8mb4_general_ci NOT NULL,
+  `deleted_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1036,15 +1184,15 @@ CREATE TABLE `product_type_archive` (
 --
 
 CREATE TABLE `returnitems` (
-  `return_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `product_image` varchar(255) DEFAULT NULL,
-  `receipt_image` varchar(255) DEFAULT NULL,
-  `product_name` varchar(255) DEFAULT NULL,
-  `status` varchar(255) DEFAULT NULL,
-  `branch` varchar(50) DEFAULT NULL
+  `return_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `product_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `receipt_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `branch` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1056,7 +1204,7 @@ CREATE TRIGGER `trigger_delete_return_request` BEFORE DELETE ON `returnitems` FO
 
     SELECT user_email INTO v_user_email
     FROM users 
-    WHERE user_id = OLD.user_id;  -- Fixed NEW to OLD since this is a DELETE trigger
+    WHERE user_id = OLD.user_id;  
     
     INSERT INTO admin_notifications (return_id, ntype, user_email, head_msg)
     VALUES (
@@ -1081,7 +1229,7 @@ CREATE TRIGGER `trigger_insert_return_request` AFTER INSERT ON `returnitems` FOR
         NEW.return_id,
         'return request', 
         v_user_email, 
-        'New Return Request'  -- Updated message
+        'New Return Request'  
     );
 END
 $$
@@ -1122,14 +1270,14 @@ DELIMITER ;
 --
 
 CREATE TABLE `return_payments` (
-  `return_payment_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `return_status` text DEFAULT NULL,
-  `proof_of_payment` text DEFAULT NULL,
-  `amount_return` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `date` datetime DEFAULT current_timestamp(),
-  `branch` varchar(100) DEFAULT NULL
+  `return_payment_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `return_status` text COLLATE utf8mb4_general_ci,
+  `proof_of_payment` text COLLATE utf8mb4_general_ci,
+  `amount_return` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `branch` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1139,7 +1287,7 @@ CREATE TABLE `return_payments` (
 --
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int NOT NULL,
   `user_email` varchar(1000) NOT NULL,
   `user_password` varchar(1000) NOT NULL,
   `user_firstname` varchar(1000) NOT NULL,
@@ -1148,7 +1296,7 @@ CREATE TABLE `users` (
   `user_mobile` varchar(255) NOT NULL,
   `type` enum('Admin','Customer','Cashier') DEFAULT NULL,
   `assigned_branch` enum('Caloocan','San Jose Del Monte, Bulacan','Quezon City','Valenzuela City') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `users`
@@ -1157,13 +1305,22 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`, `user_lastname`, `user_address`, `user_mobile`, `type`, `assigned_branch`) VALUES
 (6, 'admin@email.com', 'admin', 'admin', 'administrator', 'Ilocos Norte', '09123456778', 'Admin', 'Caloocan'),
 (8, 'kate@email.com', 'kate', 'Kate', 'Ruaza', 'myaddress', '093473455', 'Customer', NULL),
-(17, 'cashier@gmail.com', 'cash', 'cashier firstname', 'cashier lastname', 'cashier address', '091238141', 'Cashier', 'Caloocan'),
+(17, 'cashier@gmail.com', 'cash', 'John', 'Lee', 'Caloocan', '091238141', 'Cashier', 'Caloocan'),
 (25, 'bulancanadmin@email.com', 'admin', 'bulacan', 'admin', 'bulacan', '90193192738', 'Admin', 'San Jose Del Monte, Bulacan'),
 (26, 'qcadmin@email.com', 'admin', 'quezon city', 'admin', 'Quezon City', '09123619823', 'Admin', 'Quezon City'),
 (27, 'valenzuelaadmin@email.com', 'admin', 'valenzuela', 'admin', 'Valenzuela City', '0923724971', 'Admin', 'Valenzuela City'),
 (28, 'bulacancashier@email.com', 'cash', 'bulacan', 'cashier', 'Bulacan', '029187492131', 'Cashier', 'San Jose Del Monte, Bulacan'),
 (29, 'qccashier@email.com', 'admin', 'quezon city', 'cashier', 'Quezon City', '092391823', 'Cashier', 'Quezon City'),
-(30, 'valenzuelacashier@email.com', 'cash', 'valenzuela', 'cashier', 'Valenzuela City', '0923917941', 'Cashier', 'Valenzuela City');
+(30, 'valenzuelacashier@email.com', 'cash', 'valenzuela', 'cashier', 'Valenzuela City', '0923917941', 'Cashier', 'Valenzuela City'),
+(31, 'jay@gmail.com', 'jay', 'Jay', 'Casio', 'City', '09123456789', 'Customer', 'Caloocan'),
+(32, 'michael@gmail.com', 'michael', 'Michael', 'Tan', 'Caloocan', '09123456787', 'Customer', 'Caloocan'),
+(33, 'sarah@gmail.com', 'sarah', 'Sarah', 'Lim', 'Caloocan', '09123456786', 'Customer', 'Caloocan'),
+(34, 'david@gmail.com', 'david', 'David', 'Garcia', 'Caloocan', '09123456785', 'Customer', 'Caloocan'),
+(35, 'elena@gmail.com', 'elena', 'Elena', 'Chua', 'Caloocan', '09123456784', 'Customer', 'Caloocan'),
+(36, 'carlos@gmail.com', 'carlos', 'Carlos', 'Ng', 'Caloocan', '09123456783', 'Customer', 'Caloocan'),
+(37, 'sofia@gmail.com', 'sofia', 'Sofia', 'Yu', 'Caloocan', '09123456782', 'Customer', 'Caloocan'),
+(38, 'daniel@gmail.com', 'daniel', 'Daniel', 'Wong', 'Caloocan', '09123456781', 'Customer', 'Caloocan'),
+(39, 'grace@gmail.com', 'grace', 'Grace', 'Chen', 'Caloocan', '09123456780', 'Customer', 'Caloocan');
 
 -- --------------------------------------------------------
 
@@ -1172,19 +1329,10 @@ INSERT INTO `users` (`user_id`, `user_email`, `user_password`, `user_firstname`,
 --
 
 CREATE TABLE `wishlist` (
-  `wish_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `item_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Structure for view `admin_notifications_views`
---
-DROP TABLE IF EXISTS `admin_notifications_views`;
-
-CREATE VIEW `admin_notifications_views`  AS SELECT `a`.`id` AS `id`, `a`.`user_email` AS `user_email`, `a`.`status` AS `status`, `a`.`ntype` AS `ntype`, `a`.`head_msg` AS `head_msg`, `a`.`created_at` AS `created_at`, CASE WHEN `a`.`payment_id` is null AND `a`.`order_id` is not null THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',`o`.`order_name`,'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',`o`.`order_name`,'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',`o`.`order_name`,'.') end from `orderdetails` `o` where `o`.`order_id` = `a`.`order_id`) WHEN `a`.`ntype` in ('ordered','requested','confirmed','cancelled') THEN (select case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', '),'.') end from `orderdetails` `o` where `o`.`payment_id` = `a`.`payment_id` group by `a`.`payment_id`) WHEN `a`.`ntype` in ('returned','return request','return rejected','return deleted') THEN (select case `a`.`ntype` when 'returned' then concat(`a`.`user_email`,' has returned ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return request' then concat(`a`.`user_email`,' has requested to return ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return rejected' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been rejected') when 'return deleted' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been deleted') end from `returnitems` `r` where `r`.`return_id` = `a`.`return_id`) END AS `message` FROM `admin_notifications` AS `a` ;
+  `wish_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `item_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
@@ -1308,103 +1456,112 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `branch`
 --
 ALTER TABLE `branch`
-  MODIFY `branch_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `branch_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `brand_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `brands_archive`
 --
 ALTER TABLE `brands_archive`
-  MODIFY `delete_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `delete_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `cartitems`
 --
 ALTER TABLE `cartitems`
-  MODIFY `itemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
+  MODIFY `itemID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `item_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
+  MODIFY `order_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
 
 --
 -- AUTO_INCREMENT for table `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `pallet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=245;
+  MODIFY `pallet_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=245;
 
 --
 -- AUTO_INCREMENT for table `paymentform`
 --
 ALTER TABLE `paymentform`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT for table `payment_track`
 --
 ALTER TABLE `payment_track`
-  MODIFY `track_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `track_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `product_requests`
 --
 ALTER TABLE `product_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `request_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `product_type`
 --
 ALTER TABLE `product_type`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `type_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `product_type_archive`
 --
 ALTER TABLE `product_type_archive`
-  MODIFY `delete_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `delete_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `returnitems`
 --
 ALTER TABLE `returnitems`
-  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `return_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `return_payments`
 --
 ALTER TABLE `return_payments`
-  MODIFY `return_payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `return_payment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wish_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `wish_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `admin_notifications_views`
+--
+DROP TABLE IF EXISTS `admin_notifications_views`;
+
+CREATE VIEW `admin_notifications_views`  AS SELECT `a`.`id` AS `id`, `a`.`user_email` AS `user_email`, `a`.`status` AS `status`, `a`.`ntype` AS `ntype`, `a`.`head_msg` AS `head_msg`, `a`.`created_at` AS `created_at`, (case when ((`a`.`payment_id` is null) and (`a`.`order_id` is not null)) then (select (case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',convert(`o`.`order_name` using utf8mb4),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',convert(`o`.`order_name` using utf8mb4),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',convert(`o`.`order_name` using utf8mb4),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',convert(`o`.`order_name` using utf8mb4),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',convert(`o`.`order_name` using utf8mb4),'.') end) from `orderdetails` `o` where (`o`.`order_id` = `a`.`order_id`)) when (`a`.`ntype` in ('ordered','requested','confirmed','cancelled')) then (select (case `a`.`ntype` when 'ordered' then concat(`a`.`user_email`,' has placed a new order for ',convert(group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', ') using utf8mb4),'.') when 'requested' then concat(`a`.`user_email`,' has requested payment approval for ',convert(group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', ') using utf8mb4),'.') when 'confirmed' then concat('Payment confirmed for ',`a`.`user_email`,'\'s order of ',convert(group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', ') using utf8mb4),'.') when 'cancelled' then concat('Payment cancelled for ',`a`.`user_email`,'\'s order of ',convert(group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', ') using utf8mb4),'.') when 'returned' then concat('Item refund for ',`a`.`user_email`,'\'s order of ',convert(group_concat(`o`.`order_name` order by `o`.`order_name` ASC separator ', ') using utf8mb4),'.') end) from `orderdetails` `o` where (`o`.`payment_id` = `a`.`payment_id`) group by `a`.`payment_id`) when (`a`.`ntype` in ('returned','return request','return rejected','return deleted')) then (select (case `a`.`ntype` when 'returned' then concat(`a`.`user_email`,' has returned ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return request' then concat(`a`.`user_email`,' has requested to return ',`r`.`quantity`,' ',`r`.`product_name`,'. Reason: ',`r`.`reason`) when 'return rejected' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been rejected') when 'return deleted' then concat('Return request for ',`r`.`quantity`,' ',`r`.`product_name`,' has been deleted') end) from `returnitems` `r` where (`r`.`return_id` = `a`.`return_id`)) end) AS `message` FROM `admin_notifications` AS `a` ;
 
 --
 -- Constraints for dumped tables
